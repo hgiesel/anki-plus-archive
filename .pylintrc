@@ -1,0 +1,2 @@
+[Master]
+init-hook='import sys; sys.path.append("/Users/hgiesel/anki-2.1.8")
