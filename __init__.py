@@ -25,56 +25,69 @@ icon_path_archive = os.path.join(icon_path, "archive.png")
 def on_archive(editor):
     found_file = False
 
-    quest_index = editor.note.keys().index(config['quest_field'])
-    quest_content = editor.note.fields[quest_index]
-    quest = re.search(config['quest_regex'], quest_content).group(1) # only match inner group
+    try:
+        quest_field_index = editor.note.keys().index(config['quest_field'])
+    except:
+        showInfo('Note type does not have quest field: '+config['quest_field'])
+        return
+
+    quest_content = editor.note.fields[quest_field_index]
+
+    try:
+        quest = re.search(config['quest_regex'], quest_content).group(1) # only match inner group
+    except:
+        showInfo('Quest field does not contain quest tag specified by this regex: '+config['quest_regex'])
+        return
+
 
     # first tag that is found that contains a sign of being hierarchical is taken to be topic
     indices = [i for i, item in enumerate(editor.note.tags) if re.search('::', item)]
 
-    if len(indices) >= 0:
-        tag = editor.note.tags[indices[0]]
+    if len(indices) == 0:
+        showInfo('Tags do not contain topic tag')
+        return
 
-        tag_matches = re.search(config['topic_regex'], tag)
-        topic = tag_matches.group(1)
-        subtopic = tag_matches.group(2)
+    tag = editor.note.tags[indices[0]]
+    tag_matches = re.search(config['topic_regex'], tag)
+    topic = tag_matches.group(1)
+    subtopic = tag_matches.group(2)
 
-        if config['debug']:
-            showInfo(str(
-                '$TOPIC    = ' + topic    + '\n' +
-                '$SUBTOPIC = ' + subtopic + '\n' +
-                '$QUEST    = ' + quest    + '\n'
-                ))
+    if config['debug']:
+        showInfo(str(
+            '$TOPIC    = ' + topic    + '\n' +
+            '$SUBTOPIC = ' + subtopic + '\n' +
+            '$QUEST    = ' + quest    + '\n'
+            ))
 
-        for root, _, files in os.walk(config['notes_path']):
-            if os.path.basename(root) == topic:
-                for filename in files:
-                    if re.match(subtopic, filename):
+    for root, _, files in os.walk(config['notes_path']):
+        if os.path.basename(root) == topic:
+            for filename in files:
+                if re.match(subtopic, filename):
 
-                        editor_command = config['editor_command']
+                    editor_command = config['editor_command']
 
-                        lineno='1'
-                        with open(root+'/'+filename, 'r+', encoding='utf-8') as handler:
-                            for num, line in enumerate(handler, 1):
-                                if re.match(re.sub('\([^?].*\)', quest, config['quest_regex']), line):
-                                    lineno=str(num)
+                    lineno='1'
+                    with open(root+'/'+filename, 'r+', encoding='utf-8') as handler:
+                        for num, line in enumerate(handler, 1):
+                            if re.match(re.sub('\([^?].*\)', quest, config['quest_regex']), line):
+                                lineno=str(num)
 
-                        if config['debug']:
-                            showInfo(str(
-                                '$ROOT   = ' + root     + '\n' +
-                                '$FILE   = ' + filename + '\n' +
-                                '$LINENO = ' + lineno   + '\n'
-                                ))
+                    if config['debug']:
+                        showInfo(str(
+                            '$ROOT   = ' + root     + '\n' +
+                            '$FILE   = ' + filename + '\n' +
+                            '$LINENO = ' + lineno   + '\n'
+                            ))
 
-                        proc = Popen(
-                            [re.sub('\$TOPIC', topic, v) for v in
-                             [re.sub('\$ROOT', root, v) for v in
-                              [re.sub('\$SUBTOPIC', subtopic, v) for v in
-                               [re.sub('\$FILE', filename, v) for v in
-                                [re.sub('\$QUEST', quest, v) for v in
-                                 [re.sub('\$LINENO', lineno, v) for v in
-                                  editor_command]]]]]], env={})
-                        found_file = True
+                    proc = Popen(
+                        [re.sub('\$TOPIC', topic, v) for v in
+                         [re.sub('\$ROOT', root, v) for v in
+                          [re.sub('\$SUBTOPIC', subtopic, v) for v in
+                           [re.sub('\$FILE', filename, v) for v in
+                            [re.sub('\$QUEST', quest, v) for v in
+                             [re.sub('\$LINENO', lineno, v) for v in
+                              editor_command]]]]]], env={})
+                    found_file = True
 
     if not found_file:
         showInfo('Nothing was found')

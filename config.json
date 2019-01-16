@@ -5,7 +5,7 @@
   "quest_regex": ":(\\d+)[^:]*:",
   "topic_regex": "(?:.*::)?([^:]*)::([^:]*)$",
 
-  "notes_path": "/Users/hgiesel/Developer/notes",
+  "notes_path": "/Users/hgiesel/Developer/archive",
 
   "editor_command": [
     "/usr/local/bin/vimr",
