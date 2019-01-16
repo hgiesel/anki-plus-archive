@@ -1,0 +1,17 @@
+{
+  "debug": false,
+
+  "quest_field": "Quest",
+  "quest_query": ":(\d+)[^:]*:",
+
+  "notes_path": "/Users/hgiesel/Developer/notes",
+  "editor_command": [
+    "/usr/local/bin/vimr",
+    "$ROOT/$FILE",
+    "--nvim",
+    "-c",
+    "'bd!'",
+    "-c",
+    "'/^:$QUEST.*:$/'"
+  ]
+}

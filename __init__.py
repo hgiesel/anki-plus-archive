@@ -1,3 +1,6 @@
+import re
+import os
+
 # import the main window object (mw) from aqt
 from aqt import mw
 # import the "show info" tool from utils.py
@@ -8,42 +11,62 @@ from aqt.qt import *
 from anki.hooks import addHook
 from subprocess import Popen, PIPE
 
-NOTES_PATH = '/Users/hgiesel/Developer/notes/README.adoc'
 # a = aqt.editcurrent.EditCurrent(mw).editor.note.fields # arrray of field values
 # a = aqt.editcurrent.EditCurrent(mw).editor.note.keys() # array of field names
 # a = aqt.editcurrent.EditCurrent(mw).editor.note.values()
-
+config = mw.addonManager.getConfig(__name__)
 
 # cross out the currently selected text
-def onStrike(editor):
-    editor.web.eval("wrap('<del>', '</del>');")
-    quest_index = editor.note.keys().index("Front")
+def on_archive(editor):
+    found_file = False
+
+    quest_index = editor.note.keys().index(config['quest_field'])
     quest_content = editor.note.fields[quest_index]
-    m = re.search(':(\d*).*?:', foo).group(1) # only match inner group
-    showInfo(str(m))
-    showInfo(str('hello world'))
-    proc = Popen(['/usr/local/bin/mvim', NOTES_PATH], env={})
+    quest = re.search(config['quest_regex'], quest_content).group(1) # only match inner group
 
-def addMyButton(buttons, editor):
-    editor._links['strike'] = onStrike
-    return buttons + [editor._addButton(
+    indices = [i for i, item in enumerate(editor.note.tags) if re.search('.*::.*', item)]
+    if len(indices) >= 0:
+        tag = editor.note.tags[indices[0]]
+
+        topic = re.search("([^:]*)::[^:]*", tag).group(1)
+        subtopic = re.search("::([^:]*)", tag).group(1)
+
+        for root, _, files in os.walk(config['notes_path']):
+            if os.path.basename(root) == topic:
+                for file in files:
+                    if re.match(subtopic, file):
+
+                        editor_command = config['editor_command']
+
+                        if config['debug']:
+                            showInfo(str(
+                                '$TOPIC' + topic + '\n' +
+                                '$ROOT' + root + '\n' +
+                                '$SUBTOPIC' ++ subtopic + '\n' +
+                                '$FILE' + file + '\n' +
+                                '$QUEST' + quest + '\n'
+                                ))
+
+
+                        proc = Popen(
+                            [re.sub('\$TOPIC', topic, v) for v in
+                             [re.sub('\$ROOT', root, v) for v in
+                              [re.sub('\$SUBTOPIC', subtopic, v) for v in
+                               [re.sub('\$FILE', file, v) for v in
+                                [re.sub('\$QUEST', quest, v) for v in
+                                 editor_command]]]]], env={})
+                        found_file = True
+
+    if not found_file:
+        showInfo('Nothing was found')
+
+
+def add_my_button(buttons, editor):
+    editor._links['archive'] = on_archive
+    buttons.insert(-1, editor._addButton(
         "iconname", # "/full/path/to/icon.png",
-        "Open in archive", # link name
-        "tooltip")]
+        "archive",
+        "Open quest in archive"))
+    return buttons
 
-addHook("setupEditorButtons", addMyButton)
-
-
-def test_function():
-    # get the number of cards in the current collection, which is stored in
-    # the main window
-    card_count = mw.col.cardCount()
-    # show a message box
-    showInfo("Card count: %d" % card_count)
-
-# create a new menu item, "test"
-ACTION = QAction("test", mw)
-# set it to call testFunction when it's clicked
-ACTION.triggered.connect(test_function)
-# and add it to the tools menu
-mw.form.menuTools.addAction(ACTION)
+addHook("setupEditorButtons", add_my_button)
