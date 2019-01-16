@@ -2,9 +2,11 @@
   "debug": false,
 
   "quest_field": "Quest",
-  "quest_query": ":(\d+)[^:]*:",
+  "quest_regex": ":(\\d+)[^:]*:",
+  "topic_regex": "(?:.*::)?([^:]*)::([^:]*)$",
 
   "notes_path": "/Users/hgiesel/Developer/notes",
+
   "editor_command": [
     "/usr/local/bin/vimr",
     "$ROOT/$FILE",
@@ -12,6 +14,8 @@
     "-c",
     "'bd!'",
     "-c",
-    "'/^:$QUEST.*:$/'"
+    "'/^:$QUEST.*:$/'",
+    "-c",
+    "normal! zz"
   ]
 }
