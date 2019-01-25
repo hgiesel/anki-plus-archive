@@ -1,4 +1,4 @@
-= Anki Invoke
+= Anki Contextualize
 
 This addon creates a button above the Editor, which allows
 you to invoke a (shell commmand) using information obtained
