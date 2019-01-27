@@ -1,6 +1,8 @@
 import re
 import os
 
+from . import util
+
 # import the main window object (mw) from aqt
 from aqt import mw
 # import the "show info" tool from utils.py
@@ -10,11 +12,30 @@ from aqt.qt import *
 
 from anki.hooks import addHook
 from subprocess import Popen, PIPE
+from shutil     import copyfile
 
+# from pathlib import Path
+
+home = os.path.expanduser('~')
 config = mw.addonManager.getConfig(__name__)
-addon_path = os.path.dirname(__file__)
+
+addon_path = os.path.abspath(os.path.dirname(__file__))
+
 icon_path = os.path.join(addon_path, "icons")
 icon_path_archive = os.path.join(icon_path, "archive.png")
+
+
+def install_ark():
+    showInfo(str(home))
+    install_path = home + '/.local/bin'
+
+    if os.path.isdir(install_path):
+        os.symlink(addon_path + '/ark.py', install_path + '/ark')
+        os.chmod(install_path + '/ark', 0o755)
+    else:
+        showInfo('Make sure the directory exists: ' + install_path)
+
+
 
 # cross out the currently selected text
 def on_archive(editor):
@@ -98,3 +119,4 @@ def add_my_button(buttons, editor):
     return buttons
 
 addHook("setupEditorButtons", add_my_button)
+install_ark()

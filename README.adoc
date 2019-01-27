@@ -1,5 +1,31 @@
-= Anki Contextualize
+= Anki Context
 
-This addon creates a button above the Editor, which allows
-you to invoke a (shell commmand) using information obtained
-from the card.
+This addon is a tool suite to help you combine Anki with your
+notes. It does so in mainly two ways:
+* adding a button in the editor to execute several commands
+* offering the command-line tool `ark`
+
+
+
+
+
+== `ark` command line tool
+
+
+.List of commands
+
+
+* `ark paths`
+
+* `ark stats`
+
+* `ark decloze`
+
+----
+echo ''
+----
+
+* `ark match`
+
+* `ark update`
+** updates vim-context to the latest release from github

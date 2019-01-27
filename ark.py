@@ -17,6 +17,16 @@ content_lines = (# block titles
         r'[^\n\'":=/\-+< ]+)'
         )
 
+def decloze(text):
+    cloze_anki_regex = re.compile(r'\{\{c[0-9]+::([^(::)(\}\})]*)(?:::[^(?:\}\})]*)?\}\}')
+    cloze_overlapper_regex = re.compile(r'\[\[oc[0-9]+::([^(::)(\]\])]*)(?:::[^(?:\]\])]*)?\]\]')
+
+    result = cloze_overlapper_regex.sub(r'\1',
+             cloze_anki_regex.sub(r'\1', text))
+
+    return result
+
+
 def ark():
     print(
 '''
@@ -471,8 +481,8 @@ class ArkUri:
                 queries.append(' '.join(ArkUri(constructed_uri).query()))
 
             remote_qcounts, outsiders = db.anki_query_count(queries, check_against=self.query())
-
-            # print('### outsider ' + str(outsiders))
+            if remote_qcounts is None:
+                theparser.error('you probably need to select a profile')
 
             result += [(t[0][0], t[0][1], t[1]) for t in tuple(zip(stats, remote_qcounts))]
             result += [o for o in outsiders]
@@ -490,6 +500,8 @@ class ArkUri:
                 queries.append(' '.join(ArkUri(constructed_uri).query()))
 
             remote_qcounts, _ = db.anki_query_count(queries)
+            if remote_qcounts is None:
+                theparser.error('you probably need to select a profile')
 
             for t in tuple(zip(stats, remote_qcounts)):
                 result.append( (t[0][0], t[0][1], t[1]) )
@@ -501,12 +513,16 @@ class ArkUri:
                 queries.append(' '.join(ArkUri(entry[0]).query()))
 
             remote_qcounts, _ = db.anki_query_count(queries)
+            if remote_qcounts is None:
+                theparser.error('you probably need to select a profile')
 
             for t in tuple(zip(stats, remote_qcounts)):
                 result.append( (t[0][0], t[0][1], t[1]) )
 
         elif self.mode in [Mode.ANCESTOR]:
             remote_qcount, _ = db.anki_query_count([' '.join(self.query())])
+            if remote_qcount is None:
+                theparser.error('you probably need to select a profile')
             result.append( (stats[0][0], stats[0][1], remote_qcount[0]) )
 
         return result
@@ -593,17 +609,16 @@ class AnkiConnection:
         resp = urllib.request.urlopen(self.req, query)
         resp_json = json.loads(resp.read().decode('utf-8'))
 
-        counts = [len(r) for r in resp_json['result']]
+        counts = None
+        if not None in resp_json['result']:
+            counts = [len(r) for r in resp_json['result']]
 
+        outsiders = []
         if check_against is not None:
             resp_flattened = [item for sublist in resp_json['result'] for item in sublist]
-
             outsiders = self.anki_query_check_against(resp_flattened, check_against)
 
-            return (counts, outsiders)
-
-        else:
-            return (counts, [])
+        return (counts, outsiders)
 
     def anki_delete(self):
         pass
@@ -614,7 +629,7 @@ class AnkiConnection:
 if __name__ == '__main__':
 
     config = None
-    with open('/Users/hgiesel/Library/Application Support/Anki2/addons21/anki-contextualize/config.json') as f:
+    with open('/Users/hgiesel/Library/Application Support/Anki2/addons21/anki-context/config.json') as f:
         config = json.load(f)
 
     arkParser = argparse.ArgumentParser(description='Manage and query your notes!',
@@ -633,9 +648,11 @@ if __name__ == '__main__':
     subparsers_dict['paths'].add_argument('uri', nargs='?', default='',
         help='archive uri you want to query')
 
+
     subparsers_dict['stats'] = subparsers.add_parser('stats')
     subparsers_dict['stats'].add_argument('uri', nargs='?', default='',
         help='archive uri you want to query')
+
 
     subparsers_dict['query'] = subparsers.add_parser('query')
     subparsers_dict['query'].add_argument('-v', '--validate', action='store_true',
@@ -646,6 +663,15 @@ if __name__ == '__main__':
     subparsers_dict['match'] = subparsers.add_parser('match')
     subparsers_dict['match'].add_argument('uri', nargs='?', default='',
         help='match cards and see if any are missing or extra')
+
+    subparsers_dict['decloze'] = subparsers.add_parser('decloze')
+    subparsers_dict['decloze'].add_argument('uri', nargs='?', default='',
+        help='match cards and see if any are missing or extra')
+
+    subparsers_dict['decloze'].add_argument('infile', nargs='?', type=argparse.FileType('r'),
+            default=sys.stdin)
+    subparsers_dict['decloze'].add_argument('outfile', nargs='?', type=argparse.FileType('w'),
+            default=sys.stdout)
 
     subparsers_dict['ark'] = subparsers.add_parser('ark')
 
@@ -667,6 +693,11 @@ if __name__ == '__main__':
         elif ARGV.cmd == 'query':
             result = getattr(ArkUri(ARGV.uri), ARGV.cmd)(ARGV.validate)
             print(' '.join(result))
+
+        elif ARGV.cmd == 'decloze':
+            text = ARGV.infile.read()
+            text_declozed = decloze(text)
+            print(text_declozed, file=ARGV.outfile)
 
         elif ARGV.cmd == 'match':
             anki_connection = AnkiConnection(

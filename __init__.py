@@ -9,4 +9,4 @@ Copyright: (c) 2019 Henrik Giesel <https://glutanimate.com/>
 License: GNU AGPLv3 <https://www.gnu.org/licenses/agpl.html>
 """
 
-from . import contextualize
+from . import context
