@@ -42,7 +42,7 @@ This addon is a tool suite to help you create two-way
 connections between Anki with your notes.
 It assumes you have notes written in plain text, which
 contain content you want to add as questions to your Anki deck.
-They might be written in
+They might be written in plain text formats, including
 link:https://en.wikipedia.org/wiki/Markdown[Markdown],
 link:https://asciidoctor.org/docs/what-is-asciidoc[Asciidoc] (my recommendation!), or
 link:https://orgmode.org/[Emacs org-mode].
