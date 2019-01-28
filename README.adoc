@@ -1,6 +1,6 @@
 = Anki Context
 
-.The problem
+==== The problem
 Anki is a SRS software that helps you remember knowledge
 with the least effort possible.
 The best Anki cards are built with the 
