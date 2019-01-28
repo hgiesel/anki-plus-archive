@@ -1,19 +1,151 @@
 = Anki Context
 
-This addon is a tool suite to help you combine Anki with your
-notes. It does so in mainly two ways:
-* adding a button in the editor to execute several commands
-* offering the command-line tool `ark`
+.The problem
+Anki is a SRS software that helps you remember knowledge
+with the least effort possible.
+The best Anki cards are built with the 
+link:https://supermemo.guru/wiki/20_rules_of_knowledge_formulation[*minimum information principle*]
+in mind.
+For vocabulary of a foreign language, this means you don't 
+require the knowledge of other words in order to guess the
+content of the current card. By adding example sentences,
+you can create some context, but besides that you generally
+strife for minimal interference between cards.
 
+However most other knowledge is settled in a lot of context.
+For example, knowing what web sites are, is inseparably
+connected to what HTTP requests are, what HTML looks like, etc.
 
+Thinkable ways to create learn such content with Anki is:
 
+. creating big notes, that contain all of the information on one note
 
+This violates the aforementioned *minimum information principle*
+
+. creating small notes, but a lot of them
+
+This is the desirable solution. Individual notes can be connected with tags.
+However, while Anki is an ideal solution for you spaced repetition needs,
+it does not work well as a general archive for your knowledge.
+For example, it is neither easy to browse, or edit existing cards.
+Another issue that you cannot easliy add sources,
+or information to a multiple of cards, as the information has
+always to be associated with an individual card. And last but not least,
+adding information requires you to create a note for it. However
+there might be information associated with a note in Anki,
+which does not be a note itself.
+
+.The solution
+This addon is a tool suite to help you create two-way
+connections between Anki with your notes.
+It assumes you have notes written in plain text, which
+contain content you want to add as questions to your Anki deck.
+They might be written in
+link:https://en.wikipedia.org/wiki/Markdown[Markdown],
+link:https://asciidoctor.org/docs/what-is-asciidoc[Asciidoc] (my recommendation!), or
+link:https://orgmode.org/[Emacs org-mode].
+
+It does so in mainly two ways:
+. adds a set of buttons in the Anki editor for commands to interact with your notes
+. offers the command-line tool `ark`
+
+== Setup
+
+// TODO
+// You can create such a connection by adding 'quest identifers' into the file. For an example of such a file, see
+// link:https://raw.githubusercontent.com/hgiesel/archive/master/mathematics/abstract-algebra/graph-theory/lattices-2.adoc[here]
+// The easiest to create Anki cards from your plain text is using
+// link:https://en.wikipedia.org/wiki/Cloze_test[cloze deletions].
+
+== Section, page, and quest identifiers
+
+=== Section identifiers
+
+Section identifiers can either signify an individual section, or a section group
+a section corresponds to a directory in the filesystem, and contains possible pages.
+A section cannot contain another section.
+It is marked by containing a `README` file.
+
+Section identifers have the form:
+
+.Section identifier
+----
+[ancestor//][section]
+----
+
+=== Page identifiers
+
+Each section can contain multiple pages. A page corresponds to a file in the filesystem.
+
+Section identifers have the form:
+
+.Page identifier
+----
+[section][:page]
+----
+
+=== Quest identifiers
+
+Each
+
+Quest identifers have the form:
+
+.Quest identifiers
+----
+[section][:page][#quest]
+----
+
+=== Examples
+
+.Example filesystem
+----
+archive
+├── information-security
+│   └──  cryptography
+│       ├── README.adoc
+│       ├── symmetric-key-encryption-1.adoc
+│       └── symmetric-key-encryption-2.adoc
+└── mathematics
+    ├── graph-theory
+    │   ├── README.adoc
+    │   ├── graphs-1.adoc
+    │   ├── graphs-2.adoc
+    │   └── lattices.adoc
+    └── group-theory/
+        ├── README.adoc
+        ├── groups.adoc
+        └── rings.adoc
+----
+
+.Example identifiers
+. `(nothing)`
+** denotes directory 'archive'
+. `mathematics//`
+** denotes directory 'mathematics'
+. `cryptography`
+** denotes directory 'cryptogrphy'
+. `mathematics//@`
+** denotes directories 'graph-theory', and 'group-theory'
+. `graph-theory:graphs-1`
+** denotes file 'graphs-1.adoc'
+. `graph-theory:graphs-@`
+** denotes files 'graphs-1.adoc', and 'graphs-2.adoc'
+. `graph-theory:@`
+** denotes files 'graphs-1.adoc', 'graphs-2.adoc', 'lattices.adoc'
+. `graph-theory:graphs-1#4`
+** denotes the quest number '4' in the file 'graphs-1.adoc'
+** it is not sure, whether it even exists
+. `graph-theory:graphs-1#@`
+** denotes all quest defined within 'graphs-1.adoc'
+** might be none at all
+. `@`
+** denotes all directories within 'archive' that contain a 'README' file
+. `@:@`
+** denotes all files within 'archive', that are in directories together with a 'README' file
+. `@:@#@`
+** denotes all quests defined within the 'archive'
 
 == `ark` command line tool
-
-
-.List of commands
-
 
 * `ark paths`
 
