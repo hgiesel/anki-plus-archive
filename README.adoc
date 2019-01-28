@@ -47,7 +47,7 @@ link:https://en.wikipedia.org/wiki/Markdown[Markdown],
 link:https://asciidoctor.org/docs/what-is-asciidoc[Asciidoc] (my recommendation!), or
 link:https://orgmode.org/[Emacs org-mode].
 
-It does so in mainly two ways:
+.It does so in mainly two ways:
 . adds a set of buttons in the Anki editor for commands to interact with your notes
 . offers the command-line tool `ark`
 
