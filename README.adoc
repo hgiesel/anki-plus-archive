@@ -1,6 +1,7 @@
 = Anki Context
 
-.The problem
+==== The problem
+
 Anki is a SRS software that helps you remember knowledge
 with the least effort possible.
 The best Anki cards are built with the 
@@ -16,36 +17,37 @@ However most other knowledge is settled in a lot of context.
 For example, knowing what web sites are, is inseparably
 connected to what HTTP requests are, what HTML looks like, etc.
 
-Thinkable ways to create learn such content with Anki is:
+Thinkable ways to create learn such content with Anki include:
 
 * creating _big notes, that contain all of the information_ on one note
 
-This violates the aforementioned *minimum information principle*
+However this violates the aforementioned *minimum information principle*
 
 * creating _small notes, but a lot of them_
 
-This is the desirable solution. Individual notes can be connected with tags.
+This is the desirable solution. Individual notes concerning a topic can be connected with tags.
 However, while Anki is an ideal solution for you spaced repetition needs,
 it does not work well as a general archive for your knowledge.
 For example, it is neither easy to browse, or edit existing cards.
 Another issue that you cannot easliy add sources,
-or information to a multiple of cards, as the information has
-always to be associated with an individual card. And last but not least,
+or information to a multiple of notes, as the information always has
+to be associated with an individual card. And last but not least,
 adding information requires you to create a note for it. However
 there might be information associated with a note in Anki,
-which does not be a note itself.
+which does not need to be a note itself.
 
-.The solution
+==== The solution
+
 This addon is a tool suite to help you create two-way
 connections between Anki with your notes.
 It assumes you have notes written in plain text, which
 contain content you want to add as questions to your Anki deck.
-They might be written in
+They might be written in plain text formats, including
 link:https://en.wikipedia.org/wiki/Markdown[Markdown],
 link:https://asciidoctor.org/docs/what-is-asciidoc[Asciidoc] (my recommendation!), or
 link:https://orgmode.org/[Emacs org-mode].
 
-It does so in mainly two ways:
+.It does so in mainly two ways:
 . adds a set of buttons in the Anki editor for commands to interact with your notes
 . offers the command-line tool `ark`
 
