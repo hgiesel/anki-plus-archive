@@ -1,59 +1,23 @@
-#!/usr/bin/env python3
-import re
 import enum
-import argparse
 import os
 import sys
-import json
-import urllib.request
+import re
+from re import compile
 
-content_lines = (# block titles
-        r'^(\.[^. ]+|'
-        # ordered list
-        r'\.+ .+|'
-        # unordered list
-        r'\*+ .+|'
-        # any lines starting with anything except those
-        r'[^\n\'":=/\-+< ]+)'
-        )
+ARCHIVE_ROOT = os.environ['ARCHIVE_ROOT']
 
-def decloze(text):
-    cloze_anki_regex = re.compile(r'\{\{c[0-9]+::([^(::)(\}\})]*)(?:::[^(?:\}\})]*)?\}\}')
-    cloze_overlapper_regex = re.compile(r'\[\[oc[0-9]+::([^(::)(\]\])]*)(?:::[^(?:\]\])]*)?\]\]')
+class Printer:
+    @staticmethod
+    def print_stats(vals, delimiter=None):
+        '''pretty print values from ArkUri:stats '''
+        if delimiter is None:
+            delimiter = '\t'
 
-    result = cloze_overlapper_regex.sub(r'\1',
-             cloze_anki_regex.sub(r'\1', text))
+        for val in vals:
+                line = delimiter.join([
+                        str(v) for v in list(val) ])
 
-    return result
-
-
-def ark():
-    print(
-'''
-ark() {
-  local entry
-arr="$(quiet=errors arkutil paths "$1")"
-exitstatus=$?
-   [[ ! $exitstatus == '0' ]] && return $exitstatus
-read -a entry <<< "${arr[@]}"
-
-if [[ -d ${entry} ]]; then
-  cd "$entry"
-
-  elif [[ -f ${entry} ]]; then
-    $EDITOR "${entry}"
-
-  elif [[ ${entry} =~ ^(.*):(.*): ]]; then
-    $EDITOR "${BASH_REMATCH[1]}" +${BASH_REMATCH[2]} -c 'normal! zz'
-  fi
-}
-
-alias hasq="awk '{ if(\$2 != 0) { print \$0 } }'"
-alias noq="awk '{ if(\$2 == 0) { print \$0 } }'"
-
-alias nomatch="awk '{ if(\$2 != \$3 ) { print \$0 } }'"
-alias miss="awk '{ if(\$3 != 1) { print \$0 } }'"
-''')
+                print(line)
 
 class Mode(enum.Enum):
     ''' modes for ArkUri.__analyze '''
@@ -73,25 +37,44 @@ class Mode(enum.Enum):
     QUEST_B  = enum.auto()
     QUEST_C  = enum.auto()
 
-class ArkPrinter:
-    @staticmethod
-    def print_stats(vals):
-        '''pretty print values from ArkUri:stats '''
-        for val in vals:
-            print('\t'.join([str(v) for v in list(val)]))
+class Identifier:
 
     @staticmethod
-    def print_paths(vals):
-        '''prints values from ArkUri:paths '''
-        for val in vals:
-            file_name, lineno = val
-            if lineno is not None:
-                print('{0}:{1}:'.format(file_name, lineno))
+    def to_rel_path(path):
+        '''
+        can transform:
+        abs_path -> rel path from archive root
+        '''
+        result = os.path.relpath(path, os.path.join(ARCHIVE_ROOT, '..'))
+        return result
+
+    @staticmethod
+    def to_identifier(path, omit_section=None):
+        '''
+        can transform:
+        abs_path -> section
+        abs_path -> section:page
+        abs_path -> :page
+        '''
+
+        if os.path.isdir(path):
+            section = os.path.basename(path)
+            result = section
+
+        elif os.path.isfile(path):
+            root, fileName = os.path.split(path)
+            section = os.path.basename(root)
+            page, _ = os.path.splitext(fileName)
+
+            if omit_section:
+                result = ':'+page
             else:
-                print(file_name)
+                result = section+':'+page
 
-class ArkUri:
-    def __init__(self, uri='', hypothetical=False):
+        return result
+
+
+    def __init__(self, uri=None, printer=None, hypothetical=False):
         ''' (self) -> ([ResultDict], mode: Mode, summary_name: String)
         * Analzyes uri and returns one of the following:
 
@@ -114,6 +97,14 @@ class ArkUri:
         ** 'group-theory:@#@'             -> (single dir+multiple files     ,QUEST_B)
         ** '@:@#@'                        -> (multiple dirs,files,lines     ,QUEST_C)
         '''
+
+        if uri is None:
+            uri = ''
+
+        if printer is None:
+            self.printer = print
+        else:
+            self.printer = printer
 
         component_regex = (# optional ancestor component
                            r'^(?:([^#/:]+)//)?'
@@ -158,21 +149,25 @@ class ArkUri:
 
             if self.page_component:
 
+                # section defaults to cwd if page is specified
+                if not self.section_component:
+                    self.section_component = os.path.basename(os.getcwd())
+                    tempMode = Mode.SECTION_I
+
                 if self.page_component == '@':
                     if tempMode == Mode.SECTION_A:
                         tempMode = Mode.PAGE_B
 
-                    elif tempMode == Mode.SECTION_I:
+                    else: # tempMode == Mode.SECTION_I:
                         tempMode = Mode.PAGE_A
 
-                    else:
-                        theparser.error('query malformed: cannot use page topics without definite section topic or @')
-
-                elif tempMode == Mode.SECTION_I and self.page_component.endswith('-@') and len(self.page_component) >= 3:
-                    tempMode = Mode.PAGE_S
-
                 elif tempMode == Mode.SECTION_I:
-                    tempMode = Mode.PAGE_I
+
+                    if self.page_component.endswith('-@') and len(self.page_component) >= 3:
+                        tempMode = Mode.PAGE_S
+
+                    else:
+                        tempMode = Mode.PAGE_I
 
             ''' quest components '''
 
@@ -195,24 +190,26 @@ class ArkUri:
                     tempMode = Mode.QUEST_I
 
                 elif self.quest_component:
-                    theparser.error('query malformed: cannot use quest identifers without definite page topic or @')
+                    self.printer('query malformed: cannot use quest identifers without definite page topic or @')
 
             self.mode = tempMode
 
-        else:
-            theparser.error('query malformed: invalid archive uri')
+            # print('ancestor: ' + self.ancestor_component)
+            # print('section: ' + self.section_component)
+            # print('page: '    + self.page_component)
+            # print(self.quest_component)
 
-        if ARGV.debug:
-            print('ancestor: {}\nsection: {}\npage: {}\nmode: {}'.format(
-                   self.ancestor_component,
-                   self.section_component,
-                   self.page_component,
-                   self.mode))
+        else:
+            self.printer('query malformed: invalid archive uri')
+
+        if not hypothetical:
+            self.analysis = self.__analyze()
 
     def __analyze(self):
-
         summary_name = os.environ['ARCHIVE_ROOT']
-        topics      = []
+        topics       = []
+
+        self.failed = False
 
         '''
         processing of ancestor topic
@@ -243,11 +240,13 @@ class ArkUri:
             unique_ancestors = set(matched_ancestors)
 
             if len(unique_ancestors) < 1:
-                theparser.error('no such ancestor topic exists')
+                self.printer('no such ancestor topic exists')
+                self.failed = True
 
             if len(unique_ancestors) > 1:
-                theparser.error('ancestor topic is ambiguous: ' +
+                self.printer('ancestor topic is ambiguous: ' +
                     ' '.join(map(lambda d: os.path.basename(d), unique_ancestors)))
+                self.failed = True
 
             summary_name = unique_ancestors.pop()
 
@@ -259,18 +258,24 @@ class ArkUri:
             topics = list(filter(lambda t: re.search(section_regex, t['dirName']), topics))
 
             if len(topics) < 1:
-                theparser.error('no such section topic exists')
+                self.printer('no such section topic exists')
+                self.failed = True
 
             if len(topics) > 1:
-                theparser.error('section topic is ambiguous: '
+                self.printer('section topic is ambiguous: '
                     + ' '.join(list(map(lambda t: os.path.basename(t['dirName']), topics))))
+                self.failed = True
 
         '''
         processing of page topic
         '''
 
-        first_dir = topics[0]
-
+        if len(topics):
+            first_dir = topics[0]
+        else:
+            self.printer('no sections found')
+            self.failed = True
+            return ({}, summary_name)
 
         if self.mode == Mode.PAGE_S or self.mode == Mode.QUEST_SA:
             page_regex = '^' + self.page_component[:-2].replace('-', '[^./]*-') + '[^./]*\..*$'
@@ -283,19 +288,22 @@ class ArkUri:
                 lambda f: re.search(page_regex, f['fileName']), first_dir['files']))
 
         if len(first_dir['files']) < 1:
-            theparser.error('no such page topic exists')
+            self.printer('no such page topic exists')
+            self.failed = True
 
         # e.g. `gr-@` would hit `graphs-theory-1` and `groups-1`
         if self.page_component.endswith('-@') and len(first_dir['files']) > 1:
             page_series = set(map(lambda f: re.search('(.*)-.*', f['fileName']).group(1), first_dir['files']))
             if len(page_series) > 1:
-                theparser.error('page topic series is ambiguous: '
+                self.printer('page topic series is ambiguous: '
                     + ' '.join(list(map(lambda s: os.path.basename(s), page_series))))
+                self.failed = True
 
         elif self.page_component and not self.page_component == '@' and len(first_dir['files']) > 1:
-            theparser.error('page topic is ambiguous: '
+            self.printer('page topic is ambiguous: '
                 + ' '.join(list(map(lambda f:
                     os.path.splitext(os.path.basename(f['fileName']))[0], first_dir['files']) )))
+            self.failed = True
 
         '''
         processing of quest identifier
@@ -325,11 +333,13 @@ class ArkUri:
                 lambda l: l['quest'] == self.quest_component, first_file['lines']))
 
             if len(first_file['lines']) < 1:
-                theparser.error('no such quest identifier exists in file')
+                self.printer('no such quest identifier exists in file')
+                self.failed = True
 
             elif len(first_file['lines']) > 1:
-                theparser.error('quest is ambiguous: '
+                self.printer('quest is ambiguous: '
                     + ' '.join(list(map(lambda f: os.path.basename(f['fileName']), first_file))))
+                self.failed = True
                 # should actually never happen
 
         '''
@@ -342,38 +352,53 @@ class ArkUri:
         '''
         returns list of dirs, files, or files with linenos
         '''
-        topics, summary_name = self.__analyze()
+        topics, summary_name = self.analysis
         result = []
 
         if self.mode in [Mode.QUEST_C, Mode.QUEST_B, Mode.QUEST_SA, Mode.QUEST_A, Mode.QUEST_I]:
             for d in topics:
                 for f in d['files']:
                     for l in f['lines']:
-                        result.append( (d['dirName'] + '/' + f['fileName'], l['lineno']) )
+                        result.append(( os.path.normpath(os.path.join(d['dirName'], f['fileName'])), l['lineno'] ))
 
         elif self.mode in [Mode.PAGE_B, Mode.PAGE_A, Mode.PAGE_S, Mode.PAGE_I]:
             for d in topics:
                 for f in d['files']:
-                    result.append( (topics[0]['dirName']+'/'+f['fileName'], None) )
+                    result.append(( os.path.normpath(os.path.join(topics[0]['dirName'], f['fileName'])), None ))
 
         elif self.mode in [Mode.SECTION_A, Mode.SECTION_I]:
             for d in topics:
-                result.append( (d['dirName'],None) )
+                result.append(( os.path.normpath(d['dirName']), None ))
 
         elif self.mode in [Mode.ANCESTOR]:
-            result.append( (summary_name,None) )
+            result.append(( os.path.normpath(summary_name), None ))
 
         else:
-            theparser.error('should-never-happen error')
+            self.printer('should-never-happen error')
 
         return result
 
     def stats(self, preanalyzed=None, fakeMode=None):
-        '''
-        returns list of (identifer, count of content lines, count of qtags)
-        '''
-        topics, summary_name = preanalyzed if preanalyzed is not None else self.__analyze()
+        ''' returns list of (identifer, qid, lineno) '''
+        ''' returns list of (identifer, count of qtags, count of content lines) '''
+
+        topics, summary_name = preanalyzed if preanalyzed is not None else self.analysis
         mode = fakeMode if fakeMode is not None else self.mode
+
+        quest_id_regex = compile(r'^:(\d+)\a*:$')
+        content_line_regex = compile(
+                # block titles
+                r'^(\.[^. ]+|'
+                # ordered list
+                r'\.+ .+|'
+                # unordered list
+                r'\*+ .+|'
+                # any lines starting with anything except those
+                r'[^\n\'":=/\-+< ]+)')
+
+        other_regexes = [
+                content_line_regex
+                ]
 
         result = []
 
@@ -382,65 +407,198 @@ class ArkUri:
                 for f in d['files']:
                     for l in f['lines']:
 
-                        display_name = ''
-                        if len(topics) == 1:
-                            display_name = os.path.splitext(f['fileName'])[0]
-                        else:
-                            display_name = os.path.basename(d['dirName']) + ':' + os.path.splitext(f['fileName'])[0]
-
-                        result.append( (display_name,
+                        result.append((
+                            os.path.normpath(os.path.join(d['dirName'], f['fileName'])),
                             l['quest'],
-                            l['lineno']) )
+                            l['lineno'] ))
 
         elif mode in [Mode.PAGE_I, Mode.PAGE_S, Mode.PAGE_A, Mode.PAGE_B]:
-
-
-            content_line_regex = re.compile(content_lines)
-            quest_id_regex = re.compile(r'^:(\d+)\a*:$')
 
             for d in topics:
                 for f in d['files']:
 
-                    quest_count = 0
-                    content_line_count = 0
-
-                    display_name = ''
-                    if len(topics) == 1:
-                        display_name = os.path.splitext(f['fileName'])[0]
-                    else:
-                        display_name = os.path.basename(d['dirName']) + ':' + os.path.splitext(f['fileName'])[0]
+                    qid_count = 0
+                    other_counts = [0] * len(other_regexes)
 
                     with open(d['dirName']+'/'+f['fileName'], "r") as fx:
                         searchlines = fx.readlines()
                         for _, line in enumerate(searchlines):
                             if quest_id_regex.search(line):
-                                quest_count += 1
-                            elif content_line_regex.search(line):
-                                content_line_count += 1
+                                qid_count += 1
 
-                        result.append( (display_name,
-                            quest_count,
-                            content_line_count) )
+                            for idx, re in enumerate(other_regexes):
+                                if re.search(line):
+                                    other_counts[idx] += 1
+
+                        result.append((
+                            os.path.normpath(os.path.join(d['dirName'], f['fileName'])),
+                            qid_count) + tuple(other_counts))
 
         elif mode in [Mode.SECTION_I, Mode.SECTION_A]:
 
             for d in topics:
                 all_stats = self.stats( ([d],''), Mode.PAGE_A )
-                result.append((os.path.basename(d['dirName']),
+                result.append((
+                    os.path.normpath(d['dirName']),
                     str(sum(map(lambda l: int(l[1]), all_stats))),
-                    str(sum(map(lambda l: int(l[2]), all_stats)))))
+                    str(sum(map(lambda l: int(l[2]), all_stats))) ))
+                # TODO generalize to accepts any amount of stats
 
         elif mode in [Mode.ANCESTOR]:
 
             all_stats = self.stats( (topics,''), Mode.PAGE_A )
-            result.append((os.path.basename(summary_name),
+            result.append((
+                os.path.normpath(summary_name),
                 str(sum(map(lambda l: int(l[1]), all_stats))),
-                str(sum(map(lambda l: int(l[2]), all_stats)))))
+                str(sum(map(lambda l: int(l[2]), all_stats))) ))
+            # TODO generalize to accepts any amount of stats
 
         else:
-            theparser.error('should-never-happen error')
+            self.printer('should-never-happen error')
 
         return result
+
+    def headings(self):
+        if not self.page_component:
+            self.printer('needs page component')
+        elif self.quest_component:
+            self.printer('must not have quest component')
+        else:
+            return self._headings()
+
+    def _headings(self):
+        '''
+        returns list of headers defined in file
+        [{
+            'fileName': '/path/to/archive/group-like-2.adoc'
+            'headings': [{
+                'info': '= Foobar',
+                'lineno': [23]
+            }]
+        }]
+        '''
+
+        result = []
+
+        paths = [p[0] for p in self.paths()]
+        heading_regex = re.compile('^=(?: )?(.*)$')
+
+        for f in paths:
+
+            headings = []
+
+            with open(f, "r") as fx:
+                searchlines = fx.readlines()
+
+                for lineno, line in enumerate(searchlines):
+
+                    heading_match = heading_regex.search(line)
+                    if heading_match:
+                        headings.append((heading_match.group(1), lineno))
+
+            result.append({
+                'fileName': f,
+                'headings': headings
+                })
+
+
+        return result
+
+    def integrity(self):
+        if not self.page_component:
+            self.printer('needs page component')
+        elif self.quest_component:
+            self.printer('must not have quest component')
+        else:
+            return self._integrity()
+
+    def _integrity(self):
+        '''
+        returns list of integrity errors of files
+        [{
+            'fileName': '/path/to/archive/group-like-2.adoc'
+            'errors': [{
+                'type': 'duplicate_qid',
+                'info': '03',
+                'lineno': [23,34]
+            }]
+        }]
+        '''
+
+        paths = [p[0] for p in self.paths()]
+
+        duplicate_qids = []
+        dangling_qid_references = []
+        dangling_page_references = []
+
+        qid_regex = re.compile('^:([0-9]+):(?: .*)?$')
+        qid_ref_regex = re.compile('^:ext:([0-9]+):(?: .*)?$')
+        page_ref_regex = re.compile('<<([^,]+)(?:,.*)?>>')
+
+        result = []
+
+        for f in paths:
+
+            qids = []
+            qid_refs = []
+            page_refs = []
+
+            dangling_qid_references = []
+            dangling_page_references = []
+
+            result.append({
+                'fileName': f,
+                'errors': [] })
+
+            with open(f, "r") as fx:
+                searchlines = fx.readlines()
+
+                for lineno, line in enumerate(searchlines):
+
+                    qid_match = qid_regex.search(line)
+                    if qid_match:
+                        qids.append((qid_match.group(1), lineno))
+
+                    qid_ref_match = qid_ref_regex.search(line)
+                    if qid_ref_match:
+                        qid_refs.append((qid_ref_match.group(1), lineno))
+
+                    page_ref_match = page_ref_regex.search(line)
+                    if page_ref_match:
+                        page_refs.append((page_ref_match.group(1), lineno))
+
+                duplicate_qids = [qid[0] for qid in qids]
+                unique_qids    = set(duplicate_qids)
+
+                for qid in unique_qids:
+                    duplicate_qids.remove(qid)
+
+                for qid_ref in qid_refs:
+                    if qid_ref[0] not in unique_qids:
+                        dangling_qid_references.append(qid_ref)
+
+                for page_ref in page_refs:
+                    id = Identifier(uri=page_ref[0], printer=lambda _: ())
+                    if id.failed:
+                        dangling_page_references.append(page_ref)
+
+                list(filter(lambda e: e['fileName'] == f, result))[0]['errors'] += [{
+                        'type': 'duplicate_qid',
+                        'info': dupe,
+                        'lineno': [entry[1] + 1 for entry in qids if entry[0] == dupe]
+                    } for dupe in set(duplicate_qids)] + [{
+                        'type': 'dangling_qid_reference',
+                        'info': dangling_qid_ref[0],
+                        'lineno': [dangling_qid_ref[1] + 1]
+                    } for dangling_qid_ref in dangling_qid_references] + [{
+                        'type': 'dangling_page_reference',
+                        'info': dangling_page_ref[0],
+                        'lineno': [dangling_page_ref[1] + 1]
+                    } for dangling_page_ref in dangling_page_references]
+
+        return result
+
+
 
     def query(self, validate=False, type='anki'):
         if validate:
@@ -482,7 +640,7 @@ class ArkUri:
 
             remote_qcounts, outsiders = db.anki_query_count(queries, check_against=self.query())
             if remote_qcounts is None:
-                theparser.error('you probably need to select a profile')
+                self.printer('you probably need to select a profile')
 
             result += [(t[0][0], t[0][1], t[1]) for t in tuple(zip(stats, remote_qcounts))]
             result += [o for o in outsiders]
@@ -501,7 +659,7 @@ class ArkUri:
 
             remote_qcounts, _ = db.anki_query_count(queries)
             if remote_qcounts is None:
-                theparser.error('you probably need to select a profile')
+                self.printer('you probably need to select a profile')
 
             for t in tuple(zip(stats, remote_qcounts)):
                 result.append( (t[0][0], t[0][1], t[1]) )
@@ -514,7 +672,7 @@ class ArkUri:
 
             remote_qcounts, _ = db.anki_query_count(queries)
             if remote_qcounts is None:
-                theparser.error('you probably need to select a profile')
+                self.printer('you probably need to select a profile')
 
             for t in tuple(zip(stats, remote_qcounts)):
                 result.append( (t[0][0], t[0][1], t[1]) )
@@ -522,196 +680,7 @@ class ArkUri:
         elif self.mode in [Mode.ANCESTOR]:
             remote_qcount, _ = db.anki_query_count([' '.join(self.query())])
             if remote_qcount is None:
-                theparser.error('you probably need to select a profile')
+                self.printer('you probably need to select a profile')
             result.append( (stats[0][0], stats[0][1], remote_qcount[0]) )
 
         return result
-
-class AnkiConnection:
-    def __init__(self, port=8765, deck_name=None, quest_field_name=None, quest_id_regex=None):
-        '''setup connection to anki'''
-        self.req = urllib.request.Request('http://localhost:' + str(port))
-        self.req.add_header('Content-Type', 'application/json; charset=utf-8')
-
-        self.quest_field_name = quest_field_name
-        self.quest_id_regex = quest_id_regex
-        self.deck_name = deck_name
-
-    def anki_add(self, json):
-        pass
-
-    def anki_query_check_against(self, resps, check_against):
-
-        check_against_query = ' '.join(check_against) + ' deck:{0}*'.format(self.deck_name)
-
-        check_against_req = json.dumps({
-            'action': 'findNotes',
-            'version': 6,
-            'params': {
-                'query': check_against_query
-                }
-            }).encode('utf-8')
-
-
-        check_against_resp = urllib.request.urlopen(self.req, check_against_req)
-        check_against_json = json.loads(check_against_resp.read().decode('utf-8'))
-
-        check_against_filtered = [entry for entry in check_against_json['result'] if not entry in resps]
-
-        if len(check_against_filtered):
-            outsider_info_query = json.dumps({
-                "action": "notesInfo",
-                "version": 6,
-                "params": {
-                    "notes": check_against_filtered
-                    }
-                }).encode('utf-8')
-
-            outsider_info_resp = urllib.request.urlopen(self.req, outsider_info_query)
-            outsider_info_json = json.loads(outsider_info_resp.read().decode('utf-8'))
-
-            tags = [list(filter(lambda tag: re.match('.*::.*', tag), entry['tags']))
-                for entry in outsider_info_json['result']]
-
-            displayed_tags = [ ':'.join(re.match('(.*)::(.*)', ts[0]).groups())
-                if len(ts) == 1 else '???:???' for ts in tags]
-
-            quest_fields = [entry['fields'][self.quest_field_name]['value']
-                for entry in outsider_info_json['result']]
-
-            quest_ids = [re.sub('(?:<[^>]*>)*?' + self.quest_id_regex + '.*', r'\g<1>', entry)
-                for entry in quest_fields]
-
-            zipped_ids = list(zip(displayed_tags, quest_ids))
-            zipped_ids_unique = set(zipped_ids)
-
-            result =  [i + (-zipped_ids.count(i),) for i in zipped_ids_unique]
-
-            return result
-
-        else:
-            return []
-
-
-    def anki_query_count(self, query_list, check_against=None):
-
-        query = json.dumps({
-            'action': 'multi',
-            'version': 6,
-            'params': {
-                'actions': [{
-                    'action': 'findNotes',
-                    'params': { 'query': q + ' deck:{}*'.format(self.deck_name) }
-                    } for q in query_list]
-                }
-            }).encode('utf-8')
-
-        resp = urllib.request.urlopen(self.req, query)
-        resp_json = json.loads(resp.read().decode('utf-8'))
-
-        counts = None
-        if not None in resp_json['result']:
-            counts = [len(r) for r in resp_json['result']]
-
-        outsiders = []
-        if check_against is not None:
-            resp_flattened = [item for sublist in resp_json['result'] for item in sublist]
-            outsiders = self.anki_query_check_against(resp_flattened, check_against)
-
-        return (counts, outsiders)
-
-    def anki_delete(self):
-        pass
-
-    def anki_match(self):
-        pass
-
-if __name__ == '__main__':
-
-    config = None
-    with open('/Users/hgiesel/Library/Application Support/Anki2/addons21/anki-context/config.json') as f:
-        config = json.load(f)
-
-    arkParser = argparse.ArgumentParser(description='Manage and query your notes!',
-        prog='arkutil')
-
-    arkParser.add_argument('-q', '--quiet', action='store_true',
-        help='do not echo result or error')
-    arkParser.add_argument('-d', '--debug', action='store_true',
-        help='do not echo result or error')
-
-    subparsers = arkParser.add_subparsers(dest='cmd',
-        help='command to be used with the archive uri')
-    subparsers_dict = {}
-
-    subparsers_dict['paths'] = subparsers.add_parser('paths')
-    subparsers_dict['paths'].add_argument('uri', nargs='?', default='',
-        help='archive uri you want to query')
-
-
-    subparsers_dict['stats'] = subparsers.add_parser('stats')
-    subparsers_dict['stats'].add_argument('uri', nargs='?', default='',
-        help='archive uri you want to query')
-
-
-    subparsers_dict['query'] = subparsers.add_parser('query')
-    subparsers_dict['query'].add_argument('-v', '--validate', action='store_true',
-            default=False, help='get a query you can use in Anki')
-    subparsers_dict['query'].add_argument('uri', nargs='?', default='',
-        help='additionally verify uri against archive')
-
-    subparsers_dict['match'] = subparsers.add_parser('match')
-    subparsers_dict['match'].add_argument('uri', nargs='?', default='',
-        help='match cards and see if any are missing or extra')
-
-    subparsers_dict['decloze'] = subparsers.add_parser('decloze')
-    subparsers_dict['decloze'].add_argument('uri', nargs='?', default='',
-        help='match cards and see if any are missing or extra')
-
-    subparsers_dict['decloze'].add_argument('infile', nargs='?', type=argparse.FileType('r'),
-            default=sys.stdin)
-    subparsers_dict['decloze'].add_argument('outfile', nargs='?', type=argparse.FileType('w'),
-            default=sys.stdout)
-
-    subparsers_dict['ark'] = subparsers.add_parser('ark')
-
-    ARGV = arkParser.parse_args()
-
-    if ARGV.cmd is not None:
-        theparser = subparsers_dict[ARGV.cmd]
-
-        result = None
-
-        if ARGV.cmd == 'paths':
-            result = getattr(ArkUri(ARGV.uri), ARGV.cmd)()
-            ArkPrinter.print_paths(result)
-
-        elif ARGV.cmd == 'stats':
-            result = getattr(ArkUri(ARGV.uri), ARGV.cmd)()
-            ArkPrinter.print_stats(result)
-
-        elif ARGV.cmd == 'query':
-            result = getattr(ArkUri(ARGV.uri), ARGV.cmd)(ARGV.validate)
-            print(' '.join(result))
-
-        elif ARGV.cmd == 'decloze':
-            text = ARGV.infile.read()
-            text_declozed = decloze(text)
-            print(text_declozed, file=ARGV.outfile)
-
-        elif ARGV.cmd == 'match':
-            anki_connection = AnkiConnection(
-                    deck_name='misc::head',
-                    quest_field_name='Quest',
-                    quest_id_regex=r':([0-9]+)\a*:'
-                    )
-
-            result = getattr(ArkUri(ARGV.uri), ARGV.cmd)(anki_connection)
-
-            ArkPrinter.print_stats(result)
-
-        elif ARGV.cmd == 'ark':
-            ark()
-
-        else:
-            getattr(ArkUri(ARGV.uri), ARGV.cmd)()

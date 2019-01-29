@@ -1,0 +1,44 @@
+import os
+import sys
+import re
+
+sys_encoding = sys.getfilesystemencoding()
+addon_path = os.path.dirname(__file__)
+
+def decloze(text):
+    cloze_anki_regex = re.compile(r'\{\{c[0-9]+::([^(::)(\}\})]*)(?:::[^(?:\}\})]*)?\}\}')
+    cloze_overlapper_regex = re.compile(r'\[\[oc[0-9]+::([^(::)(\]\])]*)(?:::[^(?:\]\])]*)?\]\]')
+
+    result = cloze_overlapper_regex.sub(r'\1',
+             cloze_anki_regex.sub(r'\1', text))
+
+    return result
+
+
+def stdlib():
+    print(
+'''
+ark() {
+  local entry
+arr="$(quiet=errors arkutil paths "$1")"
+exitstatus=$?
+   [[ ! $exitstatus == '0' ]] && return $exitstatus
+read -a entry <<< "${arr[@]}"
+
+if [[ -d ${entry} ]]; then
+  cd "$entry"
+
+  elif [[ -f ${entry} ]]; then
+    $EDITOR "${entry}"
+
+  elif [[ ${entry} =~ ^(.*):(.*): ]]; then
+    $EDITOR "${BASH_REMATCH[1]}" +${BASH_REMATCH[2]} -c 'normal! zz'
+  fi
+}
+
+alias hasq="awk '{ if(\$2 != 0) { print \$0 } }'"
+alias noq="awk '{ if(\$2 == 0) { print \$0 } }'"
+
+alias nomatch="awk '{ if(\$2 != \$3 ) { print \$0 } }'"
+alias miss="awk '{ if(\$3 != 1) { print \$0 } }'"
+''')

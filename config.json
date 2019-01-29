@@ -1,9 +1,16 @@
 {
   "debug": false,
 
+  "regexes": {
+    "headings": "=(?: )?(.*)",
+    "quest_ids": ":([0-9]+):(?: .*)?",
+    "stats": [
+      "(\\.[^. ]+|\\.+ .+|\\*+ .+|[^\\n\\'\":=/\\-+< ]+)"
+    ]
+  },
   "quest_field": "Quest",
-  "quest_regex": ":(\\d+)[^:]*:",
-  "topic_regex": "(?:.*::)?([^:]*)::([^:]*)$",
+  "quest_regex": ":([0-9]+):(?: .*)?",
+  "heading_regex": "=(?: )?(.*)",
 
   "notes_path": "/Users/hgiesel/Developer/archive",
 

@@ -18,11 +18,11 @@ connected to what HTTP requests are, what HTML looks like, etc.
 
 Thinkable ways to create learn such content with Anki is:
 
-. creating big notes, that contain all of the information on one note
+* creating _big notes, that contain all of the information_ on one note
 
 This violates the aforementioned *minimum information principle*
 
-. creating small notes, but a lot of them
+* creating _small notes, but a lot of them_
 
 This is the desirable solution. Individual notes can be connected with tags.
 However, while Anki is an ideal solution for you spaced repetition needs,
@@ -97,7 +97,8 @@ Quest identifers have the form:
 
 === Examples
 
-.Example filesystem
+==== Example filesystem
+
 ----
 archive
 ├── information-security
@@ -117,7 +118,8 @@ archive
         └── rings.adoc
 ----
 
-.Example identifiers
+==== Example identifiers
+
 . `(nothing)`
 ** denotes directory 'archive'
 . `mathematics//`
@@ -144,6 +146,22 @@ archive
 ** denotes all files within 'archive', that are in directories together with a 'README' file
 . `@:@#@`
 ** denotes all quests defined within the 'archive'
+
+==== Example filesystem 2
+
+----
+archive
+└── zk
+    ├── 201901231653.adoc
+    ├── 201901211225.adoc
+    ├── 201812231348.adoc
+    └── 201812122021.adoc
+----
+
+==== Example identifiers 2
+
+. `zk:
+
 
 == `ark` command line tool
 

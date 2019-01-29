@@ -1,8 +1,6 @@
 import re
 import os
 
-from . import util
-
 # import the main window object (mw) from aqt
 from aqt import mw
 # import the "show info" tool from utils.py
@@ -14,6 +12,8 @@ from anki.hooks import addHook
 from subprocess import Popen, PIPE
 from shutil     import copyfile
 
+from .util import *
+
 # from pathlib import Path
 
 home = os.path.expanduser('~')
@@ -24,18 +24,12 @@ addon_path = os.path.abspath(os.path.dirname(__file__))
 icon_path = os.path.join(addon_path, "icons")
 icon_path_archive = os.path.join(icon_path, "archive.png")
 
-
 def install_ark():
-    showInfo(str(home))
     install_path = home + '/.local/bin'
 
     if os.path.isdir(install_path):
-        os.symlink(addon_path + '/ark.py', install_path + '/ark')
+        os.symlink(addon_path + '/../__init__.py', install_path + '/ark')
         os.chmod(install_path + '/ark', 0o755)
-    else:
-        showInfo('Make sure the directory exists: ' + install_path)
-
-
 
 # cross out the currently selected text
 def on_archive(editor):
