@@ -45,6 +45,6 @@ ark() {
 alias hasq="awk '{ if(\$2 != 0) { print \$0 } }'"
 alias noq="awk '{ if(\$2 == 0) { print \$0 } }'"
 
-alias nomatch="awk '{ if(\$2 != \$3 ) { print \$0 } }'"
+alias noma="awk '{ if(\$2 != \$3 ) { print \$0 } }'"
 alias miss="awk '{ if(\$3 != 1) { print \$0 } }'"
 ''')

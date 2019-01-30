@@ -1,4 +1,6 @@
-
+import urllib
+import json
+import re
 
 class AnkiConnection:
     def __init__(self, port=8765, deck_name=None, quest_field_name=None, quest_id_regex=None):

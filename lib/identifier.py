@@ -9,7 +9,7 @@ ARCHIVE_ROOT = os.environ['ARCHIVE_ROOT']
 class Printer:
     @staticmethod
     def print_stats(vals, delimiter=None):
-        '''pretty print values from ArkUri:stats '''
+        '''pretty print values from Identifier:stats '''
         if delimiter is None:
             delimiter = '\t'
 
@@ -20,7 +20,7 @@ class Printer:
                 print(line)
 
 class Mode(enum.Enum):
-    ''' modes for ArkUri.__analyze '''
+    ''' modes for Identifier.__analyze '''
     ANCESTOR = enum.auto()
 
     SECTION_I = enum.auto()
@@ -630,13 +630,13 @@ class Identifier:
             for entry in stats:
                 if self.mode == Mode.QUEST_C:
                     constructed_quest = entry[1]
-                    constructed_section, constructed_page = entry[0].split(':')
+                    constructed_section, constructed_page = Identifier.to_identifier(entry[0]).split(':')
                 else:
                     constructed_quest = entry[1]
                     constructed_section, constructed_page = self.section_component, entry[0]
 
                 constructed_uri = constructed_section + ':' + constructed_page + '#' + constructed_quest
-                queries.append(' '.join(ArkUri(constructed_uri).query()))
+                queries.append(' '.join(Identifier(constructed_uri).query()))
 
             remote_qcounts, outsiders = db.anki_query_count(queries, check_against=self.query())
             if remote_qcounts is None:
@@ -650,12 +650,12 @@ class Identifier:
             queries = []
             for entry in stats:
                 if self.mode == Mode.PAGE_B:
-                    constructed_section, constructed_page = entry[0].split(':')
+                    constructed_section, constructed_page = Identifier.to_identifier(entry[0]).split(':')
                 else:
                     constructed_section, constructed_page = self.section_component, entry[0]
 
                 constructed_uri = constructed_section + ':' + constructed_page
-                queries.append(' '.join(ArkUri(constructed_uri).query()))
+                queries.append(' '.join(Identifier(constructed_uri).query()))
 
             remote_qcounts, _ = db.anki_query_count(queries)
             if remote_qcounts is None:
@@ -668,7 +668,7 @@ class Identifier:
 
             queries = []
             for entry in stats:
-                queries.append(' '.join(ArkUri(entry[0]).query()))
+                queries.append(' '.join(Identifier(Identifier.to_identifier(entry[0])).query()))
 
             remote_qcounts, _ = db.anki_query_count(queries)
             if remote_qcounts is None:
