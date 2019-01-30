@@ -19,21 +19,27 @@ def stdlib():
     print(
 '''
 ark() {
-  local entry
-arr="$(quiet=errors arkutil paths "$1")"
-exitstatus=$?
-   [[ ! $exitstatus == '0' ]] && return $exitstatus
-read -a entry <<< "${arr[@]}"
 
-if [[ -d ${entry} ]]; then
-  cd "$entry"
+    if [[ "$1" =~ ^(-*|paths|stats|headings|verify|query|match|decloze|stdlib)$ ]]; then
+        command ark "$@"
 
-  elif [[ -f ${entry} ]]; then
-    $EDITOR "${entry}"
+    else
+        arr="$(command ark paths "$1")"
+        local entry
+        exitstatus=$?
+         [[ ! $exitstatus == '0' ]] && return $exitstatus
+        read -a entry <<< "${arr[@]}"
 
-  elif [[ ${entry} =~ ^(.*):(.*): ]]; then
-    $EDITOR "${BASH_REMATCH[1]}" +${BASH_REMATCH[2]} -c 'normal! zz'
-  fi
+        if [[ -d ${entry} ]]; then
+            cd "${entry}"
+
+        elif [[ -f ${entry} ]]; then
+            $EDITOR "${entry}"
+
+        elif [[ "${entry}" =~ ^(.*):(.*): ]]; then
+            $EDITOR "${BASH_REMATCH[1]}" +${BASH_REMATCH[2]} -c 'normal! zz'
+        fi
+    fi
 }
 
 alias hasq="awk '{ if(\$2 != 0) { print \$0 } }'"

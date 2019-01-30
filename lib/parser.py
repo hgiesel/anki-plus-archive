@@ -13,7 +13,7 @@ def setup_parser():
         config = json.load(f)
 
     arkParser = argparse.ArgumentParser(description='Manage and query your notes!',
-        prog='arkutil')
+        prog='ark')
 
     arkParser.add_argument('-q', '--quiet', action='store_true',
         help='do not echo result or error')
@@ -35,6 +35,8 @@ def setup_parser():
     subparsers_dict['stats'] = subparsers.add_parser('stats')
     subparsers_dict['stats'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
             default='default', help='decide how paths should be printed')
+    subparsers_dict['stats'].add_argument('-d', '--delimiter',
+            default='\t', help='decide the delimiter for the output')
     subparsers_dict['stats'].add_argument('uri', nargs='?', default='',
         help='archive uri you want to query')
 
@@ -47,10 +49,12 @@ def setup_parser():
     subparsers_dict['headings'].add_argument('uri', nargs='?', default='',
         help='archive uri you want to query')
 
-    subparsers_dict['integrity'] = subparsers.add_parser('integrity')
-    subparsers_dict['integrity'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
+    subparsers_dict['verify'] = subparsers.add_parser('verify')
+    subparsers_dict['verify'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
             default='default', help='decide how paths should be printed')
-    subparsers_dict['integrity'].add_argument('uri', nargs='?', default='',
+    subparsers_dict['verify'].add_argument('-d', '--delimiter',
+            default='\t', help='decide the delimiter for the output')
+    subparsers_dict['verify'].add_argument('uri', nargs='?', default='',
         help='archive uri you want to query')
 
     subparsers_dict['query'] = subparsers.add_parser('query')
@@ -78,4 +82,4 @@ def setup_parser():
 
     argv = arkParser.parse_args()
 
-    return (argv, subparsers_dict[argv.cmd].error)
+    return (argv, subparsers_dict[argv.cmd].error if argv.cmd else None)

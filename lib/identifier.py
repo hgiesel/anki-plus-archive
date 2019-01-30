@@ -258,7 +258,7 @@ class Identifier:
             topics = list(filter(lambda t: re.search(section_regex, t['dirName']), topics))
 
             if len(topics) < 1:
-                self.printer('no such section topic exists')
+                self.printer('no such section topic exists: "'+self.section_component+'"')
                 self.failed = True
 
             if len(topics) > 1:
@@ -288,7 +288,7 @@ class Identifier:
                 lambda f: re.search(page_regex, f['fileName']), first_dir['files']))
 
         if len(first_dir['files']) < 1:
-            self.printer('no such page topic exists')
+            self.printer('no such page topic exists: "' + self.page_component + '"')
             self.failed = True
 
         # e.g. `gr-@` would hit `graphs-theory-1` and `groups-1`
@@ -504,15 +504,15 @@ class Identifier:
 
         return result
 
-    def integrity(self):
+    def verify(self):
         if not self.page_component:
             self.printer('needs page component')
         elif self.quest_component:
             self.printer('must not have quest component')
         else:
-            return self._integrity()
+            return self._verify()
 
-    def _integrity(self):
+    def _verify(self):
         '''
         returns list of integrity errors of files
         [{

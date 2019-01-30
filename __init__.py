@@ -43,14 +43,30 @@ else:
                 result = []
 
             if ARGV.delimiter == 'default':
-                result = [(path[0]+':'+str(path[1])+':',) for path in result]
+                result = [(path[0]+':'+str(path[1])+':',) if path[1] is not None else (path[0],) for path in result]
 
             Printer.print_stats(result, delimiter=ARGV.delimiter)
 
         elif ARGV.cmd == 'stats':
             addr = Identifier(ARGV.uri, printer=printer)
+
             result = getattr(addr, ARGV.cmd)()
-            Printer.print_stats(result)
+
+            if ARGV.paths == 'default':
+                pass
+
+            if ARGV.paths == 'full':
+                pass
+            elif ARGV.paths == 'rel':
+                result = [(Identifier.to_rel_path(e[0]),) + e[1:] for e in result]
+            elif ARGV.paths == 'id':
+                result = [(Identifier.to_identifier(e[0]),) + e[1:] for e in result]
+            elif ARGV.paths == 'shortid':
+                result = [(Identifier.to_identifier(e[0], omit_section=True),) + e[1:] for e in result]
+            elif ARGV.paths == 'none':
+                result = [e[1:] for e in result]
+
+            Printer.print_stats(result, delimiter=ARGV.delimiter)
 
 
         elif ARGV.cmd == 'headings':
@@ -78,10 +94,24 @@ else:
             print(' '.join(result))
 
 
-        elif ARGV.cmd == 'integrity':
+        elif ARGV.cmd == 'verify':
             addr = Identifier(ARGV.uri, printer=printer)
+
             result = getattr(addr, ARGV.cmd)()
-            Printer.print_stats(result)
+            lines = [(entry['fileName'],error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
+
+            if ARGV.paths == 'default':
+                lines = [(entry['fileName'],error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
+            elif ARGV.paths == 'rel':
+                lines = [(Identifier.to_rel_path(entry['fileName']), error['type'],error['info'], error['lineno']) for entry in result for error in entry['errors']]
+            elif ARGV.paths == 'id':
+                lines = [(Identifier.to_identifier(entry['fileName']), error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
+            elif ARGV.paths == 'shortid':
+                lines = [(Identifier.to_identifier(entry['fileName'], omit_section=True), error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
+            elif ARGV.paths == 'none':
+                lines = [(error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
+
+            Printer.print_stats(lines, delimiter=ARGV.delimiter)
 
         elif ARGV.cmd == 'match':
             anki_connection = AnkiConnection(
