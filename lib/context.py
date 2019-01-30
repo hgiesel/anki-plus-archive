@@ -21,15 +21,15 @@ config = mw.addonManager.getConfig(__name__)
 
 addon_path = os.path.abspath(os.path.dirname(__file__))
 
-icon_path = os.path.join(addon_path, "icons")
+icon_path = os.path.join(addon_path, "../icons")
 icon_path_archive = os.path.join(icon_path, "archive.png")
 
 def install_ark():
-    install_path = home + '/.local/bin'
+    install_path = os.path.join(home, '.local/bin', 'ark')
 
-    if os.path.isdir(install_path):
-        os.symlink(addon_path + '/../__init__.py', install_path + '/ark')
-        os.chmod(install_path + '/ark', 0o755)
+    if os.path.isdir(install_path) and not os.path.isfile(install_path):
+        os.symlink(addon_path + '/../__init__.py', install_path)
+        os.chmod(install_path, 0o755)
 
 # cross out the currently selected text
 def on_archive(editor):
