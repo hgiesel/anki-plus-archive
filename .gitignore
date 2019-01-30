@@ -1,2 +1,4 @@
 .DS_Store
 meta.json
+__pycache__/*
+__pycache__
