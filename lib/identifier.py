@@ -362,24 +362,7 @@ class Identifier:
 
         return (topics, summary_name)
 
-    def standardid(self):
-        topics, _ = self.analysis
-        first_dir = topics[0]
-
-        path = self.paths[0]
-
-        if self.mode == QUEST_I:
-            dirName, fileName = os.path.split(path)
-            return os.path.basename(dirName) + ':' + os.path.splitext(fileName)[0] + first_dir['files']['lines'][0]['quest']
-        elif self.mode == PAGE_I:
-            dirName, fileName = os.path.split(path)
-            return os.path.basename(dirName) + ':' + os.path.splitext(fileName)[0]
-        elif self.mode == SECTION_I:
-            return os.path.basename(path)
-        else:
-            return None
-
-    def paths(self, pages=None, tocs=None):
+    def paths(self, pages=None, tocs=None, usequest=None):
         ''' returns list of dirs, files, or files with linenos '''
 
         filetypes = []
@@ -389,17 +372,22 @@ class Identifier:
         elif pages:
             pages = False
 
-        if tocs is None or pages:
+        if tocs is None or tocs:
             tocs = True
             filetypes.append('tocs')
         elif tocs:
             tocs = False
 
+        if usequest is None or not usequest:
+            filefield = 'lineno'
+        else:
+            filefield = 'quest'
+
         topics, summary_name = self.analysis
         result = []
 
         if self.quest_component:
-            result = [(( os.path.normpath(os.path.join(d['dirName'], f['fileName'])), l['lineno'] ))
+            result = [(( os.path.normpath(os.path.join(d['dirName'], f['fileName'])), l[filefield] ))
                     for d in topics for ft in filetypes for f in d[ft] for l in f['lines']]
 
         elif self.page_component:
@@ -409,10 +397,8 @@ class Identifier:
         elif self.section_component:
             result = [(( os.path.normpath(d['dirName']), None )) for d in topics]
 
-
         else:
             result.append(( os.path.normpath(summary_name), None ))
-
 
         return result
 

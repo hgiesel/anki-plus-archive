@@ -3,22 +3,40 @@ import json
 import re
 
 class AnkiConnection:
-    def __init__(self, port=8765, deck_name=None, quest_field_name=None, quest_id_regex=None):
+    def __init__(self, port=8765, deck_name=None, model_name=None,
+            quest_field_name=None, content_field_name=None,
+            quest_id_regex=None):
         '''setup connection to anki'''
         self.req = urllib.request.Request('http://localhost:' + str(port))
         self.req.add_header('Content-Type', 'application/json; charset=utf-8')
 
-        self.quest_field_name = quest_field_name
         self.quest_id_regex = quest_id_regex
+
+        self.quest_field_name = quest_field_name
+        self.content_field_name = content_field_name
 
         self.deck_name = deck_name
         self.model_name = deck_name
 
-    def anki_add(self, query):
+    def anki_add(self, tag, qid, content):
         pass
 
-    def anki_browse(self, tag, qid, content):
-        pass
+    def anki_browse(self, query):
+        browse_query = ' '.join(query) + ' deck:{0}*'.format(self.deck_name)
+
+        browse_req = json.dumps({
+            'action': 'guiBrowse',
+            'version': 6,
+            'params': {
+                'query': browse_query
+                }
+            }).encode('utf-8')
+
+        browse_resp = urllib.request.urlopen(self.req, browse_req)
+        browse_json = json.loads(browse_resp.read().decode('utf-8'))
+
+        return browse_json
+
 
     def anki_query_check_against(self, resps, check_against):
 

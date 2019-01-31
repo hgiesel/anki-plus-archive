@@ -41,6 +41,15 @@ def setup_parser():
         help='archive uri you want to query')
 
 
+
+    subparsers_dict['pagerefs'] = subparsers.add_parser('pagerefs')
+    subparsers_dict['pagerefs'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
+            default='default', help='decide how paths should be printed')
+    subparsers_dict['pagerefs'].add_argument('-d', '--delimiter',
+            default='default', help='decide the delimiter for the output')
+    subparsers_dict['pagerefs'].add_argument('uri', nargs='?', default='',
+        help='archive uri you want to query')
+
     subparsers_dict['headings'] = subparsers.add_parser('headings')
     subparsers_dict['headings'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
             default='default', help='decide how paths should be printed')
@@ -57,6 +66,8 @@ def setup_parser():
     subparsers_dict['verify'].add_argument('uri', nargs='?', default='',
         help='archive uri you want to query')
 
+
+
     subparsers_dict['query'] = subparsers.add_parser('query')
     subparsers_dict['query'].add_argument('-v', '--validate', action='store_true',
             default=False, help='get a query you can use in Anki')
@@ -68,6 +79,17 @@ def setup_parser():
             default='default', help='decide how paths should be printed')
     subparsers_dict['match'].add_argument('uri', nargs='?', default='',
         help='match cards and see if any are missing or extra')
+
+    subparsers_dict['add'] = subparsers.add_parser('add')
+    subparsers_dict['add'].add_argument('uri', nargs='?', default='',
+        help='add cards and see if any are missing or extra')
+    subparsers_dict['add'].add_argument('content', nargs='?', type=argparse.FileType('r'),
+            default=sys.stdin)
+
+    subparsers_dict['browse'] = subparsers.add_parser('browse')
+    subparsers_dict['browse'].add_argument('uri', nargs='?', default='',
+        help='browse cards and see if any are missing or extra')
+
 
 
     subparsers_dict['decloze'] = subparsers.add_parser('decloze')

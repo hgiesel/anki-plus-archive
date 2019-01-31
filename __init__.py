@@ -116,13 +116,43 @@ else:
         elif ARGV.cmd == 'match':
             anki_connection = AnkiConnection(
                     deck_name='misc::head',
+                    model_name='Cloze (overlapping)',
                     quest_field_name='Quest',
+                    content_field_name='Quest',
                     quest_id_regex=r':([0-9]+)\a*:')
 
             addr = Identifier(ARGV.uri, printer=printer)
             result = getattr(addr, ARGV.cmd)(anki_connection)
 
             Printer.print_stats(result)
+
+        elif ARGV.cmd == 'add':
+            anki_connection = AnkiConnection(
+                    deck_name='misc::head',
+                    model_name='Cloze (overlapping)',
+                    quest_field_name='Quest',
+                    content_field_name='Quest',
+                    quest_id_regex=r':([0-9]+)\a*:')
+
+            tag, qid = Identifier(ARGV.uri, printer=printer).paths(usequest=True)
+
+
+            result = anki_connection.anki_add(addr[0].replace(':', '::'), addr[1], ARGV.content.read())
+            print(result)
+
+        elif ARGV.cmd == 'browse':
+            anki_connection = AnkiConnection(
+                    deck_name='misc::head',
+                    model_name='Cloze (overlapping)',
+                    quest_field_name='Quest',
+                    content_field_name='Quest',
+                    quest_id_regex=r':([0-9]+)\a*:')
+
+            addr = Identifier(ARGV.uri, printer=printer).query()
+            result = anki_connection.anki_browse(addr)
+
+            print(result)
+
 
         elif ARGV.cmd == 'decloze':
             text = ARGV.infile.read()
