@@ -16,10 +16,35 @@ class AnkiConnection:
         self.content_field_name = content_field_name
 
         self.deck_name = deck_name
-        self.model_name = deck_name
+        self.model_name = model_name
 
     def anki_add(self, tag, qid, content):
-        pass
+        print(tag +'\n'+ qid + '\n'+ content)
+
+        add_req = json.dumps({
+                'action': 'guiAddCards',
+                'version': 6,
+                'params': {
+                    'note': {
+                        'deckName': self.deck_name,
+                        'modelName': self.model_name,
+                        'fields': {
+                            self.quest_field_name: ':'+qid+':',
+                            self.content_field_name: content
+                            },
+                        'options': {
+                            'closeAfterAdding': True
+                            },
+                        'tags': [
+                            tag
+                            ]
+                        }
+                    }
+                }).encode('utf-8')
+
+        add_resp = urllib.request.urlopen(self.req, add_req)
+        add_json = json.loads(add_resp.read().decode('utf-8'))
+        return add_json
 
     def anki_browse(self, query):
         browse_query = ' '.join(query) + ' deck:{0}*'.format(self.deck_name)

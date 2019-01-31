@@ -19,7 +19,7 @@ if aqt_spec is not None:
 else:
     from lib.parser import setup_parser
 
-    from lib.identifier import Identifier, Printer
+    from lib.identifier import Mode, Identifier, Printer
     from lib.util import decloze, stdlib
     from lib.srs_connection import AnkiConnection
 
@@ -134,10 +134,15 @@ else:
                     content_field_name='Quest',
                     quest_id_regex=r':([0-9]+)\a*:')
 
-            tag, qid = Identifier(ARGV.uri, printer=printer).paths(usequest=True)
+            ident = Identifier(ARGV.uri, printer=printer)
+            if not ident.mode == Mode.QUEST_I:
+                printer('uri must designate a single quest')
 
+            addr = ident.paths(usequest=True)[0]
 
-            result = anki_connection.anki_add(addr[0].replace(':', '::'), addr[1], ARGV.content.read())
+            result = anki_connection.anki_add(
+                    Identifier.to_identifier(addr[0]).replace(':', '::'),
+                    addr[1], ARGV.content.read())
             print(result)
 
         elif ARGV.cmd == 'browse':
