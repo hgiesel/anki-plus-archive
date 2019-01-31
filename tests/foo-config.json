@@ -1,13 +1,9 @@
 {
   "debug": false,
 
-  "archive_root": "/Users/hgiesel/Developer/archive",
-
   "regexes": {
-    "pagerefs": "asdf",
-    "qidrefs": "asdf",
     "headings": "=(?: )?(.*)",
-    "qids": ":([0-9]+):(?: .*)?",
+    "quest_ids": ":([0-9]+):(?: .*)?",
     "stats": [
       "(\\.[^. ]+|\\.+ .+|\\*+ .+|[^\\n\\'\":=/\\-+< ]+)"
     ]
@@ -16,6 +12,7 @@
   "quest_regex": ":([0-9]+):(?: .*)?",
   "heading_regex": "=(?: )?(.*)",
 
+  "notes_path": "/Users/hgiesel/Developer/archive",
 
   "editor_command": [
     "/usr/local/bin/vimr",

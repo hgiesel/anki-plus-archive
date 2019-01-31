@@ -21,7 +21,7 @@ class Printer:
 
 class Mode(enum.Enum):
     ''' modes for Identifier.__analyze '''
-    ANCESTOR = enum.auto()
+    ARCHIVE = enum.auto()
 
     SECTION_I = enum.auto()
     SECTION_A = enum.auto()
@@ -81,7 +81,7 @@ class Identifier:
         ** 'abstract-algebra<@'           -> (multiple dirs                ,~doesn't affect mode)
         ** 'abstract-algebra<'            -> (multiple dirs                ,~doesn't affect mode)
 
-        ** ''                             -> (multiple dirs                 ,ANCESTOR)
+        ** ''                             -> (multiple dirs                 ,ARCHIVE)
 
         ** 'group-theory'                 -> (single dir+multiple files     ,SECTION_I)
         ** '@'                            -> (multiple dirs                 ,SECTION_A)
@@ -130,12 +130,12 @@ class Identifier:
         self.hypthetical = hypothetical
 
         if matches is not None:
-            self.ancestor_component = matches.group(1) or ''
+            self.filter_component   = matches.group(1) or ''
             self.section_component  = matches.group(2) or ''
             self.page_component     = matches.group(3) or ''
             self.quest_component    = matches.group(4) or ''
 
-            tempMode = Mode.ANCESTOR
+            tempMode = Mode.ARCHIVE
 
             ''' section components '''
 
@@ -194,7 +194,7 @@ class Identifier:
 
             self.mode = tempMode
 
-            # print('ancestor: ' + self.ancestor_component)
+            # print('ancestor: ' + self.filter_component)
             # print('section: ' + self.section_component)
             # print('page: '    + self.page_component)
             # print(self.quest_component)
@@ -212,31 +212,45 @@ class Identifier:
         self.failed = False
 
         '''
-        processing of ancestor topic
+        processing of filter
         '''
-        if self.ancestor_component:
+        if self.filter_component:
             matched_ancestors = []
-            ancestor_regex = re.compile('(.*/' + self.ancestor_component.replace('-','[^./]*-') + '[^./]*)/')
+            ancestor_regex = re.compile('(.*/' + self.filter_component.replace('-','[^./]*-') + '[^./]*)/?')
 
         readme_regex = re.compile('^README\..*')
         for root, dirs, files in os.walk(summary_name):
             dirs[:] = [d for d in dirs if not d.startswith('.')]
             files[:] = [f for f in files if not f.startswith('.')]
 
-            if self.ancestor_component:
+            if self.filter_component:
                 match = ancestor_regex.search(root)
                 if any([readme_regex.search(file) for file in files]) and root is not summary_name and match:
                     topics.append({
                         'dirName':   root,
-                        'files': [{'fileName': file, 'lines': []} for file in files if not readme_regex.search(file)]})
+                        'files': [{
+                            'fileName': file,
+                            'lines': []
+                            } for file in files if not readme_regex.search(file)],
+                        'tocs': [{
+                            'fileName': file,
+                            'lines': []
+                            } for file in files if readme_regex.search(file)]})
                     matched_ancestors.append(match.group(1))
             else:
                 if any([readme_regex.search(file) for file in files]) and root is not summary_name:
                     topics.append({
                         'dirName':   root,
-                        'files': [{'fileName': file, 'lines':[]} for file in files if not readme_regex.search(file)]})
-
-        if self.ancestor_component:
+                        'files': [{
+                            'fileName': file,
+                            'lines': []
+                            } for file in files if not readme_regex.search(file)],
+                        'tocs': [{
+                            'fileName': file,
+                            'lines': []
+                            } for file in files if readme_regex.search(file)]
+                        })
+        if self.filter_component:
             unique_ancestors = set(matched_ancestors)
 
             if len(unique_ancestors) < 1:
@@ -348,33 +362,57 @@ class Identifier:
 
         return (topics, summary_name)
 
-    def paths(self):
-        '''
-        returns list of dirs, files, or files with linenos
-        '''
+    def standardid(self):
+        topics, _ = self.analysis
+        first_dir = topics[0]
+
+        path = self.paths[0]
+
+        if self.mode == QUEST_I:
+            dirName, fileName = os.path.split(path)
+            return os.path.basename(dirName) + ':' + os.path.splitext(fileName)[0] + first_dir['files']['lines'][0]['quest']
+        elif self.mode == PAGE_I:
+            dirName, fileName = os.path.split(path)
+            return os.path.basename(dirName) + ':' + os.path.splitext(fileName)[0]
+        elif self.mode == SECTION_I:
+            return os.path.basename(path)
+        else:
+            return None
+
+    def paths(self, pages=None, tocs=None):
+        ''' returns list of dirs, files, or files with linenos '''
+
+        filetypes = []
+        if pages is None or pages:
+            pages = True
+            filetypes.append('files')
+        elif pages:
+            pages = False
+
+        if tocs is None or pages:
+            tocs = True
+            filetypes.append('tocs')
+        elif tocs:
+            tocs = False
+
         topics, summary_name = self.analysis
         result = []
 
-        if self.mode in [Mode.QUEST_C, Mode.QUEST_B, Mode.QUEST_SA, Mode.QUEST_A, Mode.QUEST_I]:
-            for d in topics:
-                for f in d['files']:
-                    for l in f['lines']:
-                        result.append(( os.path.normpath(os.path.join(d['dirName'], f['fileName'])), l['lineno'] ))
+        if self.quest_component:
+            result = [(( os.path.normpath(os.path.join(d['dirName'], f['fileName'])), l['lineno'] ))
+                    for d in topics for ft in filetypes for f in d[ft] for l in f['lines']]
 
-        elif self.mode in [Mode.PAGE_B, Mode.PAGE_A, Mode.PAGE_S, Mode.PAGE_I]:
-            for d in topics:
-                for f in d['files']:
-                    result.append(( os.path.normpath(os.path.join(topics[0]['dirName'], f['fileName'])), None ))
+        elif self.page_component:
+            result = [(( os.path.normpath(os.path.join(topics[0]['dirName'], f['fileName'])), None ))
+                    for d in topics for ft in filetypes for f in d[ft]]
 
-        elif self.mode in [Mode.SECTION_A, Mode.SECTION_I]:
-            for d in topics:
-                result.append(( os.path.normpath(d['dirName']), None ))
+        elif self.section_component:
+            result = [(( os.path.normpath(d['dirName']), None )) for d in topics]
 
-        elif self.mode in [Mode.ANCESTOR]:
-            result.append(( os.path.normpath(summary_name), None ))
 
         else:
-            self.printer('should-never-happen error')
+            result.append(( os.path.normpath(summary_name), None ))
+
 
         return result
 
@@ -444,7 +482,7 @@ class Identifier:
                     str(sum(map(lambda l: int(l[2]), all_stats))) ))
                 # TODO generalize to accepts any amount of stats
 
-        elif mode in [Mode.ANCESTOR]:
+        elif mode in [Mode.ARCHIVE]:
 
             all_stats = self.stats( (topics,''), Mode.PAGE_A )
             result.append((
@@ -499,6 +537,53 @@ class Identifier:
             result.append({
                 'fileName': f,
                 'headings': headings
+                })
+
+
+        return result
+
+    def pagerefs(self):
+        if not self.page_component:
+            self.printer('needs page component')
+        elif self.quest_component:
+            self.printer('must not have quest component')
+        else:
+            return self._verify()
+
+    def _pagerefs(self):
+        '''
+        returns list of headers defined in file
+        [{
+            'fileName': '/path/to/archive/group-like-2.adoc'
+            'pagerefs': [{
+                'info': 'graph-theory:24234
+                'lineno': [23]
+            }]
+        }]
+        '''
+
+        result = []
+
+        paths = [p[0] for p in self.paths()]
+        pageref_regex = re.compile('<<([^,]+)(?:,.*)?>>')
+
+        for f in paths:
+
+            pagerefs = []
+
+            with open(f, "r") as fx:
+                searchlines = fx.readlines()
+
+                for lineno, line in enumerate(searchlines):
+
+                    pageref_match = pageref_regex.search(line)
+                    if pageref_match:
+                        pageref = Identifier(pageref_match.group(1)).standardid
+                        pagerefs.append({'info': pageref, 'lineno': lineno})
+
+            result.append({
+                'fileName': f,
+                'pagerefs': pagerefs
                 })
 
 
@@ -677,7 +762,7 @@ class Identifier:
             for t in tuple(zip(stats, remote_qcounts)):
                 result.append( (t[0][0], t[0][1], t[1]) )
 
-        elif self.mode in [Mode.ANCESTOR]:
+        elif self.mode in [Mode.ARCHIVE]:
             remote_qcount, _ = db.anki_query_count([' '.join(self.query())])
             if remote_qcount is None:
                 self.printer('you probably need to select a profile')

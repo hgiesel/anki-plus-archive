@@ -10,9 +10,14 @@ class AnkiConnection:
 
         self.quest_field_name = quest_field_name
         self.quest_id_regex = quest_id_regex
-        self.deck_name = deck_name
 
-    def anki_add(self, json):
+        self.deck_name = deck_name
+        self.model_name = deck_name
+
+    def anki_add(self, query):
+        pass
+
+    def anki_browse(self, tag, qid, content):
         pass
 
     def anki_query_check_against(self, resps, check_against):
@@ -67,7 +72,6 @@ class AnkiConnection:
         else:
             return []
 
-
     def anki_query_count(self, query_list, check_against=None):
 
         query = json.dumps({
@@ -94,10 +98,3 @@ class AnkiConnection:
             outsiders = self.anki_query_check_against(resp_flattened, check_against)
 
         return (counts, outsiders)
-
-    def anki_delete(self):
-        pass
-
-    def anki_match(self):
-        pass
-

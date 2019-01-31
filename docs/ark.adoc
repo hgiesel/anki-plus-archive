@@ -1,0 +1,44 @@
+= The `ark` command line tool
+
+== Managing your archive
+
+* `ark paths`
+
+* `ark stats`
+
+* `ark update`
+** updates vim-context to the latest release from github
+
+== Managing file content
+
+* `ark verify`
+
+* `ark headings`
+
+== Managing pagerefs
+
+* `ark tocs`
+
+* `ark refs`
+
+* `ark revrefs`
+
+== Managing quest ids
+
+* `ark qids`
+
+* `ark match`
+
+== Interaction with Anki
+
+* `ark query`
+
+* `ark add`
+
+* `ark browse`
+
+== Utilities
+
+* `ark decloze`
+
+* `ark stdlib`
