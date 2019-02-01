@@ -395,7 +395,7 @@ class Identifier:
                     for d in topics for ft in filetypes for f in d[ft] for l in f['lines']]
 
         elif self.page_component:
-            result = [(( os.path.normpath(os.path.join(topics[0]['dirName'], f['fileName'])), None ))
+            result = [(( os.path.normpath(os.path.join(d['dirName'], f['fileName'])), None ))
                     for d in topics for ft in filetypes for f in d[ft]]
 
         elif self.section_component:
@@ -539,10 +539,10 @@ class Identifier:
 
     def _pagerefs(self):
         '''
-        returns list of headers defined in file
+        returns list of pagerefs defined in file
         [{
             'fileName': '/path/to/archive/group-like-2.adoc',
-            'pagerefs': [('graph-theory:24234, [23])]
+            'pagerefs': [('graph-theory:fcd2cda, [23])]
             }]
         }]
         '''
@@ -552,9 +552,7 @@ class Identifier:
         paths = [p[0] for p in self.paths()]
         pageref_regex = re.compile('<<([^,]+)(?:,.*)?>>')
 
-
         for f in paths:
-
             pagerefs = []
 
             with open(f, "r") as fx:
@@ -565,7 +563,10 @@ class Identifier:
                     pageref_match = pageref_regex.search(line)
                     if pageref_match:
 
-                        fileName, _ = Identifier(pageref_match.group(1)).paths()[0]
+                        provisional_id = pageref_match.group(1)
+                        fileName, _ = Identifier(provisional_id
+                                if not provisional_id.startswith(':')
+                                else os.path.basename(os.path.dirname(f))+provisional_id).paths()[0]
 
                         dirName, baseName = os.path.split(fileName)
                         pageref = ':'.join([os.path.basename(dirName), os.path.splitext(baseName)[0]])
@@ -579,6 +580,31 @@ class Identifier:
 
 
         return result
+
+    def revpagerefs(self):
+        if not self.page_component:
+            self.printer('needs page component')
+        elif self.quest_component:
+            self.printer('must not have quest component')
+        else:
+            return self._revpagerefs()
+
+    def _revpagerefs(self, uri=''):
+        '''
+        traces back all pagerefs to a specific file
+        [{
+            'pageref': '/path/to/archive/group-like-2.adoc',
+            'traceback': [(['/path/to/file], 23)]
+            }]
+        }]
+
+        uri: the uri you want to trace back till
+        acts differently for content pages and tocs:
+        * content pages are only traced back one step
+        * tocs are traced back until the end
+        '''
+
+
 
     def verify(self):
         if not self.page_component:
