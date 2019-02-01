@@ -19,12 +19,12 @@ def stdlib():
     print(
 '''
 ark() {
-    
+
     if [[ "$#" -eq 0 ]]; then
         set ''
     fi
 
-    if [[ "$1" =~ ^(-.*|paths|stats|headings|verify|query|match|decloze|stdlib)$ ]]; then
+    if [[ "$1" =~ ^(-.*|paths|stats|pagerefs|revpagerefs|headings|verify|query|match|browse|add|decloze|stdlib)$ ]]; then
         command ark "$@"
 
     else
