@@ -13,10 +13,7 @@ class Printer:
         if delimiter is None:
             delimiter = '\t'
 
-        lines = ''
-        for val in vals:
-                lines += delimiter.join([ str(v) for v in list(val) ])+'\n'
-
+        lines = '\n'.join([ delimiter.join([ str(v) for v in list(val) ]) for val in vals ])
         print(lines)
 
 class Mode(enum.Enum):
@@ -194,11 +191,6 @@ class Identifier:
 
             self.mode = tempMode
 
-            # print('ancestor: ' + self.filter_component)
-            # print('section: ' + self.section_component)
-            # print('page: '    + self.page_component)
-            # print(self.quest_component)
-
         else:
             self.printer('query malformed: invalid archive uri')
 
@@ -216,17 +208,17 @@ class Identifier:
         '''
         if self.filter_component:
             matched_ancestors = []
-            ancestor_regex = re.compile('(.*/' + self.filter_component.replace('-','[^./]*-') + '[^./]*)/?')
+            ancestor_regex = re.compile('(.*/' + self.filter_component.replace('-','[^./]*-') + '[^-./]*)/?')
 
         first_dir = True
-        readme_regex = re.compile('^README\..*')
+        toc_regex = re.compile('^README.*')
 
         for root, dirs, files in os.walk(summary_name):
             files[:] = [f for f in files if not f.startswith('.')]
 
             content_pages, tocs = [], []
             for f in files:
-                (tocs if readme_regex.search(f) else content_pages).append(f)
+                (tocs if toc_regex.search(f) else content_pages).append(f)
 
             dirs[:] = [d for d in dirs if
                     not d.startswith('.') and (not tocs or first_dir)]
@@ -246,7 +238,7 @@ class Identifier:
                         'lines': []
                         } for f in content_pages],
                     'tocs': [{
-                        'fileName': f,
+                        'fileName': t,
                         'lines': []
                         } for t in tocs]
                     })
@@ -293,7 +285,7 @@ class Identifier:
             return ({}, summary_name)
 
         if self.mode == Mode.PAGE_S or self.mode == Mode.QUEST_SA:
-            page_regex = re.compile('^' + self.page_component[:-2].replace('-', '[^./]*-') + '[^./]*\..*$')
+            page_regex = re.compile('^' + self.page_component[:-2].replace('-', '[^./]*-') + '[^-./]*\..*$')
 
             first_dir['files'] = list(filter(
                 lambda f: page_regex.search(f['fileName']), first_dir['files']))
@@ -301,7 +293,7 @@ class Identifier:
                 lambda f: page_regex.search(f['fileName']), first_dir['tocs']))
 
         elif self.page_component and not self.page_component.endswith('@'):
-            page_regex = re.compile('^' + self.page_component.replace('-', r'[^./]*-') + r'[^./]*\..*$')
+            page_regex = re.compile('^' + self.page_component.replace('-', r'[^./]*-') + r'[^-./]*\..*$')
 
             first_dir['files'] = list(filter(
                 lambda f: page_regex.search(f['fileName']), first_dir['files']))
@@ -323,7 +315,7 @@ class Identifier:
         elif self.page_component and not self.page_component == '@' and len(first_dir['files'] + first_dir['tocs']) > 1:
             self.printer('page topic is ambiguous: '
                 + ' '.join(list(map(lambda f:
-                    os.path.splitext(os.path.basename(f['fileName']))[0], first_dir['files']) )))
+                    os.path.splitext(os.path.basename(f['fileName']))[0], first_dir['files'] + first_dir['tocs']) )))
             self.failed = True
 
         '''
@@ -528,7 +520,7 @@ class Identifier:
         else:
             return self._pagerefs()
 
-    def _pagerefs(self):
+    def _pagerefs(self, key_by=None):
         '''
         returns list of pagerefs defined in file
         [{
@@ -538,36 +530,71 @@ class Identifier:
         }]
         '''
 
-        result = []
+        '''
+        or
+        [{
+            'graph-theory:fcd2ca': [('/path/to/archive/group-like-2.adoc', [23])
+            'group-theory:fc3434': [('/path/to/archive/group-like-2.adoc', [23])
+        }]
+        '''
 
         paths = [p[0] for p in self.paths()]
         pageref_regex = re.compile('<<([^,]+)(?:,.*)?>>')
 
-        for f in paths:
-            pagerefs = []
+        if key_by:
+            result = {}
 
-            with open(f, "r") as fx:
-                searchlines = fx.readlines()
+            for f in paths:
+                with open(f, "r") as fx:
+                    searchlines = fx.readlines()
 
-                for lineno, line in enumerate(searchlines):
+                    for lineno, line in enumerate(searchlines):
 
-                    pageref_match = pageref_regex.search(line)
-                    if pageref_match:
+                        pageref_match = pageref_regex.search(line)
+                        if pageref_match:
 
-                        provisional_id = pageref_match.group(1)
-                        fileName, _ = Identifier(provisional_id
-                                if not provisional_id.startswith(':')
-                                else os.path.basename(os.path.dirname(f))+provisional_id).paths()[0]
+                            provisional_id = pageref_match.group(1)
+                            fileName = Identifier(provisional_id
+                                    if not provisional_id.startswith(':')
+                                    else os.path.basename(os.path.dirname(f))+provisional_id).paths()[0][0]
 
-                        dirName, baseName = os.path.split(fileName)
-                        pageref = ':'.join([os.path.basename(dirName), os.path.splitext(baseName)[0]])
+                            dirName, baseName = os.path.split(fileName)
+                            pageref = ':'.join([os.path.basename(dirName), os.path.splitext(baseName)[0]])
 
-                        pagerefs.append((pageref, lineno))
+                            try:
+                                result[pageref].append( (f, lineno) )
+                            except:
+                                result[pageref] = []
+                                result[pageref].append( (f, lineno) )
 
-            result.append({
-                'fileName': f,
-                'pagerefs': pagerefs
-                })
+        else:
+            result = []
+
+            for f in paths:
+                pagerefs = []
+
+                with open(f, "r") as fx:
+                    searchlines = fx.readlines()
+
+                    for lineno, line in enumerate(searchlines):
+
+                        pageref_match = pageref_regex.search(line)
+                        if pageref_match:
+
+                            provisional_id = pageref_match.group(1)
+                            fileName, _ = Identifier(provisional_id
+                                    if not provisional_id.startswith(':')
+                                    else os.path.basename(os.path.dirname(f))+provisional_id).paths()[0]
+
+                            dirName, baseName = os.path.split(fileName)
+                            pageref = ':'.join([os.path.basename(dirName), os.path.splitext(baseName)[0]])
+
+                            pagerefs.append((pageref, lineno))
+
+                result.append({
+                    'fileName': f,
+                    'pagerefs': pagerefs
+                    })
 
 
         return result
@@ -580,12 +607,17 @@ class Identifier:
         else:
             return self._revpagerefs()
 
-    def _revpagerefs(self, uri=''):
+    def _revpagerefs(self, uri='', prepagerefs=None):
         '''
         traces back all pagerefs to a specific file
         [{
             'pageref': '/path/to/archive/group-like-2.adoc',
-            'traceback': [(['/path/to/file], 23)]
+            'traceback': [
+                [('/path/to/toc', 23)],
+                [('/path/to/file', 99)],
+                [('/path/to/toc2', 9), ('/path/to/toc', 23)],
+                [('/path/to/toc3', 69), ('/path/to/toc', 23)],
+                [('/path/to/tocX', 423), ('/path/to/toc3', 69), ('/path/to/toc', 23)]
             }]
         }]
 
@@ -594,6 +626,42 @@ class Identifier:
         * content pages are only traced back one step
         * tocs are traced back until the end
         '''
+
+        result = []
+
+        file_name, _ = self.paths()[0]
+        tag = Identifier.to_identifier(file_name)
+
+        if not prepagerefs:
+            pagerefs = Identifier('@:@')._pagerefs(key_by=True)
+        else:
+            pagerefs = prepagerefs
+
+        
+        try:
+            pre_result= [[pr] for pr in pagerefs[tag]]
+        except:
+            pre_result = []
+
+        add_result = []
+
+        toc_regex = re.compile('^README.*')
+        for elem in pre_result:
+            if toc_regex.search(os.path.basename(elem[0][0])):
+
+                new_id = Identifier((Identifier.to_identifier(elem[0][0])))
+                # print('new id: '+ str(new_id.paths()))
+                next_lookup =  new_id._revpagerefs(uri=uri, prepagerefs=pagerefs)
+                # print('new lookup: ' + str(next_lookup))
+                add_result += [ i + elem for i in next_lookup['traceback'] ]
+
+
+        result = {
+                'pageref': file_name,
+                'traceback': pre_result + add_result
+                }
+
+        return result
 
 
 

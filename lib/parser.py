@@ -41,6 +41,13 @@ def setup_parser():
         help='archive uri you want to query')
 
 
+    subparsers_dict['headings'] = subparsers.add_parser('headings')
+    subparsers_dict['headings'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
+            default='default', help='decide how paths should be printed')
+    subparsers_dict['headings'].add_argument('-d', '--delimiter',
+            default='default', help='decide the delimiter for the output')
+    subparsers_dict['headings'].add_argument('uri', nargs='?', default='',
+        help='archive uri you want to query')
 
     subparsers_dict['pagerefs'] = subparsers.add_parser('pagerefs')
     subparsers_dict['pagerefs'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
@@ -50,12 +57,12 @@ def setup_parser():
     subparsers_dict['pagerefs'].add_argument('uri', nargs='?', default='',
         help='archive uri you want to query')
 
-    subparsers_dict['headings'] = subparsers.add_parser('headings')
-    subparsers_dict['headings'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
+    subparsers_dict['revpagerefs'] = subparsers.add_parser('revpagerefs')
+    subparsers_dict['revpagerefs'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
             default='default', help='decide how paths should be printed')
-    subparsers_dict['headings'].add_argument('-d', '--delimiter',
+    subparsers_dict['revpagerefs'].add_argument('-d', '--delimiter',
             default='default', help='decide the delimiter for the output')
-    subparsers_dict['headings'].add_argument('uri', nargs='?', default='',
+    subparsers_dict['revpagerefs'].add_argument('uri', nargs='?', default='',
         help='archive uri you want to query')
 
     subparsers_dict['verify'] = subparsers.add_parser('verify')
