@@ -295,25 +295,29 @@ class Identifier:
             page_regex = '^' + self.page_component[:-2].replace('-', '[^./]*-') + '[^./]*\..*$'
             first_dir['files'] = list(filter(
                 lambda f: re.search(page_regex, f['fileName']), first_dir['files']))
+            first_dir['tocs'] = list(filter(
+                lambda f: re.search(page_regex, f['fileName']), first_dir['tocs']))
 
         elif self.page_component and not self.page_component.endswith('@'):
             page_regex = '^' + self.page_component.replace('-', r'[^./]*-') + r'[^./]*\..*$'
             first_dir['files'] = list(filter(
                 lambda f: re.search(page_regex, f['fileName']), first_dir['files']))
+            first_dir['tocs'] = list(filter(
+                lambda f: re.search(page_regex, f['fileName']), first_dir['tocs']))
 
-        if len(first_dir['files']) < 1:
+        if len(first_dir['files'] + first_dir['tocs']) < 1:
             self.printer('no such page topic exists: "' + self.page_component + '"')
             self.failed = True
 
         # e.g. `gr-@` would hit `graphs-theory-1` and `groups-1`
-        if self.page_component.endswith('-@') and len(first_dir['files']) > 1:
+        if self.page_component.endswith('-@') and len(first_dir['files'] + first_dir['tocs']) > 1:
             page_series = set(map(lambda f: re.search('(.*)-.*', f['fileName']).group(1), first_dir['files']))
             if len(page_series) > 1:
                 self.printer('page topic series is ambiguous: '
                     + ' '.join(list(map(lambda s: os.path.basename(s), page_series))))
                 self.failed = True
 
-        elif self.page_component and not self.page_component == '@' and len(first_dir['files']) > 1:
+        elif self.page_component and not self.page_component == '@' and len(first_dir['files'] + first_dir['tocs']) > 1:
             self.printer('page topic is ambiguous: '
                 + ' '.join(list(map(lambda f:
                     os.path.splitext(os.path.basename(f['fileName']))[0], first_dir['files']) )))
@@ -366,17 +370,17 @@ class Identifier:
         ''' returns list of dirs, files, or files with linenos '''
 
         filetypes = []
-        if pages is None or pages:
-            pages = True
-            filetypes.append('files')
-        elif pages:
-            pages = False
-
         if tocs is None or tocs:
             tocs = True
             filetypes.append('tocs')
         elif tocs:
             tocs = False
+
+        if pages is None or pages:
+            pages = True
+            filetypes.append('files')
+        elif pages:
+            pages = False
 
         if usequest is None or not usequest:
             filefield = 'lineno'
@@ -495,10 +499,7 @@ class Identifier:
         returns list of headers defined in file
         [{
             'fileName': '/path/to/archive/group-like-2.adoc'
-            'headings': [{
-                'info': '= Foobar',
-                'lineno': [23]
-            }]
+            'headings': [('= Foobar', [23])]
         }]
         '''
 
@@ -534,16 +535,14 @@ class Identifier:
         elif self.quest_component:
             self.printer('must not have quest component')
         else:
-            return self._verify()
+            return self._pagerefs()
 
     def _pagerefs(self):
         '''
         returns list of headers defined in file
         [{
-            'fileName': '/path/to/archive/group-like-2.adoc'
-            'pagerefs': [{
-                'info': 'graph-theory:24234
-                'lineno': [23]
+            'fileName': '/path/to/archive/group-like-2.adoc',
+            'pagerefs': [('graph-theory:24234, [23])]
             }]
         }]
         '''
@@ -552,6 +551,7 @@ class Identifier:
 
         paths = [p[0] for p in self.paths()]
         pageref_regex = re.compile('<<([^,]+)(?:,.*)?>>')
+
 
         for f in paths:
 
@@ -564,8 +564,13 @@ class Identifier:
 
                     pageref_match = pageref_regex.search(line)
                     if pageref_match:
-                        pageref = Identifier(pageref_match.group(1)).standardid
-                        pagerefs.append({'info': pageref, 'lineno': lineno})
+
+                        fileName, _ = Identifier(pageref_match.group(1)).paths()[0]
+
+                        dirName, baseName = os.path.split(fileName)
+                        pageref = ':'.join([os.path.basename(dirName), os.path.splitext(baseName)[0]])
+
+                        pagerefs.append((pageref, lineno))
 
             result.append({
                 'fileName': f,

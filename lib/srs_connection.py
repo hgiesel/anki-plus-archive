@@ -30,7 +30,7 @@ class AnkiConnection:
                         'modelName': self.model_name,
                         'fields': {
                             self.quest_field_name: ':'+qid+':',
-                            self.content_field_name: content
+                            self.content_field_name: content.strip().replace('\n','<br />')
                             },
                         'options': {
                             'closeAfterAdding': True

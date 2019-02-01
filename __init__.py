@@ -88,6 +88,26 @@ else:
 
             Printer.print_stats(lines, ARGV.delimiter if not ARGV.delimiter == 'default' else '\t')
 
+        elif ARGV.cmd == 'pagerefs':
+            addr = Identifier(ARGV.uri, printer=printer)
+
+            result = getattr(addr, ARGV.cmd)()
+            lines = [(val['fileName'],pageref[0],pageref[1]) for val in result for pageref in val['pagerefs']]
+
+            if ARGV.paths == 'default':
+                pass
+            elif ARGV.paths == 'rel':
+                lines = [(Identifier.to_rel_path(line[0]),) + line[1:] for line in lines]
+            elif ARGV.paths == 'id':
+                lines = [(Identifier.to_identifier(line[0]),) + line[1:] for line in lines]
+            elif ARGV.paths == 'shortid':
+                lines = [(Identifier.to_identifier(line[0], omit_section=True),) + line[1:] for line in lines]
+            elif ARGV.paths == 'none':
+                lines = [line[1:] for line in lines]
+
+            Printer.print_stats(lines, ARGV.delimiter if not ARGV.delimiter == 'default' else '\t')
+
+
         elif ARGV.cmd == 'query':
             addr = Identifier(ARGV.uri, printer=printer)
             result = getattr(addr, ARGV.cmd)(ARGV.validate)
@@ -130,7 +150,7 @@ else:
             anki_connection = AnkiConnection(
                     deck_name='misc::head',
                     model_name='Cloze (overlapping)',
-                    quest_field_name='Quest',
+                    quest_field_name='Title',
                     content_field_name='Quest',
                     quest_id_regex=r':([0-9]+)\a*:')
 
@@ -149,7 +169,7 @@ else:
             anki_connection = AnkiConnection(
                     deck_name='misc::head',
                     model_name='Cloze (overlapping)',
-                    quest_field_name='Quest',
+                    quest_field_name='Title',
                     content_field_name='Quest',
                     quest_id_regex=r':([0-9]+)\a*:')
 
