@@ -13,11 +13,11 @@ class Printer:
         if delimiter is None:
             delimiter = '\t'
 
+        lines = ''
         for val in vals:
-                line = delimiter.join([
-                        str(v) for v in list(val) ])
+                lines += delimiter.join([ str(v) for v in list(val) ])+'\n'
 
-                print(line)
+        print(lines)
 
 class Mode(enum.Enum):
     ''' modes for Identifier.__analyze '''
@@ -218,38 +218,42 @@ class Identifier:
             matched_ancestors = []
             ancestor_regex = re.compile('(.*/' + self.filter_component.replace('-','[^./]*-') + '[^./]*)/?')
 
+        first_dir = True
         readme_regex = re.compile('^README\..*')
+
         for root, dirs, files in os.walk(summary_name):
-            dirs[:] = [d for d in dirs if not d.startswith('.')]
             files[:] = [f for f in files if not f.startswith('.')]
+
+            content_pages, tocs = [], []
+            for f in files:
+                (tocs if readme_regex.search(f) else content_pages).append(f)
+
+            dirs[:] = [d for d in dirs if
+                    not d.startswith('.') and (not tocs or first_dir)]
 
             if self.filter_component:
                 match = ancestor_regex.search(root)
-                if any([readme_regex.search(file) for file in files]) and root is not summary_name and match:
-                    topics.append({
-                        'dirName':   root,
-                        'files': [{
-                            'fileName': file,
-                            'lines': []
-                            } for file in files if not readme_regex.search(file)],
-                        'tocs': [{
-                            'fileName': file,
-                            'lines': []
-                            } for file in files if readme_regex.search(file)]})
-                    matched_ancestors.append(match.group(1))
             else:
-                if any([readme_regex.search(file) for file in files]) and root is not summary_name:
-                    topics.append({
-                        'dirName':   root,
-                        'files': [{
-                            'fileName': file,
-                            'lines': []
-                            } for file in files if not readme_regex.search(file)],
-                        'tocs': [{
-                            'fileName': file,
-                            'lines': []
-                            } for file in files if readme_regex.search(file)]
-                        })
+                match = True
+
+            first_dir = False
+
+            if tocs and root is not summary_name and match:
+                topics.append({
+                    'dirName':   root,
+                    'files': [{
+                        'fileName': f,
+                        'lines': []
+                        } for f in content_pages],
+                    'tocs': [{
+                        'fileName': f,
+                        'lines': []
+                        } for t in tocs]
+                    })
+
+                if self.filter_component:
+                    matched_ancestors.append(match.group(1))
+
         if self.filter_component:
             unique_ancestors = set(matched_ancestors)
 
@@ -264,12 +268,11 @@ class Identifier:
 
             summary_name = unique_ancestors.pop()
 
-        '''
-        processing of section topic
-        '''
+        ''' processing of section topic '''
+
         if self.section_component and not self.section_component == '@':
-            section_regex = '/' + self.section_component.replace('-','[^./]*-') + '[^./]*$'
-            topics = list(filter(lambda t: re.search(section_regex, t['dirName']), topics))
+            section_regex = re.compile('/' + self.section_component.replace('-','[^./]*-') + '[^./]*$')
+            topics = list(filter(lambda t: section_regex.search(t['dirName']), topics))
 
             if len(topics) < 1:
                 self.printer('no such section topic exists: "'+self.section_component+'"')
@@ -280,9 +283,7 @@ class Identifier:
                     + ' '.join(list(map(lambda t: os.path.basename(t['dirName']), topics))))
                 self.failed = True
 
-        '''
-        processing of page topic
-        '''
+        ''' processing of page topic '''
 
         if len(topics):
             first_dir = topics[0]
@@ -292,18 +293,20 @@ class Identifier:
             return ({}, summary_name)
 
         if self.mode == Mode.PAGE_S or self.mode == Mode.QUEST_SA:
-            page_regex = '^' + self.page_component[:-2].replace('-', '[^./]*-') + '[^./]*\..*$'
+            page_regex = re.compile('^' + self.page_component[:-2].replace('-', '[^./]*-') + '[^./]*\..*$')
+
             first_dir['files'] = list(filter(
-                lambda f: re.search(page_regex, f['fileName']), first_dir['files']))
+                lambda f: page_regex.search(f['fileName']), first_dir['files']))
             first_dir['tocs'] = list(filter(
-                lambda f: re.search(page_regex, f['fileName']), first_dir['tocs']))
+                lambda f: page_regex.search(f['fileName']), first_dir['tocs']))
 
         elif self.page_component and not self.page_component.endswith('@'):
-            page_regex = '^' + self.page_component.replace('-', r'[^./]*-') + r'[^./]*\..*$'
+            page_regex = re.compile('^' + self.page_component.replace('-', r'[^./]*-') + r'[^./]*\..*$')
+
             first_dir['files'] = list(filter(
-                lambda f: re.search(page_regex, f['fileName']), first_dir['files']))
+                lambda f: page_regex.search(f['fileName']), first_dir['files']))
             first_dir['tocs'] = list(filter(
-                lambda f: re.search(page_regex, f['fileName']), first_dir['tocs']))
+                lambda f: page_regex.search(f['fileName']), first_dir['tocs']))
 
         if len(first_dir['files'] + first_dir['tocs']) < 1:
             self.printer('no such page topic exists: "' + self.page_component + '"')
@@ -360,10 +363,6 @@ class Identifier:
                 self.failed = True
                 # should actually never happen
 
-        '''
-        constructing the result
-        '''
-
         return (topics, summary_name)
 
     def paths(self, pages=None, tocs=None, usequest=None):
@@ -413,7 +412,9 @@ class Identifier:
         topics, summary_name = preanalyzed if preanalyzed is not None else self.analysis
         mode = fakeMode if fakeMode is not None else self.mode
 
-        quest_id_regex = compile(r'^:(\d+)\a*:$')
+        filetypes = ['files', 'tocs']
+
+        quest_id_regex = compile(r'^:([0-9]+):(?: \a*)?')
         content_line_regex = compile(
                 # block titles
                 r'^(\.[^. ]+|'
@@ -430,59 +431,49 @@ class Identifier:
 
         result = []
 
-        if mode in [Mode.QUEST_I, Mode.QUEST_A, Mode.QUEST_SA, Mode.QUEST_B, Mode.QUEST_C]:
-            for d in topics:
-                for f in d['files']:
-                    for l in f['lines']:
-
-                        result.append((
-                            os.path.normpath(os.path.join(d['dirName'], f['fileName'])),
+        if self.quest_component:
+            result = [ (os.path.normpath(os.path.join(d['dirName'], f['fileName'])),
                             l['quest'],
-                            l['lineno'] ))
+                            l['lineno'] )
+            for d in topics for ft in filetypes for f in d[ft] for l in f['lines']]
 
-        elif mode in [Mode.PAGE_I, Mode.PAGE_S, Mode.PAGE_A, Mode.PAGE_B]:
-
-            for d in topics:
-                for f in d['files']:
-
-                    qid_count = 0
-                    other_counts = [0] * len(other_regexes)
-
-                    with open(d['dirName']+'/'+f['fileName'], "r") as fx:
-                        searchlines = fx.readlines()
-                        for _, line in enumerate(searchlines):
-                            if quest_id_regex.search(line):
-                                qid_count += 1
-
-                            for idx, re in enumerate(other_regexes):
-                                if re.search(line):
-                                    other_counts[idx] += 1
-
-                        result.append((
-                            os.path.normpath(os.path.join(d['dirName'], f['fileName'])),
-                            qid_count) + tuple(other_counts))
-
-        elif mode in [Mode.SECTION_I, Mode.SECTION_A]:
+        elif self.page_component or fakeMode:
 
             for d in topics:
-                all_stats = self.stats( ([d],''), Mode.PAGE_A )
-                result.append((
-                    os.path.normpath(d['dirName']),
-                    str(sum(map(lambda l: int(l[1]), all_stats))),
-                    str(sum(map(lambda l: int(l[2]), all_stats))) ))
+                for ft in filetypes:
+                    for f in d[ft]:
+
+                        qid_count = 0
+                        other_counts = [0] * len(other_regexes)
+
+                        with open(os.path.join(d['dirName'],f['fileName'])) as fx:
+                            searchlines = fx.readlines()
+                            for _, line in enumerate(searchlines):
+                                if quest_id_regex.search(line):
+                                    qid_count += 1
+
+                                for idx, re in enumerate(other_regexes):
+                                    if re.search(line):
+                                        other_counts[idx] += 1
+
+                            result.append((
+                                os.path.normpath(os.path.join(d['dirName'], f['fileName'])),
+                                qid_count) + tuple(other_counts))
+
+        elif self.section_component:
+            result = [ (os.path.normpath(d['dirName']),
+                str(sum(map(lambda l: int(l[1]), self.stats([d], ''), Mode.PAGE_A))),
+                str(sum(map(lambda l: int(l[2]), self.stats([d], ''), Mode.PAGE_A))) )
+                for d in topics ]
                 # TODO generalize to accepts any amount of stats
 
-        elif mode in [Mode.ARCHIVE]:
-
-            all_stats = self.stats( (topics,''), Mode.PAGE_A )
-            result.append((
-                os.path.normpath(summary_name),
-                str(sum(map(lambda l: int(l[1]), all_stats))),
-                str(sum(map(lambda l: int(l[2]), all_stats))) ))
+        else:
+            # all_stats = self.stats( (topics,''), Mode.PAGE_A )
+            result = [( os.path.normpath(summary_name),
+                str(sum(map(lambda l: int(l[1]), self.stats( (topics, ''), Mode.PAGE_A)))),
+                str(sum(map(lambda l: int(l[2]), self.stats( (topics, ''), Mode.PAGE_A)))) )]
             # TODO generalize to accepts any amount of stats
 
-        else:
-            self.printer('should-never-happen error')
 
         return result
 
