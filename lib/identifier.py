@@ -3,6 +3,7 @@ import os
 import sys
 import re
 from re import compile
+import copy
 
 ARCHIVE_ROOT = os.environ['ARCHIVE_ROOT']
 
@@ -71,7 +72,7 @@ class Identifier:
         return result
 
 
-    def __init__(self, uri=None, printer=None, hypothetical=False):
+    def __init__(self, config, uri=None, preanalysis=None, printer=None, hypothetical=False):
         ''' (self) -> ([ResultDict], mode: Mode, summary_name: String)
         * Analzyes uri and returns one of the following:
 
@@ -103,6 +104,13 @@ class Identifier:
         else:
             self.printer = printer
 
+        if config is None:
+            self.printer('no config provided')
+        else:
+            self.config = config
+
+        self.failed = False
+
         component_regex = (# optional ancestor component
                            r'^(?:([^#/:]+)//)?'
                            # compulsory section component (but may be empty!)
@@ -127,11 +135,26 @@ class Identifier:
         self.hypthetical = hypothetical
 
         if matches is not None:
+            self.uri                = uri
             self.filter_component   = matches.group(1) or ''
             self.section_component  = matches.group(2) or ''
             self.page_component     = matches.group(3) or ''
             self.quest_component    = matches.group(4) or ''
 
+            self.__decide_mode()
+
+        else:
+            self.printer('query malformed: invalid archive uri')
+            self.failed = True
+
+        if preanalysis:
+            self.analysis = copy.deepcopy(preanalysis)
+        elif not hypothetical:
+            self.analysis, self.summary_name = self.__analyze()
+
+        self.analysis = self.__postfilter(self.analysis)
+
+    def __decide_mode(self):
             tempMode = Mode.ARCHIVE
 
             ''' section components '''
@@ -190,12 +213,6 @@ class Identifier:
                     self.printer('query malformed: cannot use quest identifers without definite page topic or @')
 
             self.mode = tempMode
-
-        else:
-            self.printer('query malformed: invalid archive uri')
-
-        if not hypothetical:
-            self.analysis = self.__analyze()
 
     def __analyze(self):
         summary_name = os.environ['ARCHIVE_ROOT']
@@ -260,6 +277,10 @@ class Identifier:
 
             summary_name = unique_ancestors.pop()
 
+        return (topics, summary_name)
+
+    def __postfilter(self, topics):
+        ''' returns filtered topic '''
         ''' processing of section topic '''
 
         if self.section_component and not self.section_component == '@':
@@ -267,7 +288,7 @@ class Identifier:
             topics = list(filter(lambda t: section_regex.search(t['dirName']), topics))
 
             if len(topics) < 1:
-                self.printer('no such section topic exists: "'+self.section_component+'"')
+                self.printer('no such section topic exists: "'+self.uri+'"')
                 self.failed = True
 
             if len(topics) > 1:
@@ -282,7 +303,7 @@ class Identifier:
         else:
             self.printer('no sections found')
             self.failed = True
-            return ({}, summary_name)
+            return {}
 
         if self.mode == Mode.PAGE_S or self.mode == Mode.QUEST_SA:
             page_regex = re.compile('^' + self.page_component[:-2].replace('-', '[^./]*-') + '[^-./]*\..*$')
@@ -294,14 +315,13 @@ class Identifier:
 
         elif self.page_component and not self.page_component.endswith('@'):
             page_regex = re.compile('^' + self.page_component.replace('-', r'[^./]*-') + r'[^-./]*\..*$')
-
             first_dir['files'] = list(filter(
                 lambda f: page_regex.search(f['fileName']), first_dir['files']))
             first_dir['tocs'] = list(filter(
                 lambda f: page_regex.search(f['fileName']), first_dir['tocs']))
 
         if len(first_dir['files'] + first_dir['tocs']) < 1:
-            self.printer('no such page topic exists: "' + self.page_component + '"')
+            self.printer('no such page topic exists: "' + self.uri + '"')
             self.failed = True
 
         # e.g. `gr-@` would hit `graphs-theory-1` and `groups-1`
@@ -355,10 +375,10 @@ class Identifier:
                 self.failed = True
                 # should actually never happen
 
-        return (topics, summary_name)
+        return topics
 
-    def paths(self, pages=None, tocs=None, usequest=None):
-        ''' returns list of dirs, files, or files with linenos '''
+    def paths(self, pages=None, tocs=None):
+        ''' resturns [(abs_file_name, ark_loc, lineno, qid)] '''
 
         filetypes = []
         if tocs is None or tocs:
@@ -373,36 +393,37 @@ class Identifier:
         elif pages:
             pages = False
 
-        if usequest is None or not usequest:
-            filefield = 'lineno'
-        else:
-            filefield = 'quest'
-
-        topics, summary_name = self.analysis
         result = []
 
         if self.quest_component:
-            result = [(( os.path.normpath(os.path.join(d['dirName'], f['fileName'])), l[filefield] ))
-                    for d in topics for ft in filetypes for f in d[ft] for l in f['lines']]
+            result = [(( 
+                os.path.normpath(os.path.join(d['dirName'], f['fileName'])),
+                os.path.basename(d['dirName']) +':'+ os.path.splitext(f['fileName'])[0],
+                l['lineno'], l['quest'] ))
+                for d in self.analysis for ft in filetypes for f in d[ft] for l in f['lines']]
 
         elif self.page_component:
-            result = [(( os.path.normpath(os.path.join(d['dirName'], f['fileName'])), None ))
-                    for d in topics for ft in filetypes for f in d[ft]]
+            result = [((
+                os.path.normpath(os.path.join(d['dirName'], f['fileName'])),
+                os.path.basename(d['dirName']) +':'+ os.path.splitext(f['fileName'])[0],
+                None, None ))
+                for d in self.analysis for ft in filetypes for f in d[ft]]
 
         elif self.section_component:
-            result = [(( os.path.normpath(d['dirName']), None )) for d in topics]
+            result = [((
+                os.path.normpath(d['dirName']),
+                os.path.basename(d['dirName']),
+                None, None ))
+                for d in self.analysis]
 
         else:
-            result.append(( os.path.normpath(summary_name), None ))
+            result.append(( os.path.normpath(self.summary_name), '', None, None ))
 
         return result
 
-    def stats(self, preanalyzed=None, fakeMode=None):
-        ''' returns list of (identifer, qid, lineno) '''
-        ''' returns list of (identifer, count of qtags, count of content lines) '''
-
-        topics, summary_name = preanalyzed if preanalyzed is not None else self.analysis
-        mode = fakeMode if fakeMode is not None else self.mode
+    def stats(self, preanalysis=None, fake_mode=None):
+        ''' returns [(identifer, qid, lineno)] for files '''
+        ''' returns [(identifer, count of qtags, count of content lines)] for qids '''
 
         filetypes = ['files', 'tocs']
 
@@ -417,53 +438,47 @@ class Identifier:
                 # any lines starting with anything except those
                 r'[^\n\'":=/\-+< ]+)')
 
-        other_regexes = [
-                content_line_regex
-                ]
+        other_regexes = config['regexes']['stats']
 
+        paths = self.paths()
         result = []
 
         if self.quest_component:
-            result = [ (os.path.normpath(os.path.join(d['dirName'], f['fileName'])),
-                            l['quest'],
-                            l['lineno'] )
-            for d in topics for ft in filetypes for f in d[ft] for l in f['lines']]
+            result = [ (entry[0], entry[3], entry[2] ) for entry in paths]
 
-        elif self.page_component or fakeMode:
+        elif self.page_component or fake_mode:
+            for entry in paths:
+                qid_count = 0
+                other_counts = [0] * len(other_regexes)
 
-            for d in topics:
-                for ft in filetypes:
-                    for f in d[ft]:
+                with open(entry[0]) as fx:
+                    searchlines = fx.readlines()
+                    for _, line in enumerate(searchlines):
+                        if quest_id_regex.search(line):
+                            qid_count += 1
 
-                        qid_count = 0
-                        other_counts = [0] * len(other_regexes)
+                        for idx, re in enumerate(other_regexes):
+                            if re.search(line):
+                                other_counts[idx] += 1
 
-                        with open(os.path.join(d['dirName'],f['fileName'])) as fx:
-                            searchlines = fx.readlines()
-                            for _, line in enumerate(searchlines):
-                                if quest_id_regex.search(line):
-                                    qid_count += 1
-
-                                for idx, re in enumerate(other_regexes):
-                                    if re.search(line):
-                                        other_counts[idx] += 1
-
-                            result.append((
-                                os.path.normpath(os.path.join(d['dirName'], f['fileName'])),
-                                qid_count) + tuple(other_counts))
+                    result.append((
+                        os.path.normpath(entry[0]),
+                        qid_count) + tuple(other_counts))
 
         elif self.section_component:
-            result = [ (os.path.normpath(d['dirName']),
-                str(sum(map(lambda l: int(l[1]), self.stats([d], ''), Mode.PAGE_A))),
-                str(sum(map(lambda l: int(l[2]), self.stats([d], ''), Mode.PAGE_A))) )
-                for d in topics ]
+            analyses = [(d[0], Identifier(self.config, uri=d[1]+':@', preanalysis=self.analysis).stats()) for d in paths]
+            result = [( d,
+                str(sum(map(lambda l: int(l[1]), a))),
+                str(sum(map(lambda l: int(l[2]), a))) )
+                for d, a in analyses ]
                 # TODO generalize to accepts any amount of stats
 
         else:
             # all_stats = self.stats( (topics,''), Mode.PAGE_A )
-            result = [( os.path.normpath(summary_name),
-                str(sum(map(lambda l: int(l[1]), self.stats( (topics, ''), Mode.PAGE_A)))),
-                str(sum(map(lambda l: int(l[2]), self.stats( (topics, ''), Mode.PAGE_A)))) )]
+            fake_stats = Identifier(self.config, uri='@:@', preanalysis=self.analysis).stats()
+            result = [( self.summary_name,
+                str(sum(map(lambda l: int(l[1]), fake_stats))),
+                str(sum(map(lambda l: int(l[2]), fake_stats))) )]
             # TODO generalize to accepts any amount of stats
 
 
@@ -637,7 +652,6 @@ class Identifier:
         else:
             pagerefs = prepagerefs
 
-        
         try:
             pre_result= [[pr] for pr in pagerefs[tag]]
         except:
@@ -663,17 +677,7 @@ class Identifier:
 
         return result
 
-
-
-    def verify(self):
-        if not self.page_component:
-            self.printer('needs page component')
-        elif self.quest_component:
-            self.printer('must not have quest component')
-        else:
-            return self._verify()
-
-    def _verify(self):
+    def verify(self, test_uri):
         '''
         returns list of integrity errors of files
         [{
@@ -686,32 +690,41 @@ class Identifier:
         }]
         '''
 
-        paths = [p[0] for p in self.paths()]
+        test_id = Identifier(self.config, uri=test_uri, preanalysis=self.analysis)
+
+        if not test_id.page_component:
+            self.printer('needs page component')
+            return []
+        elif test_id.quest_component:
+            self.printer('must not have quest component')
+            return []
+
+        test_paths = test_id.paths()
 
         duplicate_qids = []
-        dangling_qid_references = []
-        dangling_page_references = []
+        dangling_qidrefs = []
+        dangling_pagerefs = []
 
-        qid_regex = re.compile('^:([0-9]+):(?: .*)?$')
-        qid_ref_regex = re.compile('^:ext:([0-9]+):(?: .*)?$')
-        page_ref_regex = re.compile('<<([^,]+)(?:,.*)?>>')
+        qid_regex = re.compile(self.config['regexes']['qids'])
+        qidref_regex = re.compile(self.config['regexes']['qidrefs'])
+        pageref_regex = re.compile(self.config['regexes']['pagerefs'])
 
         result = []
 
-        for f in paths:
+        for f in test_paths:
 
             qids = []
-            qid_refs = []
-            page_refs = []
+            qidrefs = []
+            pagerefs = []
 
-            dangling_qid_references = []
-            dangling_page_references = []
+            dangling_qidrefs = []
+            dangling_pagerefs = []
 
             result.append({
-                'fileName': f,
+                'fileName': f[0],
                 'errors': [] })
 
-            with open(f, "r") as fx:
+            with open(f[0], "r") as fx:
                 searchlines = fx.readlines()
 
                 for lineno, line in enumerate(searchlines):
@@ -720,13 +733,15 @@ class Identifier:
                     if qid_match:
                         qids.append((qid_match.group(1), lineno))
 
-                    qid_ref_match = qid_ref_regex.search(line)
-                    if qid_ref_match:
-                        qid_refs.append((qid_ref_match.group(1), lineno))
+                    qidref_match = qidref_regex.search(line)
+                    if qidref_match:
+                        qidrefs.append((qidref_match.group(1), lineno))
 
-                    page_ref_match = page_ref_regex.search(line)
-                    if page_ref_match:
-                        page_refs.append((page_ref_match.group(1), lineno))
+                    pageref_match = pageref_regex.search(line)
+                    if pageref_match:
+                        pagerefs.append((pageref_match.group(1)
+                            if not pageref_match.group(1).startswith(':')
+                            else os.path.basename(os.path.dirname(f[0])) + pageref_match.group(1), lineno))
 
                 duplicate_qids = [qid[0] for qid in qids]
                 unique_qids    = set(duplicate_qids)
@@ -734,28 +749,28 @@ class Identifier:
                 for qid in unique_qids:
                     duplicate_qids.remove(qid)
 
-                for qid_ref in qid_refs:
-                    if qid_ref[0] not in unique_qids:
-                        dangling_qid_references.append(qid_ref)
+                for qidref in qidrefs:
+                    if qidref[0] not in unique_qids:
+                        dangling_qidrefs.append(qidref)
 
-                for page_ref in page_refs:
-                    id = Identifier(uri=page_ref[0], printer=lambda _: ())
-                    if id.failed:
-                        dangling_page_references.append(page_ref)
+                for pageref in pagerefs:
+                    fake_id = Identifier(self.config, uri=pageref[0], preanalysis=self.analysis, printer=lambda t: t)
+                    if fake_id.failed:
+                        dangling_pagerefs.append(pageref)
 
-                list(filter(lambda e: e['fileName'] == f, result))[0]['errors'] += [{
+                list(filter(lambda e: e['fileName'] == f[0], result))[0]['errors'] += [{
                         'type': 'duplicate_qid',
                         'info': dupe,
                         'lineno': [entry[1] + 1 for entry in qids if entry[0] == dupe]
                     } for dupe in set(duplicate_qids)] + [{
-                        'type': 'dangling_qid_reference',
-                        'info': dangling_qid_ref[0],
-                        'lineno': [dangling_qid_ref[1] + 1]
-                    } for dangling_qid_ref in dangling_qid_references] + [{
-                        'type': 'dangling_page_reference',
-                        'info': dangling_page_ref[0],
-                        'lineno': [dangling_page_ref[1] + 1]
-                    } for dangling_page_ref in dangling_page_references]
+                        'type': 'dangling_qidref',
+                        'info': dangling_qidref[0],
+                        'lineno': [dangling_qidref[1] + 1]
+                    } for dangling_qidref in dangling_qidrefs] + [{
+                        'type': 'dangling_pageref',
+                        'info': dangling_pageref[0],
+                        'lineno': [dangling_pageref[1] + 1]
+                    } for dangling_pageref in dangling_pagerefs]
 
         return result
 

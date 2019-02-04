@@ -4,12 +4,12 @@
   "archive_root": "/Users/hgiesel/Developer/archive",
 
   "regexes": {
-    "pagerefs": "asdf",
-    "qidrefs": "asdf",
-    "headings": "=(?: )?(.*)",
-    "qids": ":([0-9]+):(?: .*)?",
+    "pagerefs": "<<!?([^>,]+).*>>",
+    "qidrefs": "^:ext:([0-9]+):(?: .*)?$",
+    "headings": "^=(?: )?(.*)",
+    "qids": "^:([0-9]+):(?: .*)?",
     "stats": [
-      "(\\.[^. ]+|\\.+ .+|\\*+ .+|[^\\n\\'\":=/\\-+< ]+)"
+      "^(\\.[^. ]+|\\.+ .+|\\*+ .+|[^\\n\\'\":=/\\-+< ]+)"
     ]
   },
   "quest_field": "Quest",

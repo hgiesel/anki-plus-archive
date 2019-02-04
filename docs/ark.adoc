@@ -4,7 +4,14 @@
 
 * `ark paths`
 
+Will print the files associated with a specific ark locator
+This might be directories for sections, files for pages, or 
+files and lines for quests.
+
 * `ark stats`
+Will print stats for a specific ark locator.
+Section ark locators summarize the stats for pages.
+Quest ark locators have their own set of available stats.
 
 * `ark update`
 ** updates vim-context to the latest release from github

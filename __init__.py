@@ -24,32 +24,41 @@ else:
     from lib.util import decloze, stdlib
     from lib.srs_connection import AnkiConnection
 
+    import json
+    import os
+
     ARGV, printer = setup_parser()
+
+    # print(os.readlink(__file__))
+
+    config_file_name = (os.path.join(os.path.dirname(os.readlink(__file__)), 'config.json'))
+    with open(config_file_name, 'r') as f:
+        config = json.load(f)
 
     if ARGV.cmd is not None:
 
         result = None
 
         if ARGV.cmd == 'paths':
-            addr = Identifier(ARGV.uri, printer=printer)
+            addr = Identifier(config, ARGV.uri, printer=printer)
             result = getattr(addr, ARGV.cmd)()
 
             if ARGV.paths == 'rel':
-                result = [(Identifier.to_rel_path(path[0]),path[1]) for path in result]
+                printed = [(Identifier.to_rel_path(path[0]),path[1]) for path in result]
             elif ARGV.paths == 'id':
-                result = [(Identifier.to_identifier(path[0]),path[1]) for path in result]
+                printed = [(Identifier.to_identifier(path[0]),path[1]) for path in result]
             elif ARGV.paths == 'shortid':
-                result = [(Identifier.to_identifier(path[0], omit_section=True),path[1]) for path in result]
+                printed = [(Identifier.to_identifier(path[0], omit_section=True),path[1]) for path in result]
             elif ARGV.paths == 'none':
-                result = []
+                printed = []
 
             if ARGV.delimiter == 'default':
-                result = [(path[0]+':'+str(path[1])+':',) if path[1] is not None else (path[0],) for path in result]
+                printed = [(path[0] + ':' + str(path[2]) + ':',) if path[2] is not None else (path[0],) for path in result]
 
-            Printer.print_stats(result, delimiter=ARGV.delimiter)
+            Printer.print_stats(printed, delimiter=ARGV.delimiter)
 
         elif ARGV.cmd == 'stats':
-            addr = Identifier(ARGV.uri, printer=printer)
+            addr = Identifier(config, ARGV.uri, printer=printer)
 
             result = getattr(addr, ARGV.cmd)()
 
@@ -71,7 +80,7 @@ else:
 
 
         elif ARGV.cmd == 'headings':
-            addr = Identifier(ARGV.uri, printer=printer)
+            addr = Identifier(config, ARGV.uri, printer=printer)
 
             result = getattr(addr, ARGV.cmd)()
             lines = [(val['fileName'],heading[0],heading[1]) for val in result for heading in val['headings']]
@@ -90,7 +99,7 @@ else:
             Printer.print_stats(lines, ARGV.delimiter if not ARGV.delimiter == 'default' else '\t')
 
         elif ARGV.cmd == 'pagerefs':
-            addr = Identifier(ARGV.uri, printer=printer)
+            addr = Identifier(config, ARGV.uri, printer=printer)
 
             result = getattr(addr, ARGV.cmd)()
             lines = [(val['fileName'],pageref[0],pageref[1]) for val in result for pageref in val['pagerefs']]
@@ -109,19 +118,18 @@ else:
             Printer.print_stats(lines, ARGV.delimiter if not ARGV.delimiter == 'default' else '\t')
 
         elif ARGV.cmd == 'revpagerefs':
-            foo = getattr(Identifier(ARGV.uri, printer=printer), ARGV.cmd)()
+            foo = getattr(Identifier(config, ARGV.uri, printer=printer), ARGV.cmd)()
             pprint.pprint(foo)
 
         elif ARGV.cmd == 'query':
-            addr = Identifier(ARGV.uri, printer=printer)
+            addr = Identifier(config, ARGV.uri, printer=printer)
             result = getattr(addr, ARGV.cmd)(ARGV.validate)
             print(' '.join(result))
 
-
         elif ARGV.cmd == 'verify':
-            addr = Identifier(ARGV.uri, printer=printer)
+            addr = Identifier(config, '@:@', printer=printer)
 
-            result = getattr(addr, ARGV.cmd)()
+            result = getattr(addr, ARGV.cmd)(ARGV.uri)
             lines = [(entry['fileName'],error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
 
             if ARGV.paths == 'default':
@@ -145,7 +153,7 @@ else:
                     content_field_name='Quest',
                     quest_id_regex=r':([0-9]+)\a*:')
 
-            addr = Identifier(ARGV.uri, printer=printer)
+            addr = Identifier(config, ARGV.uri, printer=printer)
             result = getattr(addr, ARGV.cmd)(anki_connection)
 
             Printer.print_stats(result)
@@ -158,7 +166,7 @@ else:
                     content_field_name='Quest',
                     quest_id_regex=r':([0-9]+)\a*:')
 
-            ident = Identifier(ARGV.uri, printer=printer)
+            ident = Identifier(config, ARGV.uri, printer=printer)
             if not ident.mode == Mode.QUEST_I:
                 printer('uri must designate a single quest')
 
@@ -177,7 +185,7 @@ else:
                     content_field_name='Quest',
                     quest_id_regex=r':([0-9]+)\a*:')
 
-            addr = Identifier(ARGV.uri, printer=printer).query()
+            addr = Identifier(config, ARGV.uri, printer=printer).query()
             result = anki_connection.anki_browse(addr)
 
             print(result)
@@ -193,4 +201,4 @@ else:
             stdlib()
 
         else:
-            getattr(Identifier(ARGV.uri, printer=printer), ARGV.cmd)()
+            getattr(Identifier(config, ARGV.uri, printer=printer), ARGV.cmd)()
