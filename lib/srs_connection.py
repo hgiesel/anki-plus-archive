@@ -4,11 +4,17 @@ import re
 import pprint
 
 class AnkiConnection:
-    def __init__(self, config, port=8765):
+    def __init__(self, config, port=8765, printer=print):
         '''setup connection to anki'''
         self.req = urllib.request.Request('http://localhost:' + str(port))
         self.req.add_header('Content-Type', 'application/json; charset=utf-8')
         self.config = config
+        self.printer = printer
+
+        try:
+            add_resp = urllib.request.urlopen(self.req)
+        except:
+            self.printer('connection to db cannot be established')
 
     def anki_add(self, tag, qid, content, option=0):
         add_req = json.dumps({

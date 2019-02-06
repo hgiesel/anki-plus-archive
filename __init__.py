@@ -158,7 +158,7 @@ else:
             Printer.print_stats(lines, delimiter=ARGV.delimiter)
 
         elif ARGV.cmd == 'match':
-            anki_connection = AnkiConnection(config)
+            anki_connection = AnkiConnection(config, printer=printer)
 
             addr = Identifier(config, ARGV.uri, printer=printer)
             result, outsiders = getattr(addr, ARGV.cmd)(anki_connection)
@@ -189,7 +189,7 @@ else:
             Printer.print_stats(all_results)
 
         elif ARGV.cmd == 'add':
-            anki_connection = AnkiConnection(config)
+            anki_connection = AnkiConnection(config, printer=printer)
 
             ident = Identifier(config, ARGV.uri, printer=printer)
             if not ident.mode == Mode.QUEST_I:
@@ -202,7 +202,7 @@ else:
             print(result)
 
         elif ARGV.cmd == 'browse':
-            anki_connection = AnkiConnection(config)
+            anki_connection = AnkiConnection(config, printer=printer)
 
             addr = Identifier(config, ARGV.uri, printer=printer).query()
             result = anki_connection.anki_browse(addr)

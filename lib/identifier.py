@@ -4,6 +4,7 @@ import sys
 from re import compile
 from copy import deepcopy
 import pprint
+from itertools import groupby
 
 ARCHIVE_ROOT = os.environ['ARCHIVE_ROOT']
 
@@ -73,13 +74,13 @@ class Identifier:
 
         return result
 
-
     def __init__(self, config, uri=None, preanalysis=None, printer=None, hypothetical=False):
         ''' (self) -> ([ResultDict], mode: Mode, summary_name: String)
         * Analzyes uri and returns one of the following:
 
         ** 'abstract-algebra<@'           -> (multiple dirs                ,~doesn't affect mode)
         ** 'abstract-algebra<'            -> (multiple dirs                ,~doesn't affect mode)
+        ** 'grapth-theory:R<'             -> (multiple dirs/files          ,~doesn't affect mode)
 
         ** ''                             -> (multiple dirs                 ,ARCHIVE)
 
@@ -117,8 +118,8 @@ class Identifier:
         # e.g. for making match tests against Anki
         self.hypthetical = hypothetical
 
-        component_regex = compile(# optional ancestor component
-                           r'^(?:([^#/:]+)//)?'
+        component_regex = compile(# optional filter component
+                           r'^(?:([^#/]+)//)?'
                            # compulsory section component (but may be empty!)
                            r'([^#/:]*)'
                            # can't have quest identifier without page component!
@@ -238,71 +239,95 @@ class Identifier:
             self.mode = tempMode
 
     def __analyze(self):
+        '''
+        analyze filter component and fill
+        topics accordingly
+        '''
+
         summary_name = os.environ['ARCHIVE_ROOT']
         topics       = []
 
         self.failed = False
 
-        '''
-        processing of filter
-        '''
-        if self.filter_component:
-            matched_ancestors = []
-            ancestor_regex = compile('(.*/' + self.filter_component.replace('-','[^./]*-') + '[^-./]*)/?')
+        ''' processing of filter '''
 
-        first_dir = True
-        toc_regex = compile(self.config['regexes']['tocs'])
-
-        for root, dirs, files in os.walk(summary_name):
-            files[:] = [f for f in files if not f.startswith('.')]
-
-            content_pages, tocs = [], []
-            for f in files:
-                (tocs if toc_regex.search(f) else content_pages).append(f)
-
-            dirs[:] = [d for d in dirs if
-                    not d.startswith('.') and (not tocs or first_dir)]
-
+        if not ':' in self.filter_component:
             if self.filter_component:
-                match = ancestor_regex.search(root)
-            else:
-                match = True
+                matched_ancestors = []
+                ancestor_regex = compile('(.*/' + self.filter_component.replace('-','[^./]*-') + '[^-./]*)/?')
 
-            first_dir = False
+            first_dir = True
+            toc_regex = compile(self.config['regexes']['tocs'])
 
-            if tocs and root is not summary_name and match:
-                topics.append({
-                    'dirName':   root,
-                    'files': [{
-                        'file_name': f,
-                        'lines': []
-                        } for f in content_pages],
-                    'tocs': [{
-                        'file_name': t,
-                        'lines': []
-                        } for t in tocs]
-                    })
+            for root, dirs, files in os.walk(summary_name):
+                files[:] = [f for f in files if not f.startswith('.')]
+
+                content_pages, tocs = [], []
+                for f in files:
+                    (tocs if toc_regex.search(f) else content_pages).append(f)
+
+                dirs[:] = [d for d in dirs if
+                        not d.startswith('.') and (not tocs or first_dir)]
 
                 if self.filter_component:
-                    matched_ancestors.append(match.group(1))
+                    match = ancestor_regex.search(root)
+                else:
+                    match = True
 
-        if self.filter_component:
-            unique_ancestors = set(matched_ancestors)
+                first_dir = False
 
-            if len(unique_ancestors) < 1:
-                self.printer('no such ancestor topic exists')
-                self.failed = True
+                if tocs and root is not summary_name and match:
+                    topics.append({
+                        'dirName':   root,
+                        'files': [{
+                            'file_name': f,
+                            'lines': []
+                            } for f in content_pages],
+                        'tocs': [{
+                            'file_name': t,
+                            'lines': []
+                            } for t in tocs]
+                        })
 
-            if len(unique_ancestors) > 1:
-                self.printer('ancestor topic is ambiguous: ' +
-                    ' '.join(map(lambda d: os.path.basename(d), unique_ancestors)))
-                self.failed = True
+                    if self.filter_component:
+                        matched_ancestors.append(match.group(1))
 
-            summary_name = unique_ancestors.pop()
+            if self.filter_component:
+                unique_ancestors = set(matched_ancestors)
 
-        self.qids_set = False
+                if len(unique_ancestors) < 1:
+                    self.printer('no such ancestor topic exists')
+                    self.failed = True
 
-        return (topics, summary_name)
+                if len(unique_ancestors) > 1:
+                    self.printer('ancestor topic is ambiguous: ' +
+                        ' '.join(map(lambda d: os.path.basename(d), unique_ancestors)))
+                    self.failed = True
+
+                summary_name = unique_ancestors.pop()
+
+            self.qids_set = False
+            return (topics, summary_name)
+
+        else:
+            result = []
+
+            theid = Identifier(self.config, uri='@:@', printer=self.printer)
+            pagerefs = theid.pagerefs(self.filter_component, expand_tocs=True)
+            summary_name = Identifier(self.config, uri=self.filter_component, printer=self.printer).paths()[0][0]
+
+            files = map(lambda t: os.path.split(t), [i[2] for p in pagerefs for i in p['pagerefs']])
+            files_grouped = groupby(files, lambda t: t[0])
+
+            for key, item in files_grouped:
+                files = (list(map(lambda t: { 'file_name': t[1], 'lines': [] }, item)))
+                result.append({
+                        'dirName':   key,
+                        'files': files,
+                        'tocs': []
+                        })
+
+            return (result, summary_name)
 
     def __postfilter(self, topics):
         ''' returns filtered topic '''
