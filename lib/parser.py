@@ -67,7 +67,7 @@ def setup_parser():
             default='default', help='decide the delimiter for the output')
     subparsers_dict['revpagerefs'].add_argument('-f', '--further', action='store_true', help='follow furter pagerefs')
     subparsers_dict['revpagerefs'].add_argument('-k', type=int,
-            default=0, help='decide how deep pagerefs are traced')
+            default=-1, help='decide how deep pagerefs are traced')
     subparsers_dict['revpagerefs'].add_argument('uri', nargs='?', default='',
         help='archive uri you want to query')
 

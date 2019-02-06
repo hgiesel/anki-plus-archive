@@ -6,8 +6,6 @@ from copy import deepcopy
 import pprint
 from itertools import groupby
 
-ARCHIVE_ROOT = os.environ['ARCHIVE_ROOT']
-
 class Printer:
     @staticmethod
     def print_stats(vals, delimiter=None):
@@ -44,7 +42,7 @@ class Identifier:
         can transform:
         abs_path -> rel path from archive root
         '''
-        result = os.path.relpath(path, os.path.join(ARCHIVE_ROOT, '..'))
+        result = os.path.relpath(path, os.path.join(self.config['archive_root'], '..'))
         return result
 
     @staticmethod
@@ -244,7 +242,7 @@ class Identifier:
         topics accordingly
         '''
 
-        summary_name = os.environ['ARCHIVE_ROOT']
+        summary_name = self.config['archive_root']
         topics       = []
 
         self.failed = False
@@ -573,8 +571,7 @@ class Identifier:
 
         return result
 
-
-    def pagerefs(self, paths_searched, expand_tocs=None, further_refs=None, key_by=None, fixed_lineno=None):
+    def pagerefs(self, paths_searched, expand_tocs=None, further_refs=None, fixed_lineno=None):
         '''
         returns list of pagerefs defined in file
         self: paths considered for completion
@@ -606,90 +603,118 @@ class Identifier:
         paths_under_consideration = [p[0] for p in self.paths()]
         pageref_regex = compile(self.config['regexes']['pagerefs'])
         toc_regex = compile(self.config['regexes']['tocs'])
+        result = []
 
-        if key_by:
-            result = {}
+        for f in [t[0] for t in Identifier(self.config, preanalysis=self.analysis, uri=paths_searched).paths()]:
+            pagerefs = []
 
-            for f in [t[0] for t in Identifier(self.config, preanalysis=self.analysis, uri=paths_searched).paths()]:
-                with open(f, "r") as fx:
-                    searchlines = fx.readlines()
+            with open(f, "r") as fx:
+                searchlines = fx.readlines()
 
-                    for lineno, line in enumerate(searchlines):
+                for lineno, line in enumerate(searchlines):
 
-                        pageref_match = pageref_regex.search(line)
-                        if pageref_match:
+                    pageref_match = pageref_regex.search(line)
+                    if pageref_match:
 
-                            pageref_matched = pageref_match.group(1)
+                        pageref_matched = pageref_match.group(1)
 
-                            # dealing with further pagerefs
-                            if pageref_matched.startswith('!'):
-                                if further_refs:
-                                    pageref_matched = pageref_matched[1:]
-                                else:
-                                    continue
-
-                            prov_id = pageref_matched if not pageref_matched.startswith(':') else os.path.basename(os.path.dirname(f)) + pageref_matched
-                            prov_identifier = Identifier(self.config, uri=prov_id, preanalysis=self.analysis)
-
-                            file_name, pageref, _, _ = prov_identifier.paths()[0]
-
-                            if expand_tocs and toc_regex.search(os.path.basename(file_name)):
-                                inter_result = self.pagerefs(file_name, expand_tocs=True, further_refs=further_refs, key_by=True, fixed_lineno=lineno)
-                                print('inter_result: ' + inter_result)
-                                ## TODO
+                        # dealing with further pagerefs
+                        if pageref_matched.startswith('!'):
+                            if further_refs:
+                                pageref_matched = pageref_matched[1:]
+                            else:
                                 continue
 
-                            try:
-                                result[pageref].append( (f, lineno if not fixed_lineno else fixed_lineno, file_name) )
-                            except:
-                                result[pageref] = []
-                                result[pageref].append( (f, lineno if not fixed_lineno else fixed_lineno, file_name) )
+                        prov_id = (pageref_matched
+                                if not pageref_matched.startswith(':')
+                                else os.path.basename(os.path.dirname(f)) + pageref_matched)
 
-        else:
-            result = []
+                        prov_identifier = Identifier(self.config, uri=prov_id, preanalysis=self.analysis)
 
-            for f in [t[0] for t in Identifier(self.config, preanalysis=self.analysis, uri=paths_searched).paths()]:
-                pagerefs = []
+                        file_name, pageref, _, _ = prov_identifier.paths()[0]
 
-                with open(f, "r") as fx:
-                    searchlines = fx.readlines()
+                        if expand_tocs and toc_regex.search(os.path.basename(file_name)):
+                            inter_result = self.pagerefs(file_name, expand_tocs=True, further_refs=further_refs, fixed_lineno=lineno)
+                            result += inter_result
+                            continue
 
-                    for lineno, line in enumerate(searchlines):
+                        pagerefs.append((pageref, lineno if not fixed_lineno else fixed_lineno, file_name))
 
-                        pageref_match = pageref_regex.search(line)
-                        if pageref_match:
-
-                            pageref_matched = pageref_match.group(1)
-
-                            # dealing with further pagerefs
-                            if pageref_matched.startswith('!'):
-                                if further_refs:
-                                    pageref_matched = pageref_matched[1:]
-                                else:
-                                    continue
-
-                            prov_id = (pageref_matched
-                                    if not pageref_matched.startswith(':')
-                                    else os.path.basename(os.path.dirname(f)) + pageref_matched)
-
-                            prov_identifier = Identifier(self.config, uri=prov_id, preanalysis=self.analysis)
-
-                            file_name, pageref, _, _ = prov_identifier.paths()[0]
-
-                            if expand_tocs and toc_regex.search(os.path.basename(file_name)):
-                                inter_result = self.pagerefs(file_name, expand_tocs=True, further_refs=further_refs, fixed_lineno=lineno)
-                                result += inter_result
-                                continue
-
-                            pagerefs.append((pageref, lineno if not fixed_lineno else fixed_lineno, file_name))
-
-                result.append({
-                    'file_name': f,
-                    'pagerefs': pagerefs
-                    })
+            result.append({
+                'file_name': f,
+                'pagerefs': pagerefs
+                })
 
         return result
 
+    def pagerefs_keyby(self, paths_searched, expand_tocs=None, further_refs=None, fixed_lineno=None):
+        '''
+        returns list of pagerefs defined in file
+        self: paths considered for completion
+        -> if they are not contained within there: error?
+        paths_searched: paths where you look for pagerefs
+
+        [{
+            'graph-theory:fcd2ca': [('/path/to/archive/group-like-2.adoc', [23])]
+            'group-theory:fc3434': [('/path/to/archive/group-like-2.adoc', [23])]
+        }]
+        '''
+
+        if further_refs is None or not further_refs:
+            further_refs = False
+        else:
+            further_refs = True
+
+        if expand_tocs is None or not expand_tocs:
+            expand_tocs = False
+        else:
+            expand_tocs = True
+
+        paths_under_consideration = [p[0] for p in self.paths()]
+        pageref_regex = compile(self.config['regexes']['pagerefs'])
+        toc_regex = compile(self.config['regexes']['tocs'])
+
+        result = {}
+
+        for f in [t[0] for t in Identifier(self.config, preanalysis=self.analysis, uri=paths_searched).paths()]:
+            with open(f, "r") as fx:
+                searchlines = fx.readlines()
+
+                for lineno, line in enumerate(searchlines):
+
+                    pageref_match = pageref_regex.search(line)
+                    if pageref_match:
+
+                        pageref_matched = pageref_match.group(1)
+
+                        # dealing with further pagerefs
+                        if pageref_matched.startswith('!'):
+                            if further_refs:
+                                pageref_matched = pageref_matched[1:]
+                            else:
+                                continue
+
+                        prov_id = pageref_matched if not pageref_matched.startswith(':') else os.path.basename(os.path.dirname(f)) + pageref_matched
+                        prov_identifier = Identifier(self.config, uri=prov_id, preanalysis=self.analysis)
+
+                        try:
+                            file_name, pageref, _, _ = prov_identifier.paths()[0]
+                        except:
+                            self.printer('file contains invalid pageref')
+
+                        if expand_tocs and toc_regex.search(os.path.basename(file_name)):
+                            inter_result = self.pagerefs_keyby(file_name, expand_tocs=True, further_refs=further_refs, fixed_lineno=lineno)
+                            print('inter_result: ' + inter_result)
+                            ## TODO
+                            continue
+
+                        try:
+                            result[pageref].append( (f, lineno if not fixed_lineno else fixed_lineno, file_name) )
+                        except:
+                            result[pageref] = []
+                            result[pageref].append( (f, lineno if not fixed_lineno else fixed_lineno, file_name) )
+
+        return result
 
     def revpagerefs(self, paths_searched, prepagerefs=None, forbidden_pagerefs=None, further_refs=None, k=None):
         '''
@@ -729,49 +754,50 @@ class Identifier:
         elif k is -1 and not further_refs:
             k = 20
 
-        file_name, qid, _, _ = Identifier(self.config, uri=paths_searched, preanalysis=self.analysis).paths()[0]
+        paths = Identifier(self.config, uri=paths_searched, preanalysis=self.analysis, printer=self.printer).paths()
 
-        if k >= 1:
-            if not prepagerefs:
-                pagerefs = self.pagerefs(key_by=True, paths_searched='@:@', further_refs=further_refs)
+        for file_name, qid, _, _ in paths:
+
+            if k >= 1:
+                if not prepagerefs:
+                    pagerefs = self.pagerefs_keyby(paths_searched='@:@', further_refs=further_refs)
+                else:
+                    pagerefs = prepagerefs
+
+                if not forbidden_pagerefs:
+                    forbidden_pagerefs = []
+
+                try:
+                    pre_result = [[pr] for pr in pagerefs[qid]]
+                except:
+                    pre_result = []
+
+                for val in pre_result:
+                    if val in forbidden_pagerefs:
+                        self.printer('cycle detected starting at: "' + str(paths_searched) +'"\n' + str(forbidden_pagerefs))
+
+                add_result = []
+
+                toc_regex = compile(self.config['regexes']['tocs'])
+
+                for elem in pre_result:
+                    if toc_regex.search(os.path.basename(elem[0][0])):
+
+                        new_id = Identifier(self.config, uri=elem[0][0], preanalysis=self.analysis, printer=self.printer)
+                        next_lookup =  self.revpagerefs(new_id.paths()[0][1], prepagerefs=pagerefs,
+                                forbidden_pagerefs=pre_result + forbidden_pagerefs, k=k-1)
+
+                        add_result += [ i + elem for i in next_lookup[0]['traceback'] ]
+
+                traceback = pre_result + add_result
+
             else:
-                pagerefs = prepagerefs
+                traceback = []
 
-            if not forbidden_pagerefs:
-                forbidden_pagerefs = []
-
-            try:
-                pre_result = [[pr] for pr in pagerefs[qid]]
-            except:
-                pre_result = []
-
-            for val in pre_result:
-                if val in forbidden_pagerefs:
-                    self.printer('cycle detected starting at: "' + str(paths_searched) +'"\n' + str(forbidden_pagerefs))
-
-            add_result = []
-
-            toc_regex = compile(self.config['regexes']['tocs'])
-
-            for elem in pre_result:
-                if toc_regex.search(os.path.basename(elem[0][0])):
-
-                    new_id = Identifier(self.config, uri=elem[0][0], preanalysis=self.analysis, printer=self.printer)
-                    next_lookup =  self.revpagerefs(new_id.paths()[0][1], prepagerefs=pagerefs,
-                            forbidden_pagerefs=pre_result + forbidden_pagerefs, k=k-1)
-
-                    add_result += [ i + elem for i in next_lookup['traceback'] ]
-
-            traceback = pre_result + add_result
-
-        else:
-            print('foobar')
-            traceback = []
-
-        result = {
-                'pageref': file_name,
-                'traceback': traceback
-                }
+            result.append({
+                    'pageref': file_name,
+                    'traceback': traceback
+                    })
 
         return result
 
