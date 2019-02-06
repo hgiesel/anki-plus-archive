@@ -83,7 +83,7 @@ else:
             addr = Identifier(config, ARGV.uri, printer=printer)
 
             result = getattr(addr, ARGV.cmd)()
-            lines = [(val['fileName'],heading[0],heading[1]) for val in result for heading in val['headings']]
+            lines = [(val['file_name'],heading[0],heading[1]) for val in result for heading in val['headings']]
 
             if ARGV.paths == 'default':
                 ARGV.paths='id'
@@ -105,8 +105,8 @@ else:
         elif ARGV.cmd == 'pagerefs':
             addr = Identifier(config, '@:@', printer=printer)
 
-            result = getattr(addr, ARGV.cmd)(ARGV.uri)
-            lines = [(val['fileName'],pageref[0],pageref[1]) for val in result for pageref in val['pagerefs']]
+            result = getattr(addr, ARGV.cmd)(ARGV.uri, expand_tocs=ARGV.tocs, further_refs=ARGV.further)
+            lines = sorted([(val['file_name'],pageref[0],pageref[1]) for val in result for pageref in val['pagerefs']], key=lambda t: t[2])
 
             if ARGV.paths == 'default':
                 ARGV.paths = 'id'
@@ -139,7 +139,7 @@ else:
             addr = Identifier(config, '@:@', printer=printer)
 
             result = getattr(addr, ARGV.cmd)(ARGV.uri)
-            lines = [(entry['fileName'],error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
+            lines = [(entry['file_name'],error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
 
             if ARGV.paths == 'default':
                 ARGV.paths = 'id'
@@ -147,11 +147,11 @@ else:
             if ARGV.paths == 'full':
                 pass
             elif ARGV.paths == 'rel':
-                lines = [(Identifier.to_rel_path(entry['fileName']), error['type'],error['info'], error['lineno']) for entry in result for error in entry['errors']]
+                lines = [(Identifier.to_rel_path(entry['file_name']), error['type'],error['info'], error['lineno']) for entry in result for error in entry['errors']]
             elif ARGV.paths == 'id':
-                lines = [(Identifier.to_identifier(entry['fileName']), error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
+                lines = [(Identifier.to_identifier(entry['file_name']), error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
             elif ARGV.paths == 'shortid':
-                lines = [(Identifier.to_identifier(entry['fileName'], omit_section=True), error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
+                lines = [(Identifier.to_identifier(entry['file_name'], omit_section=True), error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
             elif ARGV.paths == 'none':
                 lines = [(error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
 

@@ -49,6 +49,10 @@ def setup_parser():
         help='archive uri you want to query')
 
     subparsers_dict['pagerefs'] = subparsers.add_parser('pagerefs')
+    subparsers_dict['pagerefs'].add_argument('-t', '--tocs', action='store_true',
+            help='expand pagerefs to tocs')
+    subparsers_dict['pagerefs'].add_argument('-f', '--further', action='store_true',
+            help='include further pagerefs')
     subparsers_dict['pagerefs'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
             default='default', help='decide how paths should be printed')
     subparsers_dict['pagerefs'].add_argument('-d', '--delimiter',

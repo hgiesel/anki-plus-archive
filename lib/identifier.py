@@ -549,7 +549,7 @@ class Identifier:
         return result
 
 
-    def pagerefs(self, paths_searched, further_refs=None, key_by=None):
+    def pagerefs(self, paths_searched, expand_tocs=None, further_refs=None, key_by=None, fixed_lineno=None):
         '''
         returns list of pagerefs defined in file
         self: paths considered for completion
@@ -573,8 +573,14 @@ class Identifier:
         else:
             further_refs = True
 
+        if expand_tocs is None or not expand_tocs:
+            expand_tocs = False
+        else:
+            expand_tocs = True
+
         paths_under_consideration = [p[0] for p in self.paths()]
         pageref_regex = compile(self.config['regexes']['pagerefs'])
+        toc_regex = compile(self.config['regexes']['tocs'])
 
         if key_by:
             result = {}
@@ -598,21 +604,26 @@ class Identifier:
                                     continue
 
                             prov_id = pageref_matched if not pageref_matched.startswith(':') else os.path.basename(os.path.dirname(f)) + pageref_matched
-
                             prov_identifier = Identifier(self.config, uri=prov_id, preanalysis=self.analysis)
 
                             file_name, pageref, _, _ = prov_identifier.paths()[0]
 
+                            if expand_tocs and toc_regex.search(os.path.basename(file_name)):
+                                inter_result = self.pagerefs(file_name, expand_tocs=True, further_refs=further_refs, key_by=True, fixed_lineno=lineno)
+                                print('inter_result: ' + inter_result)
+                                ## TODO
+                                continue
+
                             try:
-                                result[pageref].append( (f, lineno) )
+                                result[pageref].append( (f, lineno if not fixed_lineno else fixed_lineno, file_name) )
                             except:
                                 result[pageref] = []
-                                result[pageref].append( (f, lineno) )
+                                result[pageref].append( (f, lineno if not fixed_lineno else fixed_lineno, file_name) )
 
         else:
             result = []
 
-            for f in [t[0] for t in Identifier(self.config, preanalysis, self.analysis, uri=paths_searched).paths()]:
+            for f in [t[0] for t in Identifier(self.config, preanalysis=self.analysis, uri=paths_searched).paths()]:
                 pagerefs = []
 
                 with open(f, "r") as fx:
@@ -639,7 +650,13 @@ class Identifier:
                             prov_identifier = Identifier(self.config, uri=prov_id, preanalysis=self.analysis)
 
                             file_name, pageref, _, _ = prov_identifier.paths()[0]
-                            pagerefs.append((pageref, lineno))
+
+                            if expand_tocs and toc_regex.search(os.path.basename(file_name)):
+                                inter_result = self.pagerefs(file_name, expand_tocs=True, further_refs=further_refs, fixed_lineno=lineno)
+                                result += inter_result
+                                continue
+
+                            pagerefs.append((pageref, lineno if not fixed_lineno else fixed_lineno, file_name))
 
                 result.append({
                     'file_name': f,
