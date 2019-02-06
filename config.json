@@ -4,7 +4,8 @@
   "archive_root": "/Users/hgiesel/Developer/archive",
 
   "regexes": {
-    "pagerefs": "<<!?([^>,]+).*>>",
+    "tocs": "^README.*",
+    "pagerefs": "<<([^>,]+).*>>",
     "qidrefs": "^:ext:([0-9]+):(?: .*)?$",
     "headings": "^=(?: )?(.*)",
     "qids": "^:([0-9]+):(?: .*)?",
@@ -12,10 +13,15 @@
       "^(\\.[^. ]+|\\.+ .+|\\*+ .+|[^\\n\\'\":=/\\-+< ]+)"
     ]
   },
-  "quest_field": "Quest",
-  "quest_regex": ":([0-9]+):(?: .*)?",
-  "heading_regex": "=(?: )?(.*)",
 
+  "card_sets": [{
+    "deck_name": "misc::head",
+    "model_name": "Cloze (overlapping)",
+    "quest_field": "Title",
+    "content_field": "Original",
+    "qid_regex": "^:([0-9]+):(?: .*)?",
+    "pageid_regex": "(?:.*::)?([^:]*)::([^:]*)$"
+  }],
 
   "editor_command": [
     "/usr/local/bin/vimr",
@@ -24,7 +30,7 @@
     "-c",
     "'bd!'",
     "-c",
-    "'/^:$QUEST.*:$/'",
+    "'/^:$QUEST:.*$/'",
     "-c",
     "normal! zz"
   ]

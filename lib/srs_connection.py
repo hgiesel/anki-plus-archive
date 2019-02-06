@@ -1,36 +1,26 @@
 import urllib
 import json
 import re
+import pprint
 
 class AnkiConnection:
-    def __init__(self, port=8765, deck_name=None, model_name=None,
-            quest_field_name=None, content_field_name=None,
-            quest_id_regex=None):
+    def __init__(self, config, port=8765):
         '''setup connection to anki'''
         self.req = urllib.request.Request('http://localhost:' + str(port))
         self.req.add_header('Content-Type', 'application/json; charset=utf-8')
+        self.config = config
 
-        self.quest_id_regex = quest_id_regex
-
-        self.quest_field_name = quest_field_name
-        self.content_field_name = content_field_name
-
-        self.deck_name = deck_name
-        self.model_name = model_name
-
-    def anki_add(self, tag, qid, content):
-        print(tag +'\n'+ qid + '\n'+ content)
-
+    def anki_add(self, tag, qid, content, option=0):
         add_req = json.dumps({
                 'action': 'guiAddCards',
                 'version': 6,
                 'params': {
                     'note': {
-                        'deckName': self.deck_name,
-                        'modelName': self.model_name,
+                        'deckName': self.config['card_sets'][option]['deck_name'],
+                        'modelName': self.config['card_sets'][option]['model_name'],
                         'fields': {
-                            self.quest_field_name: ':'+qid+':',
-                            self.content_field_name: content.strip().replace('\n','<br />')
+                            self.config['card_sets'][option]['quest_field']: ':'+qid+':',
+                            self.config['card_sets'][option]['content_field']: content.strip().replace('\n','<br />')
                             },
                         'options': {
                             'closeAfterAdding': True
@@ -46,8 +36,8 @@ class AnkiConnection:
         add_json = json.loads(add_resp.read().decode('utf-8'))
         return add_json
 
-    def anki_browse(self, query):
-        browse_query = ' '.join(query) + ' deck:{0}*'.format(self.deck_name)
+    def anki_browse(self, query, option=0):
+        browse_query = ' '.join(query) + ' deck:{0}*'.format(self.config['card_sets'][option]['deck_name'])
 
         browse_req = json.dumps({
             'action': 'guiBrowse',
@@ -63,9 +53,9 @@ class AnkiConnection:
         return browse_json
 
 
-    def anki_query_check_against(self, resps, check_against):
+    def anki_query_check_against(self, resps, check_against, option=0):
 
-        check_against_query = ' '.join(check_against) + ' deck:{0}*'.format(self.deck_name)
+        check_against_query = ' '.join(check_against) + ' deck:{0}*'.format(self.config['card_sets'][option]['deck_name'])
 
         check_against_req = json.dumps({
             'action': 'findNotes',
@@ -99,10 +89,10 @@ class AnkiConnection:
             displayed_tags = [ ':'.join(re.match('(.*)::(.*)', ts[0]).groups())
                 if len(ts) == 1 else '???:???' for ts in tags]
 
-            quest_fields = [entry['fields'][self.quest_field_name]['value']
+            quest_fields = [entry['fields'][self.config['card_sets'][option]['quest_field']]['value']
                 for entry in outsider_info_json['result']]
 
-            quest_ids = [re.sub('(?:<[^>]*>)*?' + self.quest_id_regex + '.*', r'\g<1>', entry)
+            quest_ids = [re.sub('(?:<[^>]*>)*?' + self.config['card_sets'][option]['qid_regex'] + '.*', r'\g<1>', entry)
                 for entry in quest_fields]
 
             zipped_ids = list(zip(displayed_tags, quest_ids))
@@ -115,7 +105,7 @@ class AnkiConnection:
         else:
             return []
 
-    def anki_query_count(self, query_list, check_against=None):
+    def anki_query_count(self, query_list, check_against=None, option=0):
 
         query = json.dumps({
             'action': 'multi',
@@ -123,7 +113,7 @@ class AnkiConnection:
             'params': {
                 'actions': [{
                     'action': 'findNotes',
-                    'params': { 'query': q + ' deck:{}*'.format(self.deck_name) }
+                    'params': { 'query': q + ' deck:{}*'.format(self.config['card_sets'][option]['deck_name']) }
                     } for q in query_list]
                 }
             }).encode('utf-8')
@@ -138,6 +128,6 @@ class AnkiConnection:
         outsiders = []
         if check_against is not None:
             resp_flattened = [item for sublist in resp_json['result'] for item in sublist]
-            outsiders = self.anki_query_check_against(resp_flattened, check_against)
+            outsiders = self.anki_query_check_against(resp_flattened, check_against, option=option)
 
         return (counts, outsiders)

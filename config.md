@@ -1,7 +1,7 @@
 ### Meaning of variables in `editor_command`
-- `$TOPIC` expands to topic
-- `$ROOT` expands to expanded topic directory
-- `$SUBTOPIC` expands to subtopic
-- `$FILE` expands to basename of expanded subtopic
+- `$SECTION` expands to section
+- `$ROOT` expands to expanded section directory
+- `$PAGE` expands to page
+- `$FILE` expands to basename of expanded page
 - `$QUEST` expands to quest
 - `$LINENO` expands to line number of quest tag

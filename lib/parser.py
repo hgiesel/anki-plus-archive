@@ -6,7 +6,6 @@ import sys
 import json
 import urllib.request
 
-
 def setup_parser():
     config = None
     with open('/Users/hgiesel/Library/Application Support/Anki2/addons21/anki-context/config.json') as f:
@@ -62,6 +61,9 @@ def setup_parser():
             default='default', help='decide how paths should be printed')
     subparsers_dict['revpagerefs'].add_argument('-d', '--delimiter',
             default='default', help='decide the delimiter for the output')
+    subparsers_dict['revpagerefs'].add_argument('-f', '--further', action='store_true', help='follow furter pagerefs')
+    subparsers_dict['revpagerefs'].add_argument('-k', type=int,
+            default=0, help='decide how deep pagerefs are traced')
     subparsers_dict['revpagerefs'].add_argument('uri', nargs='?', default='',
         help='archive uri you want to query')
 
@@ -84,6 +86,8 @@ def setup_parser():
     subparsers_dict['match'] = subparsers.add_parser('match')
     subparsers_dict['match'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
             default='default', help='decide how paths should be printed')
+    subparsers_dict['match'].add_argument('-m', '--mismatches', 
+            action='store_true', help='only display files or quests which don\'t match with SRS')
     subparsers_dict['match'].add_argument('uri', nargs='?', default='',
         help='match cards and see if any are missing or extra')
 

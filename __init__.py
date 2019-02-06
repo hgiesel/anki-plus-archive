@@ -63,18 +63,18 @@ else:
             result = getattr(addr, ARGV.cmd)()
 
             if ARGV.paths == 'default':
-                pass
+                ARGV.paths = 'id'
 
             if ARGV.paths == 'full':
                 pass
             elif ARGV.paths == 'rel':
                 result = [(Identifier.to_rel_path(e[0]),) + e[1:] for e in result]
-            elif ARGV.paths == 'id':
-                result = [(Identifier.to_identifier(e[0]),) + e[1:] for e in result]
             elif ARGV.paths == 'shortid':
                 result = [(Identifier.to_identifier(e[0], omit_section=True),) + e[1:] for e in result]
             elif ARGV.paths == 'none':
                 result = [e[1:] for e in result]
+            elif ARGV.paths == 'id':
+                result = [(Identifier.to_identifier(e[0]),) + e[1:] for e in result]
 
             Printer.print_stats(result, delimiter=ARGV.delimiter)
 
@@ -86,6 +86,10 @@ else:
             lines = [(val['fileName'],heading[0],heading[1]) for val in result for heading in val['headings']]
 
             if ARGV.paths == 'default':
+                ARGV.paths='id'
+
+
+            if ARGV.paths == 'full':
                 pass
             elif ARGV.paths == 'rel':
                 lines = [(Identifier.to_rel_path(line[0]),) + line[1:] for line in lines]
@@ -99,12 +103,15 @@ else:
             Printer.print_stats(lines, ARGV.delimiter if not ARGV.delimiter == 'default' else '\t')
 
         elif ARGV.cmd == 'pagerefs':
-            addr = Identifier(config, ARGV.uri, printer=printer)
+            addr = Identifier(config, '@:@', printer=printer)
 
-            result = getattr(addr, ARGV.cmd)()
+            result = getattr(addr, ARGV.cmd)(ARGV.uri)
             lines = [(val['fileName'],pageref[0],pageref[1]) for val in result for pageref in val['pagerefs']]
 
             if ARGV.paths == 'default':
+                ARGV.paths = 'id'
+
+            if ARGV.paths == 'full':
                 pass
             elif ARGV.paths == 'rel':
                 lines = [(Identifier.to_rel_path(line[0]),) + line[1:] for line in lines]
@@ -118,8 +125,10 @@ else:
             Printer.print_stats(lines, ARGV.delimiter if not ARGV.delimiter == 'default' else '\t')
 
         elif ARGV.cmd == 'revpagerefs':
-            foo = getattr(Identifier(config, ARGV.uri, printer=printer), ARGV.cmd)()
-            pprint.pprint(foo)
+
+            result = getattr(Identifier(config, '@:@', printer=printer), ARGV.cmd)(
+                    ARGV.uri, further_refs=ARGV.further, k=ARGV.k)
+            pprint.pprint(result)
 
         elif ARGV.cmd == 'query':
             addr = Identifier(config, ARGV.uri, printer=printer)
@@ -133,7 +142,10 @@ else:
             lines = [(entry['fileName'],error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
 
             if ARGV.paths == 'default':
-                lines = [(entry['fileName'],error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
+                ARGV.paths = 'id'
+
+            if ARGV.paths == 'full':
+                pass
             elif ARGV.paths == 'rel':
                 lines = [(Identifier.to_rel_path(entry['fileName']), error['type'],error['info'], error['lineno']) for entry in result for error in entry['errors']]
             elif ARGV.paths == 'id':
@@ -146,56 +158,61 @@ else:
             Printer.print_stats(lines, delimiter=ARGV.delimiter)
 
         elif ARGV.cmd == 'match':
-            anki_connection = AnkiConnection(
-                    deck_name='misc::head',
-                    model_name='Cloze (overlapping)',
-                    quest_field_name='Quest',
-                    content_field_name='Quest',
-                    quest_id_regex=r':([0-9]+)\a*:')
+            anki_connection = AnkiConnection(config)
 
             addr = Identifier(config, ARGV.uri, printer=printer)
-            result = getattr(addr, ARGV.cmd)(anki_connection)
+            result, outsiders = getattr(addr, ARGV.cmd)(anki_connection)
 
-            Printer.print_stats(result)
+
+            if ARGV.paths == 'default':
+                ARGV.paths = 'id'
+
+            if ARGV.paths == 'full':
+                pass
+            elif ARGV.paths == 'rel':
+                result = list(map(lambda t: (Identifier.to_rel_path(t[0]), t[1], t[2]), result))
+            elif ARGV.paths == 'id':
+                result = list(map(lambda t: (Identifier.to_identifier(t[0]), t[1], t[2]), result))
+            elif ARGV.paths == 'shortid':
+                result = list(map(lambda t: (Identifier.to_identifier(t[0], omit_section=True), t[1], t[2]), result))
+            elif ARGV.paths == 'none':
+                result = list(map(lambda t: (t[1], t[2]), result))
+
+            all_results = sorted(result + outsiders, key=lambda t: t[0])
+
+            if ARGV.mismatches:
+                if addr.quest_component:
+                    all_results = list(filter(lambda t: not t[2] == 1, all_results))
+                else:
+                    all_results = list(filter(lambda t: not t[1] == t[2], all_results))
+
+            Printer.print_stats(all_results)
 
         elif ARGV.cmd == 'add':
-            anki_connection = AnkiConnection(
-                    deck_name='misc::head',
-                    model_name='Cloze (overlapping)',
-                    quest_field_name='Title',
-                    content_field_name='Quest',
-                    quest_id_regex=r':([0-9]+)\a*:')
+            anki_connection = AnkiConnection(config)
 
             ident = Identifier(config, ARGV.uri, printer=printer)
             if not ident.mode == Mode.QUEST_I:
                 printer('uri must designate a single quest')
 
-            addr = ident.paths(usequest=True)[0]
+            _, path, _, qid = ident.paths()[0]
 
             result = anki_connection.anki_add(
-                    Identifier.to_identifier(addr[0]).replace(':', '::'),
-                    addr[1], ARGV.content.read())
+                    path.replace(':', '::'), qid, ARGV.content.read())
             print(result)
 
         elif ARGV.cmd == 'browse':
-            anki_connection = AnkiConnection(
-                    deck_name='misc::head',
-                    model_name='Cloze (overlapping)',
-                    quest_field_name='Title',
-                    content_field_name='Quest',
-                    quest_id_regex=r':([0-9]+)\a*:')
+            anki_connection = AnkiConnection(config)
 
             addr = Identifier(config, ARGV.uri, printer=printer).query()
             result = anki_connection.anki_browse(addr)
 
             print(result)
 
-
         elif ARGV.cmd == 'decloze':
             text = ARGV.infile.read()
             text_declozed = decloze(text)
             print(text_declozed, file=ARGV.outfile)
-
 
         elif ARGV.cmd == 'stdlib':
             stdlib()

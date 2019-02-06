@@ -36,50 +36,56 @@ def on_archive(editor):
     found_file = False
 
     try:
-        quest_field_index = editor.note.keys().index(config['quest_field'])
+        quest_field_index = editor.note.keys().index(config['card_sets'][0]['quest_field'])
     except:
-        showInfo('Note type does not have quest field: '+config['quest_field'])
+        showInfo('Note type does not have quest field: '+config['card_sets'][0]['quest_field'])
         return
 
     quest_content = editor.note.fields[quest_field_index]
 
     try:
-        quest = re.search(config['quest_regex'], quest_content).group(1) # only match inner group
+        quest = re.search(config['card_sets'][0]['qid_regex'], quest_content).group(1) # only match inner group
     except:
-        showInfo('Quest field does not contain quest tag specified by this regex: '+config['quest_regex'])
+        showInfo('Quest field "'+ config['card_sets'][0]['quest_field'] +'" does not contain quest tag specified by this regex: "'
+                + config['card_sets'][0]['qid_regex'] + '"')
         return
 
+    pageid_regex = re.compile(config['card_sets'][0]['pageid_regex'])
 
-    # first tag that is found that contains a sign of being hierarchical is taken to be topic
-    indices = [i for i, item in enumerate(editor.note.tags) if re.search('::', item)]
+    # first tag that is found that contains a sign of being hierarchical is taken to be section
+    indices = [i for i, item in enumerate(editor.note.tags) if pageid_regex.search(item)]
 
     if len(indices) == 0:
-        showInfo('Tags do not contain topic tag')
+        showInfo('Tags do not contain section tag')
+        return
+
+    if len(indices) > 1 :
+        showInfo('Tags contain multiple viable pageids')
         return
 
     tag = editor.note.tags[indices[0]]
-    tag_matches = re.search(config['topic_regex'], tag)
-    topic = tag_matches.group(1)
-    subtopic = tag_matches.group(2)
+    tag_matches = pageid_regex.search(tag)
+    section = tag_matches.group(1)
+    page = tag_matches.group(2)
 
     if config['debug']:
         showInfo(str(
-            '$TOPIC    = ' + topic    + '\n' +
-            '$SUBTOPIC = ' + subtopic + '\n' +
+            '$SECTION    = ' + sextion    + '\n' +
+            '$PAGE = ' + page + '\n' +
             '$QUEST    = ' + quest    + '\n'
             ))
 
-    for root, _, files in os.walk(config['notes_path']):
-        if os.path.basename(root) == topic:
+    for root, _, files in os.walk(config['archive_root']):
+        if os.path.basename(root) == section:
             for filename in files:
-                if re.match(subtopic, filename):
+                if re.match(page, filename):
 
                     editor_command = config['editor_command']
 
                     lineno='1'
                     with open(root+'/'+filename, 'r+', encoding='utf-8') as handler:
                         for num, line in enumerate(handler, 1):
-                            if re.match(re.sub('\([^?].*\)', quest, config['quest_regex']), line):
+                            if re.match(re.sub('\([^?].*\)', quest, config['card_sets'][0]['qid_regex']), line):
                                 lineno=str(num)
 
                     if config['debug']:
@@ -90,9 +96,9 @@ def on_archive(editor):
                             ))
 
                     proc = Popen(
-                    map(lambda x: re.sub('\$TOPIC', topic, x),
+                    map(lambda x: re.sub('\$SECTION', section, x),
                      map(lambda x: re.sub('\$ROOT', root, x),
-                      map(lambda x: re.sub('\$SUBTOPIC', subtopic, x),
+                      map(lambda x: re.sub('\$PAGE', page, x),
                        map(lambda x: re.sub('\$FILE', filename, x),
                         map(lambda x: re.sub('\$QUEST', quest, x),
                          map(lambda x: re.sub('\$LINENO', lineno, x),
