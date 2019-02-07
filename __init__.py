@@ -163,7 +163,6 @@ else:
             addr = Identifier(config, ARGV.uri, printer=printer)
             result, outsiders = getattr(addr, ARGV.cmd)(anki_connection)
 
-
             if ARGV.paths == 'default':
                 ARGV.paths = 'id'
 
@@ -184,7 +183,7 @@ else:
                 if addr.quest_component:
                     all_results = list(filter(lambda t: not t[2] == 1, all_results))
                 else:
-                    all_results = list(filter(lambda t: not t[1] == t[2], all_results))
+                    all_results = list(filter(lambda t: not int(t[1]) == t[2], all_results))
 
             Printer.print_stats(all_results)
 

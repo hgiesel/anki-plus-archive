@@ -14,7 +14,8 @@ class Printer:
             delimiter = '\t'
 
         lines = '\n'.join([ delimiter.join([ str(v) for v in list(val) ]) for val in vals ])
-        print(lines)
+        if lines:
+            print(lines)
 
 class Mode(enum.Enum):
     ''' modes for Identifier.__analyze '''
@@ -110,7 +111,8 @@ class Identifier:
         else:
             self.config = config
 
-        self.failed = False
+        self.failed   = False
+        self.qids_set = False
 
         # queries that don't need to check against the archive
         # e.g. for making match tests against Anki
@@ -276,7 +278,7 @@ class Identifier:
 
                 if tocs and root is not summary_name and match:
                     topics.append({
-                        'dirName':   root,
+                        'dir_name':   root,
                         'files': [{
                             'file_name': f,
                             'lines': []
@@ -320,7 +322,7 @@ class Identifier:
             for key, item in files_grouped:
                 files = (list(map(lambda t: { 'file_name': t[1], 'lines': [] }, item)))
                 result.append({
-                        'dirName':   key,
+                        'dir_name':   key,
                         'files': files,
                         'tocs': []
                         })
@@ -333,7 +335,7 @@ class Identifier:
 
         if self.section_component and not self.section_component == '@':
             section_regex = compile('/' + self.section_component.replace('-','[^./]*-') + '[^./]*$')
-            topics = list(filter(lambda t: section_regex.search(t['dirName']), topics))
+            topics = list(filter(lambda t: section_regex.search(t['dir_name']), topics))
 
             if len(topics) < 1:
                 self.printer('no such section topic exists: "'+self.uri+'"')
@@ -341,7 +343,7 @@ class Identifier:
 
             if len(topics) > 1:
                 self.printer('section topic is ambiguous: '
-                    + ' '.join(list(map(lambda t: os.path.basename(t['dirName']), topics))))
+                    + ' '.join(list(map(lambda t: os.path.basename(t['dir_name']), topics))))
                 self.failed = True
 
         ''' processing of page topic '''
@@ -395,7 +397,7 @@ class Identifier:
             quest_id_regex = compile(self.config['regexes']['qids'])
             for d in topics:
                 for f in d['files']:
-                    with open(d['dirName']+'/'+f['file_name'], 'r') as stream:
+                    with open(d['dir_name']+'/'+f['file_name'], 'r') as stream:
                         searchlines = stream.readlines()
                         for idx, line in enumerate(searchlines):
                             quest_identifier = quest_id_regex.search(line)
@@ -443,22 +445,22 @@ class Identifier:
 
         if self.quest_component:
             result = [(( 
-                os.path.normpath(os.path.join(d['dirName'], f['file_name'])),
-                os.path.basename(d['dirName']) +':'+ os.path.splitext(f['file_name'])[0],
+                os.path.normpath(os.path.join(d['dir_name'], f['file_name'])),
+                os.path.basename(d['dir_name']) +':'+ os.path.splitext(f['file_name'])[0],
                 l['lineno'], l['quest'] ))
                 for d in self.analysis for ft in filetypes for f in d[ft] for l in f['lines']]
 
         elif self.page_component:
             result = [((
-                os.path.normpath(os.path.join(d['dirName'], f['file_name'])),
-                os.path.basename(d['dirName']) +':'+ os.path.splitext(f['file_name'])[0],
+                os.path.normpath(os.path.join(d['dir_name'], f['file_name'])),
+                os.path.basename(d['dir_name']) +':'+ os.path.splitext(f['file_name'])[0],
                 None, None ))
                 for d in self.analysis for ft in filetypes for f in d[ft]]
 
         elif self.section_component:
             result = [((
-                os.path.normpath(d['dirName']),
-                os.path.basename(d['dirName']),
+                os.path.normpath(d['dir_name']),
+                os.path.basename(d['dir_name']),
                 None, None ))
                 for d in self.analysis]
 
@@ -512,8 +514,8 @@ class Identifier:
         elif self.section_component:
             analyses = [(d[0], Identifier(self.config, uri=d[1]+':@', preanalysis=self.analysis).stats()) for d in paths]
             result = [( d,
-                str(sum(map(lambda l: int(l[1]), a))),
-                str(sum(map(lambda l: int(l[2]), a))) )
+                sum(map(lambda l: int(l[1]), a)),
+                sum(map(lambda l: int(l[2]), a)) )
                 for d, a in analyses ]
                 # TODO generalize to accepts any amount of stats
 
@@ -521,8 +523,8 @@ class Identifier:
             # all_stats = self.stats( (topics,''), Mode.PAGE_A )
             fake_stats = Identifier(self.config, uri='@:@', preanalysis=self.analysis).stats()
             result = [( self.summary_name,
-                str(sum(map(lambda l: int(l[1]), fake_stats))),
-                str(sum(map(lambda l: int(l[2]), fake_stats))) )]
+                sum(map(lambda l: int(l[1]), fake_stats)),
+                sum(map(lambda l: int(l[2]), fake_stats)) )]
             # TODO generalize to accepts any amount of stats
 
 
@@ -945,7 +947,7 @@ class Identifier:
 
             queries = []
             for entry in stats:
-                queries.append(' '.join(Identifier(self.config, uri=entry[0], preanalysis=self.analysis).query()))
+                queries.append(' '.join(Identifier(self.config, uri=self.filter_component + '//' + Identifier.to_identifier(entry[0]), preanalysis=self.analysis).query()))
 
             remote_qcounts, _ = db.anki_query_count(queries)
             if remote_qcounts is None:
@@ -961,6 +963,7 @@ class Identifier:
 
             result = [[( (stats[0][0], stats[0][1], remote_qcount[0]) )], []]
 
+
         return result
 
     def query(self, option=0):
@@ -968,9 +971,34 @@ class Identifier:
         result = []
         result.append('card:1')
 
+        # toc in filter_component
+        if ':' in self.filter_component:
+            prep_ac = []
+
+            for d in self.analysis:
+                for f in d['files']:
+                    prep_ac.append('tag:{0}::{1}'.format(os.path.basename(d['dir_name']), os.path.splitext(f['file_name'])[0]))
+
+            ac = '(' + ' or '.join(prep_ac) + ')'
+
+        # ancestor section in filter_component
+        elif self.filter_component:
+
+            prep_ac = []
+            for d in self.analysis:
+                prep_ac.append('tag:{0}::*'.format(os.path.basename(d['dir_name'])))
+
+            ac = '(' + ' or '.join(prep_ac) + ')'
+
+        else:
+            ac = None
+
         pc = self.section_component.replace('@', '').replace('-', '*-') + '*' if self.section_component else '*'
         lc = self.page_component.replace('@', '') .replace('-', '*-') + '*' if self.page_component else '*'
         qc = self.quest_component.replace('@', '*') if self.quest_component else '*'
+
+        if ac:
+            result.append(ac)
 
         result.append('tag:' + pc + '::' + lc)
         result.append(self.config['card_sets'][option]['quest_field'] + ':' + '"*' + ':' + qc +':' +'*"')

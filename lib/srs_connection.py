@@ -113,14 +113,16 @@ class AnkiConnection:
 
     def anki_query_count(self, query_list, check_against=None, option=0):
 
+        queries = [{
+            'action': 'findNotes',
+            'params': { 'query': q + ' deck:{}*'.format(self.config['card_sets'][option]['deck_name']) }
+            } for q in query_list]
+
         query = json.dumps({
             'action': 'multi',
             'version': 6,
             'params': {
-                'actions': [{
-                    'action': 'findNotes',
-                    'params': { 'query': q + ' deck:{}*'.format(self.config['card_sets'][option]['deck_name']) }
-                    } for q in query_list]
+                'actions': queries
                 }
             }).encode('utf-8')
 
