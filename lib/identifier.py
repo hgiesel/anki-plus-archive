@@ -165,7 +165,7 @@ class Identifier:
                 self.uri               = self.section_component+':'+self.page_component
                 self.__decide_mode()
             else:
-                self.printer('query malformed: invalid archive uri')
+                self.printer('query malformed: invalid archive uri: ' + uri)
                 self.failed = True
 
         if preanalysis:
@@ -933,7 +933,7 @@ class Identifier:
             queries = []
 
             for entry in stats:
-                constructed_uri = Identifier.to_identifier(entry[0])
+                constructed_uri = (self.filter_component + '//' if self.filter_component else '') + Identifier.to_identifier(entry[0])
                 queries.append(' '.join(Identifier(self.config, uri=constructed_uri, preanalysis=self.analysis).query()))
 
             remote_qcounts, _ = db.anki_query_count(queries)
@@ -947,7 +947,8 @@ class Identifier:
 
             queries = []
             for entry in stats:
-                queries.append(' '.join(Identifier(self.config, uri=self.filter_component + '//' + Identifier.to_identifier(entry[0]), preanalysis=self.analysis).query()))
+                constructed_uri = (self.filter_component + '//' if self.filter_component else '') + Identifier.to_identifier(entry[0])
+                queries.append(' '.join(Identifier(self.config, uri=constructed_uri, preanalysis=self.analysis).query()))
 
             remote_qcounts, _ = db.anki_query_count(queries)
             if remote_qcounts is None:
