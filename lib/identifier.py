@@ -411,8 +411,10 @@ class Identifier:
             first_dir  = topics[0]
             first_file = topics[0]['files'][0]
 
+            quest_comp_regex = compile('0*' + self.quest_component)
+
             first_file['lines'] = list(filter(
-                lambda l: l['quest'] == self.quest_component, first_file['lines']))
+                lambda l: quest_comp_regex.match(l['quest']), first_file['lines']))
 
             if len(first_file['lines']) < 1:
                 self.printer('no such quest identifier exists in file: "' + self.quest_component + '"')
