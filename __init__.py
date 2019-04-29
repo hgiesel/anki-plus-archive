@@ -31,7 +31,13 @@ else:
 
     # print(os.readlink(__file__))
 
-    config_file_name = (os.path.join(os.path.dirname(os.readlink(__file__)), 'config.json'))
+    base_path = os.path.dirname(os.readlink(__file__))
+
+    if os.path.isfile(os.path.join(base_path, 'meta.json')):
+        config_file_name = os.path.join(base_path, 'meta.json')
+    else:
+        config_file_name = os.path.join(base_path, 'config.json')
+
     with open(config_file_name, 'r') as f:
         config = json.load(f)
 
