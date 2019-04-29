@@ -14,6 +14,21 @@ import importlib.util
 aqt_spec = importlib.util.find_spec('aqt')
 
 
+def setup_config():
+  base_path = os.path.dirname(os.readlink(__file__))
+
+  if os.path.isfile(os.path.join(base_path, 'meta.json')):
+    config_file_name = os.path.join(base_path, 'meta.json')
+    with open(config_file_name, 'r') as f:
+      config = json.load(f)['config']
+
+  else:
+    config_file_name = os.path.join(base_path, 'config.json')
+    with open(config_file_name, 'r') as f:
+      config = json.load(f)
+
+  return config
+
 if aqt_spec is not None:
     from .lib import context
 
@@ -28,18 +43,7 @@ else:
     import os
 
     ARGV, printer = setup_parser()
-
-    # print(os.readlink(__file__))
-
-    base_path = os.path.dirname(os.readlink(__file__))
-
-    if os.path.isfile(os.path.join(base_path, 'meta.json')):
-        config_file_name = os.path.join(base_path, 'meta.json')
-    else:
-        config_file_name = os.path.join(base_path, 'config.json')
-
-    with open(config_file_name, 'r') as f:
-        config = json.load(f)
+    config = setup_config()
 
     if ARGV.cmd is not None:
 
