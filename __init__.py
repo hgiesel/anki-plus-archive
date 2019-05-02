@@ -11,8 +11,8 @@ License: GNU AGPLv3 <https://www.gnu.org/licenses/agpl.html>
 import pprint
 
 import importlib.util
-aqt_spec = importlib.util.find_spec('aqt')
 
+aqt_spec = importlib.util.find_spec('aqt')
 
 def setup_config():
   base_path = os.path.dirname(os.readlink(__file__))
@@ -32,7 +32,7 @@ def setup_config():
 if aqt_spec is not None:
     from .lib import context
 
-else:
+elif __name__ == '__main__':
     from lib.parser import setup_parser
 
     from lib.identifier import Mode, Identifier, Printer
@@ -42,15 +42,15 @@ else:
     import json
     import os
 
-    ARGV, printer = setup_parser()
-    config = setup_config()
+    CONFIG = setup_config()
+    ARGV, printer = setup_parser(CONFIG)
 
     if ARGV.cmd is not None:
 
         result = None
 
         if ARGV.cmd == 'paths':
-            addr = Identifier(config, ARGV.uri, printer=printer)
+            addr = Identifier(CONFIG, ARGV.uri, printer=printer)
             result = getattr(addr, ARGV.cmd)()
 
             if ARGV.paths == 'rel':
@@ -68,7 +68,7 @@ else:
             Printer.print_stats(printed, delimiter=ARGV.delimiter)
 
         elif ARGV.cmd == 'stats':
-            addr = Identifier(config, ARGV.uri, printer=printer)
+            addr = Identifier(CONFIG, ARGV.uri, printer=printer)
 
             result = getattr(addr, ARGV.cmd)()
 
@@ -90,7 +90,7 @@ else:
 
 
         elif ARGV.cmd == 'headings':
-            addr = Identifier(config, ARGV.uri, printer=printer)
+            addr = Identifier(CONFIG, ARGV.uri, printer=printer)
 
             result = getattr(addr, ARGV.cmd)()
             lines = [(val['file_name'],heading[0],heading[1]) for val in result for heading in val['headings']]
@@ -113,7 +113,7 @@ else:
             Printer.print_stats(lines, ARGV.delimiter if not ARGV.delimiter == 'default' else '\t')
 
         elif ARGV.cmd == 'pagerefs':
-            addr = Identifier(config, '@:@', printer=printer)
+            addr = Identifier(CONFIG, '@:@', printer=printer)
 
             result = getattr(addr, ARGV.cmd)(ARGV.uri, expand_tocs=ARGV.tocs, further_refs=ARGV.further)
             lines = sorted([(val['file_name'],pageref[0],pageref[1]) for val in result for pageref in val['pagerefs']], key=lambda t: t[2])
@@ -136,17 +136,17 @@ else:
 
         elif ARGV.cmd == 'revpagerefs':
 
-            result = getattr(Identifier(config, '@:@', printer=printer), ARGV.cmd)(
+            result = getattr(Identifier(CONFIG, '@:@', printer=printer), ARGV.cmd)(
                     ARGV.uri, further_refs=ARGV.further, k=ARGV.k)
             pprint.pprint(result)
 
         elif ARGV.cmd == 'query':
-            addr = Identifier(config, ARGV.uri, printer=printer)
+            addr = Identifier(CONFIG, ARGV.uri, printer=printer)
             result = getattr(addr, ARGV.cmd)(ARGV.validate)
             print(' '.join(result))
 
         elif ARGV.cmd == 'verify':
-            addr = Identifier(config, '@:@', printer=printer)
+            addr = Identifier(CONFIG, '@:@', printer=printer)
 
             result = getattr(addr, ARGV.cmd)(ARGV.uri)
             lines = [(entry['file_name'],error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
@@ -168,9 +168,9 @@ else:
             Printer.print_stats(lines, delimiter=ARGV.delimiter)
 
         elif ARGV.cmd == 'match':
-            anki_connection = AnkiConnection(config, printer=printer)
+            anki_connection = AnkiConnection(CONFIG, printer=printer)
 
-            addr = Identifier(config, ARGV.uri, printer=printer)
+            addr = Identifier(CONFIG, ARGV.uri, printer=printer)
             result, outsiders = getattr(addr, ARGV.cmd)(anki_connection)
 
             if ARGV.paths == 'default':
@@ -198,9 +198,9 @@ else:
             Printer.print_stats(all_results)
 
         elif ARGV.cmd == 'add':
-            anki_connection = AnkiConnection(config, printer=printer)
+            anki_connection = AnkiConnection(CONFIG, printer=printer)
 
-            ident = Identifier(config, ARGV.uri, printer=printer)
+            ident = Identifier(CONFIG, ARGV.uri, printer=printer)
             if not ident.mode == Mode.QUEST_I:
                 printer('uri must designate a single quest')
 
@@ -211,9 +211,9 @@ else:
             print(result)
 
         elif ARGV.cmd == 'browse':
-            anki_connection = AnkiConnection(config, printer=printer)
+            anki_connection = AnkiConnection(CONFIG, printer=printer)
 
-            addr = Identifier(config, ARGV.uri, printer=printer).query()
+            addr = Identifier(CONFIG, ARGV.uri, printer=printer).query()
             result = anki_connection.anki_browse(addr)
 
             print(result)
@@ -227,4 +227,4 @@ else:
             stdlib()
 
         else:
-            getattr(Identifier(config, ARGV.uri, printer=printer), ARGV.cmd)()
+            getattr(Identifier(CONFIG, ARGV.uri, printer=printer), ARGV.cmd)()

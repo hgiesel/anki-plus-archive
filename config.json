@@ -3,7 +3,7 @@
 
   "archive_root": "/Users/hgiesel/Developer/archive",
 
-  "regexes": {
+  "archive_syntax": {
     "tocs": "^README.*",
     "pagerefs": "<<([^>,]+).*>>",
     "qidrefs": "^:ext:([0-9]+):(?: .*)?$",

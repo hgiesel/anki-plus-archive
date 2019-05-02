@@ -1,13 +1,13 @@
-= Anki Context
+= Anki Plus Archive
 
 ==== The problem
 
 Anki is a SRS software that helps you remember knowledge
 with the least effort possible.
-The best Anki cards are built with the 
+The best Anki cards are built with the
 link:https://supermemo.guru/wiki/20_rules_of_knowledge_formulation[*minimum information principle*]
 in mind.
-For vocabulary of a foreign language, this means you don't 
+For vocabulary of a foreign language, this means you don't
 require the knowledge of other words in order to guess the
 content of the current card. By adding example sentences,
 you can create some context, but besides that you generally
@@ -34,12 +34,12 @@ or information to a multiple of notes, as the information always has
 to be associated with an individual card. And last but not least,
 adding information requires you to create a note for it. However
 there might be information associated with a note in Anki,
-which does not need to be a note itself.
+which does not need to be a note itself or part of the note.
 
 ==== The solution
 
 This addon is a tool suite to help you create two-way
-connections between Anki with your notes.
+connections between Anki with your digital notes.
 It assumes you have notes written in plain text, which
 contain content you want to add as questions to your Anki deck.
 They might be written in plain text formats, including

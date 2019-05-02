@@ -14,7 +14,7 @@ from shutil     import copyfile
 
 from .util import *
 
-# from pathlib import Path
+from . import pyperclip
 
 home = os.path.expanduser('~')
 config = mw.addonManager.getConfig(__name__)
@@ -25,9 +25,10 @@ icon_path = os.path.join(addon_path, "../icons")
 icon_path_archive = os.path.join(icon_path, "archive.png")
 
 def install_ark():
-    install_path = os.path.join(home, '.local/bin', 'ark')
+    install_dir = os.path.join(home, '.local/bin')
+    install_path = os.path.join(install_dir, 'ark')
 
-    if os.path.isdir(install_path) and not os.path.isfile(install_path):
+    if os.path.isdir(install_dir) and not os.path.isfile(install_path):
         os.symlink(addon_path + '/../__init__.py', install_path)
         os.chmod(install_path, 0o755)
 

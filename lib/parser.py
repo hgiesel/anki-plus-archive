@@ -6,11 +6,7 @@ import sys
 import json
 import urllib.request
 
-def setup_parser():
-    config = None
-    with open('/Users/hgiesel/Library/Application Support/Anki2/addons21/anki-context/config.json') as f:
-        config = json.load(f)
-
+def setup_parser(config):
     arkParser = argparse.ArgumentParser(description='Manage and query your notes!',
         prog='ark')
 
@@ -90,7 +86,7 @@ def setup_parser():
     subparsers_dict['match'] = subparsers.add_parser('match')
     subparsers_dict['match'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
             default='default', help='decide how paths should be printed')
-    subparsers_dict['match'].add_argument('-m', '--mismatches', 
+    subparsers_dict['match'].add_argument('-m', '--mismatches',
             action='store_true', help='only display files or quests which don\'t match with SRS')
     subparsers_dict['match'].add_argument('uri', nargs='?', default='',
         help='match cards and see if any are missing or extra')

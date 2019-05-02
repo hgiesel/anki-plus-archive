@@ -261,7 +261,7 @@ class Identifier:
                 ancestor_regex = compile('(.*/' + self.filter_component.replace('-','[^./]*-') + '[^-./]*)/?')
 
             first_dir = True
-            toc_regex = compile(self.config['regexes']['tocs'])
+            toc_regex = compile(self.config['archive_syntax']['tocs'])
 
             for root, dirs, files in os.walk(summary_name):
                 files[:] = [f for f in files if not f.startswith('.')]
@@ -398,7 +398,7 @@ class Identifier:
         '''
 
         if self.quest_component and not self.qids_set:
-            quest_id_regex = compile(self.config['regexes']['qids'])
+            quest_id_regex = compile(self.config['archive_syntax']['qids'])
             for d in topics:
                 for f in d['files']:
                     with open(d['dir_name'] + '/' + f['file_name'], 'r') as stream:
@@ -478,7 +478,7 @@ class Identifier:
         ''' returns [(identifer, qid, lineno)] for files '''
         ''' returns [(identifer, count of qtags, count of content lines)] for qids '''
 
-        qid_regex = compile(self.config['regexes']['qids'])
+        qid_regex = compile(self.config['archive_syntax']['qids'])
         content_line_regex = compile(
                 # block titles
                 r'^(\.[^. ]+|'
@@ -489,7 +489,7 @@ class Identifier:
                 # any lines starting with anything except those
                 r'[^\n\'":=/\-+< ]+)')
 
-        other_regexes = [compile(other_re) for other_re in self.config['regexes']['stats']]
+        other_regexes = [compile(other_re) for other_re in self.config['archive_syntax']['stats']]
 
         paths = self.paths(tocs=tocs, pages=pages)
         result = []
@@ -555,7 +555,7 @@ class Identifier:
         result = []
 
         paths = [p[0] for p in self.paths()]
-        heading_regex = compile(self.config['regexes']['headings'])
+        heading_regex = compile(self.config['archive_syntax']['headings'])
 
         for f in paths:
 
@@ -608,8 +608,8 @@ class Identifier:
             expand_tocs = True
 
         paths_under_consideration = [p[0] for p in self.paths()]
-        pageref_regex = compile(self.config['regexes']['pagerefs'])
-        toc_regex = compile(self.config['regexes']['tocs'])
+        pageref_regex = compile(self.config['archive_syntax']['pagerefs'])
+        toc_regex = compile(self.config['archive_syntax']['tocs'])
         result = []
 
         for f in [t[0] for t in Identifier(self.config, preanalysis=self.analysis, uri=paths_searched).paths()]:
@@ -678,8 +678,8 @@ class Identifier:
             expand_tocs = True
 
         paths_under_consideration = [p[0] for p in self.paths()]
-        pageref_regex = compile(self.config['regexes']['pagerefs'])
-        toc_regex = compile(self.config['regexes']['tocs'])
+        pageref_regex = compile(self.config['archive_syntax']['pagerefs'])
+        toc_regex = compile(self.config['archive_syntax']['tocs'])
 
         result = {}
 
@@ -785,7 +785,7 @@ class Identifier:
 
                 add_result = []
 
-                toc_regex = compile(self.config['regexes']['tocs'])
+                toc_regex = compile(self.config['archive_syntax']['tocs'])
 
                 for elem in pre_result:
                     if toc_regex.search(os.path.basename(elem[0][0])):
@@ -836,9 +836,9 @@ class Identifier:
         dangling_qidrefs = []
         dangling_pagerefs = []
 
-        qid_regex = compile(self.config['regexes']['qids'])
-        qidref_regex = compile(self.config['regexes']['qidrefs'])
-        pageref_regex = compile(self.config['regexes']['pagerefs'])
+        qid_regex = compile(self.config['archive_syntax']['qids'])
+        qidref_regex = compile(self.config['archive_syntax']['qidrefs'])
+        pageref_regex = compile(self.config['archive_syntax']['pagerefs'])
 
         result = []
 
