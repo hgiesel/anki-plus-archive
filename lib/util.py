@@ -15,7 +15,7 @@ def decloze(text):
     return result
 
 
-def stdlib():
+def cmdlinetool():
     print(
 '''
 ark() {
