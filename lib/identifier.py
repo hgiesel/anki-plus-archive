@@ -147,6 +147,7 @@ class Identifier:
             self.__decide_mode()
         else:
 
+            # e.g. ark ../group-theory
             if os.path.isdir(uri):
                 self.filter_component  = ''
                 self.section_component = os.path.basename(os.path.abspath(uri))
@@ -155,6 +156,8 @@ class Identifier:
 
                 self.uri               = self.section_component
                 self.__decide_mode()
+
+            # e.g. ark ./edq289gr.adoc
             elif os.path.isfile(uri):
                 full_uri = os.path.abspath(uri)
                 self.filter_component  = ''
@@ -164,6 +167,7 @@ class Identifier:
 
                 self.uri               = self.section_component+':'+self.page_component
                 self.__decide_mode()
+
             else:
                 self.printer('query malformed: invalid archive uri: ' + uri)
                 self.failed = True
@@ -397,7 +401,7 @@ class Identifier:
             quest_id_regex = compile(self.config['regexes']['qids'])
             for d in topics:
                 for f in d['files']:
-                    with open(d['dir_name']+'/'+f['file_name'], 'r') as stream:
+                    with open(d['dir_name'] + '/' + f['file_name'], 'r') as stream:
                         searchlines = stream.readlines()
                         for idx, line in enumerate(searchlines):
                             quest_identifier = quest_id_regex.search(line)
@@ -411,10 +415,10 @@ class Identifier:
             first_dir  = topics[0]
             first_file = topics[0]['files'][0]
 
-            quest_comp_regex = compile('0*' + self.quest_component)
+            quest_comp_regex = compile(self.quest_component + '$')
 
             first_file['lines'] = list(filter(
-                lambda l: quest_comp_regex.match(l['quest']), first_file['lines']))
+                lambda l: quest_comp_regex.search(l['quest']), first_file['lines']))
 
             if len(first_file['lines']) < 1:
                 self.printer('no such quest identifier exists in file: "' + self.quest_component + '"')
@@ -423,7 +427,6 @@ class Identifier:
             elif len(first_file['lines']) > 1:
                 self.printer('quest is ambiguous: "' + self.quest_component + '"')
                 self.failed = True
-                # should actually never happen
 
         return topics
 
@@ -446,7 +449,7 @@ class Identifier:
         result = []
 
         if self.quest_component:
-            result = [(( 
+            result = [((
                 os.path.normpath(os.path.join(d['dir_name'], f['file_name'])),
                 os.path.basename(d['dir_name']) +':'+ os.path.splitext(f['file_name'])[0],
                 l['lineno'], l['quest'] ))
