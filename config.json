@@ -21,6 +21,8 @@
 
   "commands": [{
     "type": "shell",
+    "title": "VimR",
+    "description": "Show the question in VimR",
     "arguments": [
       "/usr/local/bin/vimr",
       "$ROOT/$FILE",
@@ -28,12 +30,14 @@
       "-c",
       "'bd!'",
       "-c",
-      "'/^:$QUEST:.*$/'",
+      "'/^:$QID:.*$/'",
       "-c",
       "normal! zz"
     ]}, {
       "type": "clipboard",
-      "text": "$SECTION::$PAGE#$QUEST"
+      "title": "Copy URI",
+      "description": "Copy URI to clipboard ",
+      "text": "$SECTION::$PAGE#$QID"
   }],
 
   "debug": false
