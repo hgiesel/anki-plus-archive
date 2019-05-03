@@ -13,17 +13,18 @@ from .util import *
 from . import pyperclip
 
 def on_command_replace(text, archive_root, section, page, qid):
-    for root, _, files in os.walk(archive_root):
-        if os.path.basename(root) == section:
-            for filename in files:
-                if re.match(page, filename):
+    for dirname, _, bases in os.walk(archive_root):
+        if os.path.basename(dirname) == section:
+            for base in bases:
+                if re.match(page, base):
 
                     return list(map(
-                            lambda x: re.sub(r'$ROOT', archive_root, x), map(
-                                lambda x: re.sub(r'$FILE', filename, x), map(
-                                    lambda x: re.sub(r'$SECTION', section, x), map(
-                                        lambda x: re.sub(r'$PAGE', page, x), map(
-                                            lambda x: re.sub(r'$QID', qid, x), text))))))
+                            lambda x: re.sub('\$ROOT', archive_root, x), map(
+                                lambda x: re.sub('\$DIR', dirname, x), map(
+                                    lambda x: re.sub('\$BASE', base, x), map(
+                                        lambda x: re.sub('\$SECTION', section, x), map(
+                                            lambda x: re.sub('\$PAGE', page, x), map(
+                                                lambda x: re.sub('\$QID', qid, x), text)))))))
 
 def on_command(editor, archive_root: str, card_sets, comm) -> None:
     ### get qid
@@ -42,8 +43,9 @@ def on_command(editor, archive_root: str, card_sets, comm) -> None:
         try:
             qid = re.search(qid_regex, qid_unclean).group(1) # only match inner group
         except:
-            showInfo('Quest field "'+ card_sets[0]['qid_field'] +'" does not contain quest tag specified by this regex: "'
-                    + "^:([0-9]+):(?: .*)?" + '"')
+            showInfo('Quest field %s does not contain quest tag specified by this regex: '
+                    '"^:([0-9]+):(?: .*)?"' % (card_sets[0]['qid_field']))
+
             return None
     else:
         qid = str(editor.note.id)
@@ -76,6 +78,7 @@ def on_command(editor, archive_root: str, card_sets, comm) -> None:
 
     if comm['type'] == 'shell':
         result = on_command_replace(comm['arguments'], archive_root, section, page, qid)
+        proc = Popen(result, env={})
 
     elif comm['type'] == 'clipboard':
         result = on_command_replace([comm['text']], archive_root, section, page, qid)[0]
@@ -88,9 +91,12 @@ def on_command(editor, archive_root: str, card_sets, comm) -> None:
 
 def main(config, icons):
 
+    if len(config['commands']) > 6:
+        showInfo('anki-plus-archive supports a maximum of 6 commands')
+        return
+
     def on_command0(editor):
         nonlocal config
-        showInfo('Nothing was found')
         on_command(editor, config['archive_root'], config['card_sets'], config['commands'][0])
     def on_command1(editor):
         nonlocal config
