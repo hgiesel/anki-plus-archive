@@ -1,5 +1,5 @@
 from lib.identifier import Mode, Identifier, Printer
-from lib.util import decloze, cmdlinetool
+from lib.util import decloze_util, stdlib_util
 from lib.srs_connection import AnkiConnection
 
 def paths(config, argv, printer):
@@ -152,14 +152,14 @@ def add(config, argv, printer):
   anki_connection = AnkiConnection(config, printer=printer)
 
   ident = Identifier(config, argv.uri, printer=printer)
-  if not ident.mode == Mode.QUEST_I:
-    printer('uri must designate a single quest')
+  if ident.mode == Mode.QUEST_I or ident.mode == Mode.PAGE_I:
+    _, path, _, qid = ident.paths()[0]
 
-  _, path, _, qid = ident.paths()[0]
+    result = anki_connection.anki_add(path.replace(':', '::'), qid, argv.content.read())
+    print(result['result'] if result['result'] else result['error'])
 
-  result = anki_connection.anki_add(
-      path.replace(':', '::'), qid, argv.content.read())
-  print(result)
+  else:
+    printer('uri must designate a single quest or page')
 
 def browse(config, argv, printer):
   anki_connection = AnkiConnection(config, printer=printer)
@@ -167,15 +167,15 @@ def browse(config, argv, printer):
   addr = Identifier(config, argv.uri, printer=printer).query()
   result = anki_connection.anki_browse(addr)
 
-  print(result)
+  print(result['result'] if result['result'] else result['error'])
 
 def decloze(config, argv, printer):
-    text = argv.infile.read()
-    text_declozed = decloze(text)
-    print(text_declozed, file=argv.outfile)
+  text = argv.infile.read()
+  text_declozed = decloze_util(text)
+  print(text_declozed, file=argv.outfile)
 
 def stdlib(config, argv, printer):
-    cmdlinetool()
+  stdlib_util()
 
 FUNCTION_DICT = {
     'paths': paths,

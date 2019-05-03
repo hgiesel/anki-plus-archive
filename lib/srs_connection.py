@@ -16,7 +16,7 @@ class AnkiConnection:
         except:
             self.printer('connection to db cannot be established')
 
-    def anki_add(self, tag, qid, content, option=0):
+    def anki_add(self, tag, qid=None, content=None, option=0):
         add_req = json.dumps({
                 'action': 'guiAddCards',
                 'version': 6,
@@ -25,8 +25,8 @@ class AnkiConnection:
                         'deckName': self.config['card_sets'][option]['deck_name'],
                         'modelName': self.config['card_sets'][option]['model_name'],
                         'fields': {
-                            self.config['card_sets'][option]['quest_field']: ':'+qid+':',
-                            self.config['card_sets'][option]['content_field']: content.strip().replace('\n','<br />')
+                            self.config['card_sets'][option]['qid_field']: (qid if qid else ''),
+                            self.config['card_sets'][option]['content_field']: (content.strip().replace('\n','<br />') if content else '')
                             },
                         'options': {
                             'closeAfterAdding': True
@@ -78,35 +78,42 @@ class AnkiConnection:
         check_against_filtered = [entry for entry in check_against_json['result'] if not entry in resps]
 
         if len(check_against_filtered):
-            outsider_info_query = json.dumps({
-                "action": "notesInfo",
-                "version": 6,
-                "params": {
-                    "notes": check_against_filtered
-                    }
-                }).encode('utf-8')
+          outsider_info_query = json.dumps({
+            "action": "notesInfo",
+            "version": 6,
+            "params": {
+              "notes": check_against_filtered
+              }
+            }).encode('utf-8')
 
-            outsider_info_resp = urllib.request.urlopen(self.req, outsider_info_query)
-            outsider_info_json = json.loads(outsider_info_resp.read().decode('utf-8'))
+          outsider_info_resp = urllib.request.urlopen(self.req, outsider_info_query)
+          outsider_info_json = json.loads(outsider_info_resp.read().decode('utf-8'))
 
-            tags = [list(filter(lambda tag: re.match('.*::.*', tag), entry['tags']))
-                for entry in outsider_info_json['result']]
+          tags = [list(filter(lambda tag: re.match('.*::.*', tag), entry['tags']))
+            for entry in outsider_info_json['result']]
 
-            displayed_tags = [ ':'.join(re.match('(.*)::(.*)', ts[0]).groups())
-                if len(ts) == 1 else '???:???' for ts in tags]
+          displayed_tags = [ ':'.join(re.match('(.*)::(.*)', ts[0]).groups())
+            if len(ts) == 1 else '???:???' for ts in tags]
 
-            quest_fields = [entry['fields'][self.config['card_sets'][option]['quest_field']]['value']
-                for entry in outsider_info_json['result']]
+          if self.config['card_sets'][option]['qid_field']:
+            quest_fields = [entry['fields'][self.config['card_sets'][option]['qid_field']]['value']
+              for entry in outsider_info_json['result']]
 
-            quest_ids = [re.sub('(?:<[^>]*>)*?' + self.config['card_sets'][option]['qid_regex'] + '.*', r'\g<1>', entry)
-                for entry in quest_fields]
+            qid_regex = re.compile("^:?([0-9]+):?")
 
-            zipped_ids = list(zip(displayed_tags, quest_ids))
-            zipped_ids_unique = set(zipped_ids)
+            quest_ids = [re.sub('(?:<[^>]*>)*?' + qid_regex + '.*', r'\g<1>', entry)
+              for entry in quest_fields]
 
-            result =  [i + (-zipped_ids.count(i),) for i in zipped_ids_unique]
+          else:
+            quest_ids = [entry['noteId'] for entry in outsider_info_json['result']]
 
-            return result
+
+          zipped_ids = list(zip(displayed_tags, quest_ids))
+          zipped_ids_unique = set(zipped_ids)
+
+          result = [i + (-zipped_ids.count(i),) for i in zipped_ids_unique]
+
+          return result
 
         else:
             return []

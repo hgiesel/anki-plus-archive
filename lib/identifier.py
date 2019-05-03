@@ -975,7 +975,7 @@ class Identifier:
     def query(self, option=0):
 
         result = []
-        result.append('card:1')
+        result.append('"card:1"')
 
         # toc in filter_component
         if ':' in self.filter_component:
@@ -983,7 +983,7 @@ class Identifier:
 
             for d in self.analysis:
                 for f in d['files']:
-                    prep_ac.append('tag:{0}::{1}'.format(os.path.basename(d['dir_name']), os.path.splitext(f['file_name'])[0]))
+                    prep_ac.append('"tag:{0}::{1}"'.format(os.path.basename(d['dir_name']), os.path.splitext(f['file_name'])[0]))
 
             ac = '(' + ' or '.join(prep_ac) + ')'
 
@@ -1006,7 +1006,12 @@ class Identifier:
         if ac:
             result.append(ac)
 
-        result.append('tag:' + pc + '::' + lc)
-        result.append(self.config['card_sets'][option]['quest_field'] + ':' + '"*' + ':' + qc +':' +'*"')
+        pageid_prefix = self.config['card_sets'][option]['pageid_prefix']
+        result.append('"tag:' + ((pageid_prefix + '::') if pageid_prefix else '') + pc + '::' + lc + '"')
+
+        if self.config['card_sets'][option]['qid_field']:
+          result.append('"' + self.config['card_sets'][option]['qid_field'] + ':' + '*' + qc + '*"')
+        else:
+          result.append('"nid:' + qc +'' +'*"')
 
         return result

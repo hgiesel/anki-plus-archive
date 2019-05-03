@@ -5,7 +5,7 @@ import re
 sys_encoding = sys.getfilesystemencoding()
 addon_path = os.path.dirname(__file__)
 
-def decloze(text):
+def decloze_util(text):
     cloze_anki_regex = re.compile(r'\{\{c[0-9]+::([^(::)(\}\})]*)(?:::[^(?:\}\})]*)?\}\}')
     cloze_overlapper_regex = re.compile(r'\[\[oc[0-9]+::([^(::)(\]\])]*)(?:::[^(?:\]\])]*)?\]\]')
 
@@ -15,7 +15,7 @@ def decloze(text):
     return result
 
 
-def cmdlinetool():
+def stdlib_util():
     print(
 '''
 ark() {

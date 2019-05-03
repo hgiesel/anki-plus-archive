@@ -1,8 +1,5 @@
 {
-  "debug": false,
-
   "archive_root": "/Users/hgiesel/Developer/archive",
-
   "archive_syntax": {
     "tocs": "^README.*",
     "pagerefs": "<<([^>,]+).*>>",
@@ -17,21 +14,27 @@
   "card_sets": [{
     "deck_name": "misc::head",
     "model_name": "Cloze (overlapping)",
-    "quest_field": "Title",
+    "qid_field": "Title",
     "content_field": "Original",
-    "qid_regex": "^:([0-9]+):(?: .*)?",
-    "pageid_regex": "(?:.*::)?([^:]*)::([^:]*)$"
+    "pageid_prefix": ""
   }],
 
-  "editor_command": [
-    "/usr/local/bin/vimr",
-    "$ROOT/$FILE",
-    "--nvim",
-    "-c",
-    "'bd!'",
-    "-c",
-    "'/^:$QUEST:.*$/'",
-    "-c",
-    "normal! zz"
-  ]
+  "commands": [{
+    "type": "shell",
+    "arguments": [
+      "/usr/local/bin/vimr",
+      "$ROOT/$FILE",
+      "--nvim",
+      "-c",
+      "'bd!'",
+      "-c",
+      "'/^:$QUEST:.*$/'",
+      "-c",
+      "normal! zz"
+    ]}, {
+      "type": "clipboard",
+      "text": "$SECTION::$PAGE#$QUEST"
+  }],
+
+  "debug": false
 }
