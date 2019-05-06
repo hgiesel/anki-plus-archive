@@ -31,7 +31,7 @@ class AnkiConnection:
                         'deckName': self.config['card_sets'][option]['deck_name'],
                         'modelName': self.config['card_sets'][option]['model_name'],
                         'fields': {
-                            self.config['card_sets'][option]['qid_field']: (qid if qid else ''),
+                            self.config['card_sets'][option]['qid_field']: (qid if qid and not self.config['card_sets'][option]['qid_use_prefill'] else ''),
                             self.config['card_sets'][option]['content_field']: (content.strip().replace('\n','<br />') if content else '')
                             },
                         'options': {

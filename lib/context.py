@@ -1,4 +1,6 @@
 # MAIN ENTRANCE FOR EVERYTHING RUN WITHIN ANKI ITSELF
+# the name "context" derives from the Anki component of this Anki addon orginally
+# being it's own addon called "Anki-context"
 import re
 import os
 from subprocess import Popen
@@ -66,7 +68,7 @@ def on_command(editor, archive_root: str, card_sets, comm) -> None:
     ### get section and page
     pageid_prefix = card_sets[0]['pageid_prefix'] + '::' if card_sets[0]['pageid_prefix'] else ''
     pageid_suffix = '::' + card_sets[0]['pageid_suffix'] if card_sets[0]['pageid_suffix'] else ''
-    pageid_regex = re.compile(pageid_prefix + '(?:.*::)?([^:]*)::([^:]*)$' + pageid_suffix)
+    pageid_regex = re.compile(pageid_prefix + '(?:.*::)?([^:]*)::([^:]*)' + pageid_suffix)
 
     # first tag that is found that contains a sign of being hierarchical is taken to be section
     indices = [i for i, item in enumerate(editor.note.tags) if pageid_regex.search(item)]

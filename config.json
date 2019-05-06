@@ -12,12 +12,13 @@
   },
 
   "card_sets": [{
+    "content_field": "Original",
     "deck_name": "misc::head",
     "model_name": "Cloze (overlapping)",
-    "qid_field": "Title",
-    "content_field": "Original",
     "pageid_prefix": "",
-    "pageid_suffix": ""
+    "pageid_suffix": "",
+    "qid_field": "noteid",
+    "qid_use_prefill": false
   }],
 
   "commands": [{
