@@ -2,50 +2,45 @@
 
 == Managing your archive
 
-* `ark paths`
+* `ark paths <ark-uri>`
 
 Will print the files associated with a specific ark locator
-This might be directories for sections, files for pages, or 
+This might be directories for sections, files for pages, or
 files and lines for quests.
 
-* `ark stats`
+* `ark stats <ark-uri>`
+
 Will print stats for a specific ark locator.
 Section ark locators summarize the stats for pages.
 Quest ark locators have their own set of available stats.
 
-* `ark update`
-** updates vim-context to the latest release from github
+* `ark verify <ark-uri>`
 
-== Managing file content
-
-* `ark verify`
+Will test the integrity of the archive provided under `<ark-uri>`.
 
 * `ark headings`
 
-== Managing pagerefs
-
-* `ark tocs`
-
-* `ark refs`
-
-* `ark revrefs`
-
-== Managing quest ids
-
-* `ark qids`
-
-* `ark match`
 
 == Interaction with Anki
 
 * `ark query`
 
+* `ark browse`
+
 * `ark add`
 
-* `ark browse`
+* `ark match`
 
 == Utilities
 
 * `ark decloze`
 
 * `ark stdlib`
+
+== Managing pagerefs
+
+* `ark tocs`
+
+* `ark pagerefs`
+
+* `ark revrefs`

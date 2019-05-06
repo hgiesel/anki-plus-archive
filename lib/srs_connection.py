@@ -17,6 +17,12 @@ class AnkiConnection:
             self.printer('connection to db cannot be established')
 
     def anki_add(self, tag, qid=None, content=None, option=0):
+
+        tag_pref = (self.config['card_sets'][option]['pageid_prefix'] + '::' if self.config['card_sets'][option]['pageid_prefix'] else '')
+        tag_suff = ('::' + self.config['card_sets'][option]['pageid_suffix'] if self.config['card_sets'][option]['pageid_suffix'] else '')
+
+        tag_full = tag_pref + tag + tag_suff
+
         add_req = json.dumps({
                 'action': 'guiAddCards',
                 'version': 6,
@@ -32,7 +38,7 @@ class AnkiConnection:
                             'closeAfterAdding': True
                             },
                         'tags': [
-                            tag
+                            tag_full
                             ]
                         }
                     }

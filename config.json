@@ -16,7 +16,8 @@
     "model_name": "Cloze (overlapping)",
     "qid_field": "Title",
     "content_field": "Original",
-    "pageid_prefix": ""
+    "pageid_prefix": "",
+    "pageid_suffix": ""
   }],
 
   "commands": [{

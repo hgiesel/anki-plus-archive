@@ -55,29 +55,6 @@ def setup_parser(config):
   subparsers_dict['headings'].add_argument('uri', nargs='?', default='',
       help='archive uri you want to query')
 
-  subparsers_dict['pagerefs'] = subparsers.add_parser('pagerefs')
-  subparsers_dict['pagerefs'].add_argument('-t', '--tocs', action='store_true',
-      help='expand pagerefs to tocs')
-  subparsers_dict['pagerefs'].add_argument('-f', '--further', action='store_true',
-      help='include further pagerefs')
-  subparsers_dict['pagerefs'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
-      default='default', help='decide how paths should be printed')
-  subparsers_dict['pagerefs'].add_argument('-d', '--delimiter',
-      default='default', help='decide the delimiter for the output')
-  subparsers_dict['pagerefs'].add_argument('uri', nargs='?', default='',
-      help='archive uri you want to query')
-
-  subparsers_dict['revrefs'] = subparsers.add_parser('revrefs')
-  subparsers_dict['revrefs'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
-      default='default', help='decide how paths should be printed')
-  subparsers_dict['revrefs'].add_argument('-d', '--delimiter',
-      default='default', help='decide the delimiter for the output')
-  subparsers_dict['revrefs'].add_argument('-f', '--further', action='store_true', help='follow furter pagerefs')
-  subparsers_dict['revrefs'].add_argument('-k', type=int,
-      default=-1, help='decide how deep pagerefs are traced')
-  subparsers_dict['revrefs'].add_argument('uri', nargs='?', default='',
-      help='archive uri you want to query')
-
   subparsers_dict['verify'] = subparsers.add_parser('verify')
   subparsers_dict['verify'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
       default='default', help='decide how paths should be printed')
@@ -111,6 +88,30 @@ def setup_parser(config):
   subparsers_dict['browse'] = subparsers.add_parser('browse')
   subparsers_dict['browse'].add_argument('uri', nargs='?', default='',
       help='browse cards and see if any are missing or extra')
+
+
+  subparsers_dict['pagerefs'] = subparsers.add_parser('pagerefs')
+  subparsers_dict['pagerefs'].add_argument('-t', '--tocs', action='store_true',
+      help='expand pagerefs to tocs')
+  subparsers_dict['pagerefs'].add_argument('-f', '--further', action='store_true',
+      help='include further pagerefs')
+  subparsers_dict['pagerefs'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
+      default='default', help='decide how paths should be printed')
+  subparsers_dict['pagerefs'].add_argument('-d', '--delimiter',
+      default='default', help='decide the delimiter for the output')
+  subparsers_dict['pagerefs'].add_argument('uri', nargs='?', default='',
+      help='archive uri you want to query')
+
+  subparsers_dict['revrefs'] = subparsers.add_parser('revrefs')
+  subparsers_dict['revrefs'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
+      default='default', help='decide how paths should be printed')
+  subparsers_dict['revrefs'].add_argument('-d', '--delimiter',
+      default='default', help='decide the delimiter for the output')
+  subparsers_dict['revrefs'].add_argument('-f', '--further', action='store_true', help='follow furter pagerefs')
+  subparsers_dict['revrefs'].add_argument('-k', type=int,
+      default=-1, help='decide how deep pagerefs are traced')
+  subparsers_dict['revrefs'].add_argument('uri', nargs='?', default='',
+      help='archive uri you want to query')
 
   subparsers_dict['decloze'] = subparsers.add_parser('decloze')
   subparsers_dict['decloze'].add_argument('uri', nargs='?', default='',

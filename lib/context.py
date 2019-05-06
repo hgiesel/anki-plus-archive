@@ -64,8 +64,9 @@ def on_command(editor, archive_root: str, card_sets, comm) -> None:
     content = editor.note.fields[content_field]
 
     ### get section and page
-    pageid_prefix = card_sets[0]['pageid_prefix']
-    pageid_regex = re.compile((pageid_prefix + "::" if pageid_prefix else "") + "(?:.*::)?([^:]*)::([^:]*)$")
+    pageid_prefix = card_sets[0]['pageid_prefix'] + '::' if card_sets[0]['pageid_prefix'] else ''
+    pageid_suffix = '::' + card_sets[0]['pageid_suffix'] if card_sets[0]['pageid_suffix'] else ''
+    pageid_regex = re.compile(pageid_prefix + '(?:.*::)?([^:]*)::([^:]*)$' + pageid_suffix)
 
     # first tag that is found that contains a sign of being hierarchical is taken to be section
     indices = [i for i, item in enumerate(editor.note.tags) if pageid_regex.search(item)]
