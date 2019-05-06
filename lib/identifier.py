@@ -723,7 +723,7 @@ class Identifier:
 
         return result
 
-    def revpagerefs(self, paths_searched, prepagerefs=None, forbidden_pagerefs=None, further_refs=None, k=None):
+    def revrefs(self, paths_searched, prepagerefs=None, forbidden_pagerefs=None, further_refs=None, k=None):
         '''
         traces back all pagerefs to a specific file
         self: paths considered for completion
@@ -791,7 +791,7 @@ class Identifier:
                     if toc_regex.search(os.path.basename(elem[0][0])):
 
                         new_id = Identifier(self.config, uri=elem[0][0], preanalysis=self.analysis, printer=self.printer)
-                        next_lookup =  self.revpagerefs(new_id.paths()[0][1], prepagerefs=pagerefs,
+                        next_lookup =  self.revrefs(new_id.paths()[0][1], prepagerefs=pagerefs,
                                 forbidden_pagerefs=pre_result + forbidden_pagerefs, k=k-1)
 
                         add_result += [ i + elem for i in next_lookup[0]['traceback'] ]

@@ -1,6 +1,7 @@
 from lib.identifier import Mode, Identifier, Printer
 from lib.util import decloze_util, stdlib_util
 from lib.srs_connection import AnkiConnection
+import pprint
 
 def paths(config, argv, printer):
   addr = Identifier(config, argv.uri, printer=printer)
@@ -86,7 +87,7 @@ def pagerefs(config, argv, printer):
 
   Printer.print_stats(lines, argv.delimiter if not argv.delimiter == 'default' else '\t')
 
-def revpagerefs(config, argv, printer):
+def revrefs(config, argv, printer):
   result = getattr(Identifier(config, '@:@', printer=printer), argv.cmd)(
       argv.uri, further_refs=argv.further, k=argv.k)
   pprint.pprint(result)
@@ -181,13 +182,13 @@ FUNCTION_DICT = {
     'paths': paths,
     'stats': stats,
     'headings': headings,
-    'pagerefs': pagerefs,
-    'revpagerefs': revpagerefs,
     'query': query,
     'verify': verify,
-    'match': match,
     'add': add,
+    'match': match,
     'browse': browse,
+    'pagerefs': pagerefs,
+    'revrefs': revrefs,
     'decloze': decloze,
-    'stdlib': stdlib
+    'stdlib': stdlib,
     }

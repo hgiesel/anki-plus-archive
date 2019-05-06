@@ -12,7 +12,7 @@ from .util import *
 
 from . import pyperclip
 
-def on_command_replace(text, archive_root, section, page, qid):
+def on_command_replace(text, archive_root, section, page, qid, content):
     for dirname, _, bases in os.walk(archive_root):
         if os.path.basename(dirname) == section:
             for base in bases:
@@ -24,7 +24,9 @@ def on_command_replace(text, archive_root, section, page, qid):
                                     lambda x: re.sub('\$BASE', base, x), map(
                                         lambda x: re.sub('\$SECTION', section, x), map(
                                             lambda x: re.sub('\$PAGE', page, x), map(
-                                                lambda x: re.sub('\$QID', qid, x), text)))))))
+                                                lambda x: re.sub('\$CONTENT', content, x), map(
+                                                    lambda x: re.sub('\$CONTENT_DECLOZE', decloze_util(content), x), map(
+                                                        lambda x: re.sub('\$QID', qid, x), text)))))))))
 
 def on_command(editor, archive_root: str, card_sets, comm) -> None:
     ### get qid
@@ -49,6 +51,17 @@ def on_command(editor, archive_root: str, card_sets, comm) -> None:
             return None
     else:
         qid = str(editor.note.id)
+
+    ### get content
+    content_field_name = card_sets[0]['content_field']
+
+    try:
+        content_field = editor.note.keys().index(content_field_name)
+    except:
+        showInfo('Note type does not have content field: ' + content_field_name)
+        return None
+
+    content = editor.note.fields[content_field]
 
     ### get section and page
     pageid_prefix = card_sets[0]['pageid_prefix']
@@ -77,11 +90,11 @@ def on_command(editor, archive_root: str, card_sets, comm) -> None:
     # showInfo("%s::%s#%s" % (section, page, qid))
 
     if comm['type'] == 'shell':
-        result = on_command_replace(comm['arguments'], archive_root, section, page, qid)
+        result = on_command_replace(comm['arguments'], archive_root, section, page, qid, content)
         proc = Popen(result, env={})
 
     elif comm['type'] == 'clipboard':
-        result = on_command_replace([comm['text']], archive_root, section, page, qid)[0]
+        result = on_command_replace([comm['text']], archive_root, section, page, qid, content)[0]
         pyperclip.copy(result)
 
     else:

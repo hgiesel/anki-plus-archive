@@ -10,7 +10,7 @@ def decloze_util(text):
     cloze_overlapper_regex = re.compile(r'\[\[oc[0-9]+::([^(::)(\]\])]*)(?:::[^(?:\]\])]*)?\]\]')
 
     result = cloze_overlapper_regex.sub(r'\1',
-             cloze_anki_regex.sub(r'\1', text))
+            cloze_anki_regex.sub(r'\1', text))
 
     return result
 
@@ -24,7 +24,7 @@ ark() {
         set ''
     fi
 
-    if [[ "$1" =~ ^(-.*|paths|stats|pagerefs|revpagerefs|headings|verify|query|match|browse|add|decloze|stdlib)$ ]]; then
+    if [[ "$1" =~ ^(-.*|paths|stats|pagerefs|revrefs|headings|verify|query|match|browse|add|decloze|stdlib)$ ]]; then
         command ark "$@"
 
     else

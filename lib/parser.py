@@ -67,15 +67,15 @@ def setup_parser(config):
   subparsers_dict['pagerefs'].add_argument('uri', nargs='?', default='',
       help='archive uri you want to query')
 
-  subparsers_dict['revpagerefs'] = subparsers.add_parser('revpagerefs')
-  subparsers_dict['revpagerefs'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
+  subparsers_dict['revrefs'] = subparsers.add_parser('revrefs')
+  subparsers_dict['revrefs'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
       default='default', help='decide how paths should be printed')
-  subparsers_dict['revpagerefs'].add_argument('-d', '--delimiter',
+  subparsers_dict['revrefs'].add_argument('-d', '--delimiter',
       default='default', help='decide the delimiter for the output')
-  subparsers_dict['revpagerefs'].add_argument('-f', '--further', action='store_true', help='follow furter pagerefs')
-  subparsers_dict['revpagerefs'].add_argument('-k', type=int,
+  subparsers_dict['revrefs'].add_argument('-f', '--further', action='store_true', help='follow furter pagerefs')
+  subparsers_dict['revrefs'].add_argument('-k', type=int,
       default=-1, help='decide how deep pagerefs are traced')
-  subparsers_dict['revpagerefs'].add_argument('uri', nargs='?', default='',
+  subparsers_dict['revrefs'].add_argument('uri', nargs='?', default='',
       help='archive uri you want to query')
 
   subparsers_dict['verify'] = subparsers.add_parser('verify')
