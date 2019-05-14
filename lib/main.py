@@ -9,20 +9,20 @@ def paths(config, argv, printer):
     result = getattr(addr, argv.cmd)()
 
     if argv.paths == 'rel':
-        printed = [(Identifier.to_rel_path(path[0], config['archive_root']), path[1], path[2], path[3]) for path in result]
+        result = [(Identifier.to_rel_path(path[0], config['archive_root']), path[1], path[2], path[3]) for path in result]
     elif argv.paths == 'id':
-        printed = [(Identifier.to_identifier(path[0]), path[1], path[2], path[3]) for path in result]
+        result = [(Identifier.to_identifier(path[0]), path[1], path[2], path[3]) for path in result]
     elif argv.paths == 'shortid':
-        printed = [(Identifier.to_identifier(path[0], omit_section=True), path[1], path[2], path[3])
+        result = [(Identifier.to_identifier(path[0], omit_section=True), path[1], path[2], path[3])
                    for path in result]
     elif argv.paths == 'none':
-        printed = []
+        result = []
 
     if argv.delimiter == 'default':
-        printed = [(path[0] + ':' + str(path[2]) + ':',)
-                if path[2] is not None else (path[0],) for path in printed]
+        result = [(path[0] + ':' + str(path[2]) + ':',)
+                if path[2] is not None else (path[0],) for path in result]
 
-    Printer.print_stats(printed, delimiter=argv.delimiter)
+    Printer.print_stats(result, delimiter=argv.delimiter)
 
 def stats(config, argv, printer):
     addr = Identifier(config, argv.uri, printer=printer)
