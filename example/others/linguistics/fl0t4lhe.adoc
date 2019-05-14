@@ -1,0 +1,13 @@
+= Moods
+:stats: linguistics:fl0t4lhe,0,9
+
+Realis moods::
+* indicative mood: factual statements, beliefs
+
+Irrealias moods::
+* subjunctive mood: describes imaginary or hypothetical events and situations
+* conditional mood: describes conditional event depending on another event
+* optative mood: describes hopes
+* imperative mood: describes commands to a second person
+* jussive mood: describes commands to third or first person (should)
+* interrogative mood: describes questions

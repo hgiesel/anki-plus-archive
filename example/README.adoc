@@ -1,0 +1,81 @@
+= Notes
+:tag: notes
+
+== Overview
+
+* divided into several *topics*, which are directories containing:
+.. a `README.adoc`
+.. an optional `assets` directory containing diagrams, scripts, etc.
+.. asciidoc files containing information on the topic
+
+* each file is divided into questions, which usually are a block
+** the block answers the question posed
+
+== Question tags
+
+.question tags; list
+* `:1:`: normal question tag
+* `:100:`: subtag to `:1:`
+* `:101t:`: are solely questions/tasks, and don't contain any new information
+* `:102f:`: needs a fix
+
+.question tags; interaction
+* `<ll>t` (only on qtag): copy fully qualified tag of question to copyboard
+* `<ll>T`: copy ftag to copyboard
+* `<ll>i`: inserts the next available tag in current line (inspects `b:unique_qtags`)
+
+== File/Diagram import
+
+.diagrams; interaction
+* `<ml>gr` (only on file/image tag): reveal file/image in file manager
+* `<ml>go` (only on file/image tag): open file in default application
+
+* `<ml>ga`: opens the `g:go_assets_to_directory`
+* `<ml>gi`: copies files from `g:go_assets_from_directory` to `g:go_assets_to_directory`
+** also names it appropriately
+* `<ml>gI`: only possible name of file for import/reference
+
+== Anki interaction
+
+.Anki interaction; commands
+* `<ll>q` (only on qtag): copy Anki query to copyboard
+* `<ll>Q`: copy paragraph into copyboard
+
+== Guidelines
+
+.guidelines; code and math
+* for inline: always use `foo`!
+* for block: always use
+
+.guidelines; foo
+----
+foo
+----
+
+.guidelines; blocks
+* blocks which are not just listings, usually have the `:ext:` tag
+
+.guidelines; other
+* don't use "dlists"!
+** use `a: b` instead, make `a` bold if appropriate
+
+.guidelines external sources
+* for assets, become content: only allowed in fences:
+.. `include::`: for literally importing files, usually within `----` block
+* for assets, become content: only allowed as standalone blocks:
+.. `image::`: for placing a picture, can only have a block title, no bullets!
+.. `video::`: same as image
+
+* not for assets, not content!! allowed in flowing text
+.. `link:`: references other files (topics) / urls / sources
+*** often used with `//`
+
+== Important variables
+
+* b:ftag
+* b:qtags_unique
+* b:qtags_duplicate
+* b:qtags_references
+* b:qtags_references_dangling
+* b:file_references
+* b:file_references_dangling

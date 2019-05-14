@@ -1,0 +1,22 @@
+= Questions
+:stats: linguistics:mzfuxgz7,0,9
+
+== Types of questions: Yes-no-questions
+
+.Two/three/four-systems system
+. Will he go? — Yea, he will. (Ja)
+. Will he go? — Nay, he will not. (Nein)
+. Will he not go? — Yes, he will. (Doch)
+. Will he not go? — No, he will not. (Nein, rarely Ja)
+
+Negative questions usually require echo responses
+
+.Echo responses
+* used in Japanese, and Mandarin
+
+
+== Alternate questions
+== wh-questions
+** -> wh-fronting
+
+== Tag questions

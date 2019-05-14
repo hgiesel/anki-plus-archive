@@ -1,0 +1,168 @@
+= TCP Basics and Segment Structure
+:stats: transport-layer:ov1sz2lp,0,122
+
+== Introduction
+
+.tcp; relation IP and TCP (1)
+* was specified along IPv4
+
+.tcp; design decisions (2)
+* optimized for accuracy, rather than timely deliver:
+** handles errors of the connectionless, no-integrity IP
+** can produce timeouts of more than a second
+
+.tcp; importance of connection-orientedness
+* process-to-process communication has several desired properties
+* are not provided by L3 protocol (IP):
+** TCP provides them instead
+
+.PDU of TCP; size of header; size (3)
+* *segments* are the units of TCP:
+** message is divided into individual units of data
+** reassambled for user application at receiver
+
+* TCP header size is at least 20 bytes:
+** options can make it longer
+* length of segment doesn't have dedicated field:
+** IP packet size minus the IP header size
+
+== TCP segment structure
+
+.TCP header
+* TCP data is encapsulated in an IP datagram
+* its normal size is 20 bytes, unless options are sets
+
+.TCP header; graphic
+image::http://www.ssfnet.org/Exchange/tcp/Graphics/tcpHeader1.gif[TCP header]
+
+
+.TCP header; structure
+. "SrcPort (16 bit)"
+. "DstPort (16 bit)"
+. "Sequence number (32 bit)"
+. "Acknowledgement number (32 bit)"
+
+. "Data offset (4 bit)"
+. "Flag fields (12 bits)"
+. "Advertised window size (16 bit)"
+. "TCP checksum (16 bit)"
+. "Urgent pointer (16 bit)"
+. "[Options]"
+
+.Data offset (4 bit)
+* same as `IHL` in IPv4
+* specifies TCP header in 32-bit words
+* minimum of 5, to maximum of 15:
+** i.e. a maximum of 10 32-bit words of options are allowed
+
+== TCP segment structure: Flags
+
+.TCP header flags (except first three) (3,6)
+.Flag fields (12 bits)
+.Reserved (3-bit)
+. NS/CWR/ECE
+* needed for congestion control
+
+.flag fields; URG
+* signifies that this segment contains urgent data:
+** urgent pointer indicates where the *non-urgent data* contained in this segment begins
+
+.flag fields; ACK
+* acknowledgement number only valid, if flag is set:
+** this is the case every time after the first SYN
+
+.flag fields; PSH
+* sender invoked push operation:
+** indicates to receiver it should push the received segment directly to end-user process
+
+.flag fields; RST
+* used during connection establishment:
+** server is confused and wants to abort the connection
+** this can happen after server got the first SYN, but no response from its SYN/ACK
+
+.flag fields; SYN
+* used for establishing a TCP connection
+.flag fields; FIN
+* used for terminating a TCP connection
+
+== Window scaling
+
+.advertised window field; limit
+* size of the sender's *receive winow*
+* larger advertised window allows more efficient use of high-bandwidth network:
+** limited to value between 2 and 65,535
+** ! can be enlarged with windows scaling factor
+
+.TCP windows update
+* a TCP windows update is a segment similiar to an acknowledgement:
+** sent if the available memory of the receiving process changes
+** i.e. only thing changed is the advertised window field
+
+.window scaling factor; structure
+** only settable during connection establishment
+** scaling factor counts per direction
+** represents bits to left shift the 16-bit field
+
+** can be set from 0 to 14, for a maximum value of up to 1 gigabyte
+*** e.g. a value of 2 would mean two left shifts: 5 would become 20
+
+== TCP Checksum
+
+.TCP checksum field; processing
+* checksum covers the TCP pseudo header
+* must be calculated by sender and then verified by receiver
+
+.TCP checksum computation (4)
+* defined in RFC 768:
+** one's complements of one's complement sum of 16-bit words in header and text
+** if packet contains odd number of octets, it is padded to form 16-bit word
+** the pad isn't transmitted as part of the packet
+** during checksum computation, checksum field itself is replaced with zeroes
+
+.structure of TCP pseudo header (6)
+* uses a TCP pseudo header:
+.. source IP address [4 byte iff IPv4 or 16 byte iff IPv6]
+.. destination IP address [4 byte iff IPv4 or 16 byte iff IPv6]
+
+.. [4 byte TCP length iff IPv6]
+.. [1 byte, IP protocol, 2 bytes TCP length (header + padded data)] iff IPv4, or
+*** [3 bytes zero, Next header] iff IPv6
+
+.. TCP header with checksum field all set to zero
+.. TCP data
+
+.Checksum offload
+.checksum offload; issues (2)
+* many TCP/IP stack implementations have options for hardware assistance
+** automatically computes checksum in network adapter prior to transmission
+** relieves OS from using CPU cycles to calculate the checksum
+* may cause packet analyzers to report invalid checksums for outbound packets:
+** same issue may occur on VMs
+
+
+== Out-of-band data
+
+.comparison of out-of-band data and normal data (3,3)
+* normally the receiver of data will:
+.. wait till stream is finished
+.. assemble received segments into data
+.. push it to the application
+* sender can specify data as *urgent*:
+.. receiver interrupts/aborts queued stream instead until stream finishes
+.. tells receiving program to process it immediately
+.. when finished, TCP informs application and resumes with the stream queue
+
+.out-of-band data examples (1)
+* e.g. used in remote login sessions, like Telnet or SSH:
+** user sends keyboard sequence that needs computed immediately, e.g. signals
+** signal sent without waiting for program to finish its current transfer:
+*** e.g. when program on remote machine fails to operate correctly
+
+.Issues
+.issues of out-of-band data; consequence (2;1)
+* TCP OOB wasn't designed for modern Internet:
+.. no expedition of processing on the network, just on remote receiver
+* on remote host, ∃ two slightly different interpretations of OOB:
+** ∴ only single bytes of data are reliable
+
+* least used protocol feature, usually poorly implemented

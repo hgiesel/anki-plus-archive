@@ -1,0 +1,15 @@
+= Overview
+
+* linguistics is mainly concerned about three components:
+
+.Morphemes
+* smallest unit of meaning and its study, morphology:
+** e.g. syntax, semantics, semiotics
+
+.Graphemes
+* the smallest unit of writing and its study, graphemics:
+** e.g. characters, writing systems, types of characters, orthography
+
+.other topics include:
+** Etymology, the history of words
+** Pragmatics, the influence of context of language

@@ -1,0 +1,98 @@
+= Aspects
+:stats: linguistics:zwcw1ec1,0,72
+
+== Lexical aspect
+
+* part of the way in which a verb is structured in relation to time
+* an inherent property of a semantic eventuality
+** grammatical aspect is part of the grammatical realization
+
+.lexical aspect; categories
+* *telic* ⇔ *atelic*: whether has an goal / mental conclusion
+* *durative* ⇔ *punctual*: whether happening continually or not
+* *changeless*: state verbs, adjectives
+
+.lexical aspect; categories; achievement
+* telic, durative, e.g.
+.. drown, work on, write a novel
+.. `---|`
+
+.lexical aspect; categories; accomplishment
+* telic, punctual, e.g.
+.. release, open, close
+.. `|`
+
+.lexical aspect; categories; semelfactive
+* atelic, durative, e.g.
+.. walk, sit, stand, scribble
+.. `--- ---  ---`
+
+.lexical aspect; categories; activity
+* atelic, punctual, e.g.
+.. knock, cough
+.. `| | |`
+
+.lexical aspect; categories; state
+* changeless, durative, e.g.
+.. know, all adjectives
+
+
+== Grammatical aspect
+
+.grammatical aspect; examples in languages
+* simple
+* perfect
+* progressive
+* about-to future
+
+* aspectual distinction is not inherent to the events themselves:
+** decided by how the speaker views them or wishes to present them.
+** ∴ a component of conjugation
+* how a state, action, event extends over time
+
+.grammatical aspects; concerning starting, or ending an action
+* INC: *inchoative*: something "begins"
+* CES: *cessant*: something "ends"
+
+.grammatical aspects; concerning aphorisms
+* GNO: *gnomic*: a general truth, e.g.
+.. ser, "Ich bin kalt"
+* EPI: *episodic*: a personal experience, e.g.
+.. estar, "Mir ist kalt"
+
+.grammatical aspects; concerning interior composition
+* PFV: *perfective*:
+** action is seen as a simple whole, "simple truth"
+** an event presented as an unanalyzed whole
+** usually short amount of time
+** e.g. preterite in Romance languages, Russian
+* within past tense
+** perfective is translated as simple past
+** imperfective is translated to "was going", or "used to go"
+
+* IPFV: *imperfective*:
+* viewed with interior composition, e.g.
+.. *continuous aspect*: *progressive aspect*, or *stative aspect*
+.. *iterative aspect*: "she coughed"
+.. *frequentitive aspect*: "she occasionaly does ..."
+.. *habitual aspect*: "she would, she used to, she ordinarily does ..."
+.. *experiential aspect*: "she experienced ..."
+
+.grammatical aspects; concerning time of consideration
+* PERF: *perfect*, or *retrospectiv*:
+** event happened earlier than time of consideration
+** focusing on resulting state
+** used in many languages, e.g.
+*** in present perfect, past perfect, etc.
+
+* PRSP: *prospective*:
+** focusing on state that will lead up to the action
+** e.g. "going-to" future, "going to end up"
+
+== Grammatical aspect: Examples in languages
+
+.standard Chinese
+. "了": perfective aspect
+. "着": imperfective, stative aspect
+, "在": imperfective, continuous aspect
+. "过": imperfective, experiental aspect

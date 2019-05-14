@@ -1,0 +1,96 @@
+= Valency
+:stats: linguistics:lz9lmlye,0,63
+
+== Valency
+
+.valency; definition
+* number of arguments controlled by a verbal predicate can take
+
+.valency; types
+. *impersonal* (avalent), e.g. "(It) rains"
+. *intransitive* (monovalent), e.g. "He sleeps"
+. *transitive* (divalent), e.g. "He kicks the ball"
+. *ditransitive* (trivalent), e.g. "He gave her a flower"
+
+== Valency: Intransitive verbs
+
+.unergative verbs
+* intransitive verb where grammatical subject is the semantic agent
+** "Mary ran", "The children worked hard"
+
+.unaccusative verbs
+* intransitive verb where grammatical subject is the semantic patient
+* act as verbs where the semantic patient, is not in accusative position, e.g.
+** "the window broke", "the tree fell", "the man died"
+
+.controversy
+* some intransitive verbs can be considered both
+** depends on whether action was voluntary or involuntary, e.g.
+** "slide": "the door slid open", "he slided over the ice"
+
+== Valency: Transitive verbs
+
+.accusative verbs
+* requires all objects, e.g.
+** "you fed the dog yesterday", but not "you fed yesterday", but "you fed him yesterday"
+
+.object-deletion verbs
+* can be transitive, or intransitive, e.g.
+** "we have already eaten dinner", or "we have already eaten"
+** like unergative verb, or antipassive
+
+.ergative verbs
+* can be transitive, or intransitive
+* subject when intransitive becomes direct object when transitive, e.g.
+** "the submarine sank the freighter", or "the freightener sank"
+** like unaccusative verb, or passive
+
+== Valency changing operations: Valency decreasing
+
+.passive voice
+* in nominative-accusative languages, turns accusative case into nominative case, e.g.
+** "He-NOM is speaking the truth-ACC" -> "The truth-NOM is being spoken"
+* typically, in passive clauses what is usually expressed by the object is now the subject
+
+* not necssarily valency decreasing, e.g. in Japanese
+
+* deleted objects can be reintroduced as *arguments*:
+* complete the meaning of the predicate (verb phrase)
+
+.adversative passive voice
+* works like ordinary passive in syntactic nature
+* indicates somebody was negatively affected
+* "花子が 隣の学生に ピアノを 朝まで惹かれた。"
+* => Hanako was adversely affected by the neighbor playing the piano
+
+.antipassive voice
+* in absolutive-nominative languages, turns ergative case into absolutive case, e.g.
+** "He-ERG is speaking the truth-ABS." -> "He-ABS is speaking"
+
+.relation between voices and verb types
+* they sank the ship
+* the ship was sunk
+* the ship sank
+
+* sie versenken das Schiff
+* das Schiff wurde versenkt
+* das Schiff sinkte
+** => English is way more ergative than German
+
+== Valency changing operations: Valency increasing
+
+.causative voice
+
+.applicative voice
+* promotes an oblique argument of a verb to a core argument
+* many languages have dedicated morphology for applicative uses
+* especially in highly agglutinative languages, like Bantu languages
+
+* e.g. in English "run" → "outrun" is similar to an applicative voice
+** "Jack ran faster than the giant"
+** "Jack outran the giant" → "The giant was outrun by Jack"
+
+.benefactive case
+
+.dative shift
+

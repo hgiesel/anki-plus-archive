@@ -1,0 +1,24 @@
+= Group actions
+
+== Groups actions
+
+* set-theoretic representation: *group action*
+* category of affine spaces: *affine representations*
+* category of vector spaces: *representations*
+
+== Types of actions
+
+* transitive
+* faithful
+
+.free action
+* given `g,h ∈ G`, existence of `x∈X` with `g⋅x = h⋅x`:
+.. implies `g = h`, or alternatively
+.. if `g` has at least one fixed point in `X`
+* regular
+
+* primitive
+* locally free
+
+== Orbits and stabilizers
+

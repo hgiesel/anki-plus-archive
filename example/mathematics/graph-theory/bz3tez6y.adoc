@@ -1,0 +1,139 @@
+= Groups and backreferences
+
+== Groups
+
+.groups; special syntax
+* ∃ some special notation within groups:
+.. alternation `|`, e.g.
+*** `(a|b)` matches either `a`, or `b`
+.. concatenation `&`:
+*** alternative for positive lookaheads on empty atoms
+
+.groups; properties of alternation
+* alternation can be either:
+.. *eager*: takes the first option that matches
+.. *greedy*: takes the longest option
+** usually, they are eager
+
+:1545075585487:
+.groups; matching versus capturing
+. *matching*: adds text to the matched text:
+** asserting, or searching regexes are not affected much
+. *capturing*: creates backreferences:
+** most interesting for substituting regexes
+
+:1545076093654:
+.groups; types
+* matching, non-capturing groups
+* matching, capturing groups
+* atomic groups
+* non-matching groups
+* comments
+
+== Groups: Matching groups
+
+:1545076268139:
+.group types; *matching, non-capturing groups*
+* notation: `(?:atom)` in Perl; `\%(atom\)` in Vim
+
+:1545076364719:
+.group types; *matching, capturing groups*
+* backrefs can be numbered or named:
+.. numbered capture groups: `(atom)`
+.. named capture groups: `(?P=<name>regex)` `(?<name>regex)`
+
+:1545076441808:
+.group types; *atomic groups*
+* notation: `(?>regex)` in Perl; `atom\@>` in Vim
+* a possessive matching, capturing group
+* quantifiers affecting the atomic group itself are not possessive, e.g.
+** in `(?>oo?)*`, the `*` does not match possessively
+
+:1545076558383:
+.group types; example `/a(?>bc|b)c/`
+* the regex will match `abcc`, but not `abc`
+* alternative with possessive quantifiers: `/abc?+c/`
+
+:1545147574570:
+.group types; example 2
+* `/(?>oo?)*obc/` matches `ooobc`, but not
+* `/(oo?)*+obc/` does not match `ooobc`, but
+
+.group types; atomic groups; why use them
+* make regexes much more efficient by avoiding unnecessary backtracking
+
+== Groups: Non-matching groups
+
+:1545076689043:
+.group types; *non-matching groups*
+* don't match characters, just asserts them, or _matches zero-width_
+* usually aid other, matching patterns
+
+:1545076761331:
+.group types; non-matching groups; notation
+. *positive lookaheads*: `(?=regex)` in Perl, `regex\@=` in Vim
+. *negative lookaheads*: `(?!regex)` in Perl, `regex\@!` in Vim
+. *positive lookbehinds*: `(?<=regex)` in Perl, `regex\@<=` in Vim
+. *negative lookbehinds*: `(?<!regex)` in Perl, `regex\@<!` in Vim
+
+:1545077038019:
+.group types; non-matching groups; position in relation to atom
+. lookaheads succeed the modified atom
+. lookbehinds precede the modified atom
+
+:1547431630285:
+.group types; non-matching groups; example 1
+* matching `To` in `Todo`, but not `Tongue`
+.. with positive assertion: `To(?=do)`, or `To\%(do\)\@=`
+.. with negative assertion: `To(?!ngue)`, or `To\%(ngue\)\@!`
+
+:1547431688070:
+.group types; non-matching groups; example 2
+* matching `art` in `Dart`, but not `Fart`
+.. with positive assertion: `(?<=D)art`, or `\%(D\)\@<=art`
+.. with negative assertion: `(?<!F)art`, or `\%(F\)\@<!art`
+
+== Groups: Non-matching groups: Alternatives
+
+.group types; non-matching groups; alternatives
+. zoom anchors: `\zs`, `\ze`:
+** substitutes positive lookbehinds and lookaheads
+. keep the text out of the match: `\K`
+** substitutes positive lookbehinds
+. concatenation in groups `&` (only in Vim):
+** substitutes positive lookaheads on empty atoms
+
+.group types; non-matching groups; alternatives; examples
+* matches the last atom, iff all concatenated atoms match, e.g.
+.. `\(abcdef\&abc\)`, matches 'abc' in 'abcdef', but not in 'abcghi'
+.. `\(<\w{4}>\&four\)` == `\v(<\w{4}>)@= four` matches 'four', but not 'fourteen'
+
+.group types; non-matching groups; examples
+. `groups\@=s` in Vim: matches 'group' in 'groups', but not 'group types'
+. `/\v(Start)@<=Date` in Vim: matches 'Date' in 'StartDate'
+. `/\vPenis(Pump)@!` in Vim: matches 'Penis' iff not followed by 'Pump'
+. `123\zs456\ze789` in Vim: matches '456' in '123456789'
+
+.group types; *comments*
+* notation: `(?#comment)` in Perl
+* used for writing comments in regexes
+
+== Groups: Revisiting other structures
+
+.redefining as groups; characters
+* identical to series of _matching, non-capturing groups of width one_, e.g.
+.. `abc` => `(?:a)(?:b)(?:c)`
+
+.redefining as groups; classes
+* identical to an alternation in a _matching, non-capturing groups of width one_, e.g.
+.. `[abc]` => `(?:a|b|c)`
+
+.redefining as groups; anchors
+* can be seen as predefined _non-matching, non-capturing groups_, e.g.
+*** automatically atomic
+
+== Backreferences
+
+// TODO
+
+

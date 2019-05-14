@@ -1,0 +1,42 @@
+= Server management
+
+== Vagrant
+
+* `vagrant init`
+* - initalize vagrant directory
+* `vagrant up`
+* - start vagrant vm with setting or restart
+
+* `vagrant suspend`
+* save disk and RAM
+* `vagrant halt`
+* save disk + gracefully shutdown
+* `vagrant destroy`
+* save nothing + restore to clean state
+
+* `vagrant login`
+* `vagrant share`
+* - share an web address
+
+* `vagrant provision`
+* - provision (scripts)
+* `vagrant reload`
+* - reload Vagrantfile
+
+* `vagrant status`
+
+config.vm.network
+:forwarded_port, guest: 80, host: 8080
+:private_network, type: "dhcp" | ip: "192.168.55.0"
+:public_network
+
+config.vm.synced_folder
+* `vagrant provision`
+* - provision (scripts)
+* `vagrant reload`
+* - reload Vagrantfile
+
+== Ansible
+
+
+== Salt

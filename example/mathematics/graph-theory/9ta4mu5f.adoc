@@ -1,0 +1,231 @@
+= Degrees, walks, and cuts
+:stats: graph-theory:27a259b7,0,149
+
+== Graphs
+
+.graphs; definition
+* a graph `G = (V,E)` is made up of:
+.. `V`, *vertices*, or *nodes*, or *points*
+.. `E`, *edges*, or *arc*, or *lines*, a subset of `V×V` connecting `V`
+
+.graphs; interpretation as endorelation
+* can be interpreted as a pair:
+.. a set `V`
+.. an homogenous relation (endorelation) over `V×V`
+
+.graphs; graphs versus digraphs
+
+.graphs; what is a transpose graph
+* a given directed graph with same vertices, but each edge reversed
+
+.graphs; difference to graph of a function
+* the graph of a function is a way to portray heterogenous relations
+* the graphs of graph theory are a general kind of homogenous relation
+
+== Notions in graphs: Degrees
+
+.degrees, definition
+* the numbers of edges adjacent to a vertex
+** loops are counted twice
+
+.degrees; notation
+* for a vertex `v`, you write `deg v`
+
+.degrees; isolated vertex
+* a vertex `v, deg v = 0`
+
+.degrees; leaf vertex
+* a vertex `v, deg, v = 1`:
+** especially in trees
+
+.degrees; pendant edge
+* an edge adjacent to a leaf vertex
+
+.degrees; adjacent versus incident
+* for vertices `v₁,v₂`, and edges `e₁,e₂`
+.. `v₁,v₂` are adjacent, iff connected by an edge
+.. `e₁,e₂` are incident, iff they share a vertex
+.. `v₁,e₁` are incident, iff the vertex is one of the endpoints
+
+'''
+
+.Handshaking lemma
+* `Σ (deg v) = 2|E|`
+** ⇒ in every finite graph ∃ even number of vertices with odd degree
+* also called the *degree sum formula*
+
+.Handshaking lemma; consequence
+* the number of vertices with odd degree is always even:
+.. otherwise Handshaking lemma would imply half edges
+*** e.g. `Σ (deg v) = 5` ⇒ 4.5 edges
+
+.Handshaking lemma; heuristical approach
+. a graph with zero edges has degree 0
+. whenever you add an edge, you either:
+** two even degrees turn odd
+** one even degree turns odd, one odd degree turns even
+** two odd degrees turn even
+
+== Notions in digraphs: Degrees
+
+.degrees in digraphs; *head of an edge*
+* the source of an edge
+
+.degrees in digraphs; *tail of an edge*
+* the target of an edge
+
+.degrees in digraphs;
+* *indegree*: the number of incoming edges
+* *outdegree*: the number of outgoing edges
+* degree: the sum of the outdegree and indegree
+
+== Notions in graphs, and digraphs: Walks
+
+.walks; definition
+* an alternating sequence of vertices and edges, starting and ending at vertex:
+** `(v_0, e_0, v_1, e_1, …, v_(k-1), e_(k-1), v_k)`
+** each *edge* is adjacent to its two endpoints
+* in German: "Kantenzug"
+
+.walks; special types of walks (3)
+. *paths*
+. *trails*
+. *cycles*
+
+'''
+
+.paths; definition
+* a path is a trail where all vertices are distinct (except maybe first and last)
+
+.paths; Hamiltonian path
+* a path that visits each vertex exactly once
+
+.paths; Hamiltonian cycle
+* a Hamiltonian path that is also a cycle
+* finding whether such paths exist is NP-complete
+
+'''
+
+.trails; definition
+* a trail is a walk where all edges are distinct
+** in German: "Weg"
+
+.trails; Eulerian trail
+* a trail that visits each edge exactly once
+.. `G` has a Eulerian trail
+.. ``∀v ∈ V. deg^- v = outdeg^` v`+
+
+.trails; Eulerian cycle
+* a Eulerian trail that is also a cycle
+* necessary that zero, or two vertices have an odd degree:
+.. iff two, the trail starts at one, and ends at the other
+.. iff none, the trail can start anywhere
+
+* Eulerian circuit, iff all vertices have an even degree
+
+'''
+
+.walks; cycles
+* a cycle is a walk which starts and ends at the same vertex
+** in a graph with `n` vertices, `v_0 = v_(n-1)`
+** in German: "Zyklus"
+
+.walks; *closed walks*
+* a synonym for a cycle, as opposed to *open walks*
+
+.walks; *girth* is the length of the shortest cycle of the graph
+
+== Notions in graphs: Cuts
+
+.cuts
+* could be called *edge cuts*
+* a partition `C = (S,T)`, of the vertices `V` into two disjoint subsets
+** i.e. `S,T ⊂ V`
+** important is that all edges have one endpoint in `S`, one in `T`
+
+.cuts; cut-set
+* set of edges that have one endpoint in each subset of the partition
+** i.e. they identify the cuts
+** `{(u,v) ∈ E | u∈S, v∈T}`
+* ! this is not necessarily true in unconnected graphs
+
+.cuts; size/weight of a cut
+* in unweighted graphs: number of edges crossing the cuts is its *size*
+* in weighted graphs: sum of weights of cut edges is its *weight*
+
+.cuts; minimum cut; iff size/weight is not larger than the size of any other
+image::https://en.wikipedia.org/wiki/File:Min-cut.svg[]
+
+.cuts; maximum cut; iff size/weight is not smaller than the size of any other
+image::https://en.wikipedia.org/wiki/File:Max-cut.svg[]
+
+'''
+
+.vertex cuts
+* also called vertex seperators
+* a vertex subset `S ⊂ V`, iff:
+** its removal from `G` seperates nonadjacent vertices `a` and `b` into distinct components
+
+.vertex cuts; articulation points
+* also called *cut vertices*
+* a vertex cut of size `1`
+* a graph without articulation points is called *biconnected*
+
+== Notions in graphs: Connectivity
+
+.connected; *adjacent nodes*
+* relation between two vertices that are both endpoints of the same edge
+* if `p` has a length of 1, `u,v` are *adjacent*
+
+.connected; *reachable nodes*
+* relation between two vertices where ∃ a walk from `x` to `y`
+
+'''
+
+.connectivity in graphs; *connected*
+* two vertices `u,v` are connected, if `G` has a path from `u` to `v`:
+** otherwise, they are *disconnected*
+** a graph `G` is connected, if every pair of vertices is connected
+
+.connectivity in graphs; *maximally connected*
+* its connectivity equals its minimum degree
+
+'''
+
+.connectivity in graphs; *super-connected*
+* every minimum vertex cut isolates a vertex
+
+.connectivity in graphs; *hyper-connected*
+* every deletion of each minimum vertex cut creates exactly two componenets
+** one of which is an isolated vertex
+
+== Connectivity in digraphs
+
+.connectivity in digraphs; *weakly-connected*
+* a directed graph, iff replacing all directed edges produces a connected graph
+
+.connectivity in digraphs; *connected*
+* iff `∀u,v`, ∃ a directed path `u` to `v`, or a directed path `v` to `u`
+
+.connectivity in digraphs; *strongly-connected*
+* iff `∀u,v`, ∃ a directed path `u` to `v`, and a directed path `v` to `u`
+
+== Components
+
+.connected components
+* a maximal connected subgraph of `G`
+* each vertex and edge belongs to exactly one connected component
+
+.edge-connectivity
+* minimum number of a edges that need to be deleted in order to make a graph disconnected
+
+image::digraphs-connectivity.jpg[TODO]
+
+Adjacency matrix::
+. rows,columns: edges
+. kth row sum = `deg⁺_G(vₖ)`
+. kth column sum = `deg⁻_G(vₖ)`
+
+Incidence matrix::
+. rows: vertices; columns: edges
+. `-1` if source vertex, `1` is destination vertex, `0` otherwise

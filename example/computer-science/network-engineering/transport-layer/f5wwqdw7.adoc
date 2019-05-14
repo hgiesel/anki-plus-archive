@@ -1,0 +1,35 @@
+= TCP Heuristics
+:stats: transport-layer:README,0,18
+
+== TCP Keepalives
+
+.TCP keepalives; enabled how (3)
+* packet sent to keep a connection alive
+** DUPACK with seqno set to one less current seqno for the connection
+* optional feature:
+** ! only needs support on one side
+** can be set in the OS
+
+.Keepalive parameters
+* *Keepalive time*
+* duration between two keepalive transmissions in idle condition
+* TCP keepalive period required to be configurable (default ≥ 2h)
+
+* *Keepalive interval*
+* duration between two keepalive transmissions iff no received ACK:
+** i.e. ACK to previous keepalive was not received
+
+* *Keepalive retry*
+* number of retransmissions before declaring remote end as not available
+
+.purposes of TCP keepalives (2)
+* ∃ 2 purposes:
+.. check for dead peers
+.. prevent disconnection due to network inactivity
+
+.feature similar to TCP keepalives in other protocols (3)
+* feature similar to TCP keepalives is used in:
+.. SMB
+.. TLS
+.. HTTP with the `Keep-Alive` in the `Connection` header
+*** unrelated to functionality of TCP keepalives

@@ -1,0 +1,87 @@
+= Subgroups and quotient groups
+
+== Subgroups
+
+:1547347254394:
+.subgroups
+* denoted `H ≤ G`, or `H ⊆ G`
+* every group `G`, has two subgroups: `{e}`, the *trivial subgroup*, and `G`
+
+:1547389058770:
+.subgroups; *Lagrange's theorem*
+* `H ≤ G ⇒ |H| ∣ |G|`
+
+:1547389082307:
+.subgroups; *cosets*
+* in German, "Nebenklasse"
+* only make sense in relation to subgroups
+* left coset of `H ≤ G` with respect to `g₁`, given `g₁∈g ∧ g₁∉H` is:
+.. `g₁ H = { g₁ ∗ h | ∀h∈H }`
+* right coset of `H ≤ G` with respect to `g₁`, given `g₁∈g ∧ g₁∉H` is:
+.. `H g₁ = { h ∗ g₁ | ∀h∈H }`
+
+:1547389125910:
+.subgroups; subgroups; example Dih₄
+* given `G = Dih₄`, e.g.
+.. `{e,a} ⊲ G`, with right cosets `H, H∗r, H∗r², H∗r³`
+.. `{e,r²a} ⊲ G`, with right cosets `H, H∗a, H∗r, H∗r³`
+.. `{e,r²} ⊲ G`, with right cosets `H, H∗a, H∗r, H∗ra`
+.. `{e,r³a} ⊲ G`, with right cosets `H, H∗a, H∗r, H∗r²`
+.. `{e,a,r²,r²a} ⊲ G`, with right cosets `H, H∗r`
+.. `{e,r,r²,r³} ⊲ G`, with right cosets `H, H∗a`
+.. `{e,ra,r²,r³a} ⊲ G`, with right cosets `H, H∗r`
+
+:1547390040336:
+.subgroups; subgroups; example Q₈
+* given `G = Q₈`, e.g.
+.. `{1,-1} ⊲ G`, with right cosets `H, H∗i, H∗j, H∗k`
+.. `{1,i,−1,−i} ⊲ G`, with right cosets `H, H∗j`
+.. `{1,j,−1,−j} ⊲ G`, with right cosets `H, H∗k`
+.. `{1,k,−1,−k} ⊲ G`, with right cosets `H, H∗i`
+
+== Normal subgroups
+
+:1547390079148:
+.normal subgroups; definition
+* `N ⊴ G` is a normal subgroup iff `g⁻¹ N g = N, ∀g∈G`
+** called "invariant under conjugation"
+
+:1547390133322:
+.normal subgroups; simple groups
+* groups which have only two normal subgroups: `{e}, G`
+
+
+
+
+== Quotient groups
+
+:1547390165471:
+.quotient groups; notation
+* `G/N`, pronounced "G mod N", is a quotient group, iff `N ⊴ G`:
+** `G` is the group
+** `N` is the normal subgroup, defining an _equivalence_
+
+
+:1547390237527:
+.quotient groups; equivalence classes of quotient groups
+* the equivalence classes in the quotient group are:
+.. the normal subgroup
+.. its cosets
+
+:1547390262686:
+.quotient groups; example `Z₆`
+----
+G = Z₆, N = {0,3}, N′ = {0,2,4}
+G/N = { g+N | ∀g∈G } = {0+N = 3+N, 1+N = 4+N, 2+N = 5+N} = { {0,3}, {1,4}, {2,5} }
+G/N′ = { g+N′ | ∀g∈G } = {0+N′ = 2+N′ = 4+N′, 1+N′ = 3+N′ = 5+N′} = { {0,2,4}, {1,3,5} }
+----
+
+:1547390379152:
+.quotient groups; example `Dih₃`
+----
+G = Dih₃ = {e,r,r²,a,ra,r²a}, N = {e,r,r²}, N′ = {e,a},
+G/N = { g∗N | g∈G } = {eN, aN} = {{e,r,r²}, {a,r²a,ra}}
+G/N′ = { g∗N | g∈G } = {eN′, rN′, r²N′} = {{e,a}, {r,ra}, {r²,r²a}}
+-- ∵ not invariant under conjugation, e.g. r²ar ≠ a, raara ≠ a, etc.
+-- ∴ this is no normal subgroup
+----

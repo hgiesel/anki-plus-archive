@@ -1,0 +1,7 @@
+= State data type: Store
+:stats: graph-theory:a31bu7d5,0,2
+
+
+* comonad to `State`
+
+`(s -> a, s)`

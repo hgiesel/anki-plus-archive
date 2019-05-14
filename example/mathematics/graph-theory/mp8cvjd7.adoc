@@ -1,0 +1,70 @@
+= Quantifiers
+
+== Quantifiers
+
+.quantifiers
+* quantifiers work on characters or groups, i.e.
+** changes the count of atoms you want
+
+.quantifiers; tokens or atoms
+* anything that is seen as a unit
+* any kind of modifiers operate on tokens
+* e.g.
+.. characters
+.. groups
+
+.quantifiers; quantifier types
+. greedy, and docile
+. greedy, and possessive
+. lazy, or reluctant, and helpful
+
+== Quantifiers: Greedy quantifiers
+
+:1545010086454:
+.quantifier types; *greedy*
+* regexes try as often as possible, then scale down until match
+* notation: `x*`, `x+`, and `x?`
+
+:1545011650027:
+.quantifier types; *docile*
+* greedy regexes are almost always docile, i.e.
+** regexes scale down again so other tokens can match
+
+:1545011781160:
+.quantifier types; *possessive*
+* if greedy regexes are not docile, they are possessive, i.e.
+** regexes try as often as possible, then scale down without backtracking
+* notation: `x*+`, `x++`, and `x?+`
+
+.quantifier types; alternative notation for possessive
+* atomic groups are an alternative notation for possesive quantifiers:
+** e.g. `(?>x)*` is equivalent to `x*+`
+
+== Quantifiers: Lazy quantifiers
+
+:1545011901294:
+.quantifier types; *lazy*
+* regexes try as few times as possible, then scale up until match
+* notation: `x*?`, `x+?`, and `x??`
+
+:1545011929160:
+.quantifier types; *helpful*
+* lazy regexes are almost always helpful, i.e.
+** regexes scale up in order for other tokens to match
+
+.quantifier types; alternative for lazy
+* alternative notation for lazy quantifiers:
+** greedy negated character classes
+** e.g. `<.+?>` is equivalent to `<[^>]+>`
+
+== Quantifiers: Repetition quantifiers
+
+.quantifier types; greedy repetition
+* generalization of other quantifiers:
+.. `{0,1}` is equivalent to `?`
+.. `{0,}` is equivalent to `*`
+.. `{1,}` is equivalent to `+`
+.. `{m,n}` matches between m and n atoms
+
+.quantifier types; lazy repetition
+* `{m,n}?` in Perl; `{-m,n}` in Vim

@@ -1,0 +1,20 @@
+= Graphemics
+
+** Orthography, the correct writing of language
+** Semiotics, the meaning-making in symbols or signs
+
+.writings systems; Abjad
+* only write constants, and vowels are inferred, e.g.
+** Hebrew and Arabic
+
+.writings systems; Abugida
+* use constants, add vowel as modification to that constant, e.g.
+** Devanagari and other scripts from Indian subcontinent
+
+.writing systems; logography
+* every character has a unique meaning, instead of standing for a sound, e.g.
+** Chinese
+
+.writing systems; syllabary
+* each grapheme stands for a syllable, e.g.
+** Japanese

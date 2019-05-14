@@ -1,0 +1,92 @@
+= Covers, chains, and atoms
+
+== Covers
+
+.covers; covering relation
+* an element `x` is covered by `y`, or `y` is covers `x`, iff:
+** `x ⋖ y = (x ≺ y) ∧ (∄z. x ≺ z ≺ y)`, i.e.
+*** `x` is the predecessor of `y`, without any intermediate elements
+
+.covers; pronunciation
+* `x ≼ y`: x precedes or equals y
+* `x ≽ y`: x succeeds or equals y
+* `x ⋖ y`: x is covered by y
+* `x ⋗ y`: x covers y
+
+.covers; graded poset
+* a poset `(L,≤)` can be graded, iff all maximals chains have same cardinality
+* the *rank function*, `r: L → ℕ`, maps each element to its rank `r(x)`
+.. compatible with order: `∀x,y. x ≺ y ⇒ r(x) ≺ r(y)`
+.. compatible with covering relation: `∀x,y. x ⋖ y ⇒ r(x) ` 1 = r(y)+
+
+.covers; rank level
+* *rank level* is a subset of elements with given rank
+
+.covers; translated to graph theory
+* the order-theoretic version of graph-theoretical _heads, and tails_
+
+== Chains
+
+.chains
+* any totally ordered subset of some poset:
+** a _linear order within a poset_
+
+.chains; height
+* *height* of a poset is the *cardinality* of its largest chain
+
+:1545158802764:
+.chains; *saturated chains*
+* no further elements can be added while still remaining a chain
+* in finite chains: every pair of successive elements is a covering
+
+:1546470555370:
+.chains; *maximal chains*
+* saturated chain with a maximal, and a minimal element
+
+:1546470601058:
+.chains; translated to graph theory
+* are the order-theoretic version of graph-theoretical _walks_
+
+. <<!>>
+
+.chains; antichains
+// TODO
+
+== Atoms and coatoms
+
+.atoms and coatoms; meaning
+* generalizations of singletons
+* let you "select" elements from lattices (posets)
+
+:1545159622449:
+.atoms and coatoms; atoms
+* elements covering bottom, `⊥ ⋖ x`, i.e.
+** minimal among elements excluding bottom
+
+:1545159775205:
+.atoms and coatoms; coatoms
+* elements covered by top, `x ⋖ ⊤`, i.e.
+** maximal among elements excluding top
+
+'''
+
+.atoms and coatoms; atomic poset
+* a poset, iff `∀x\{⊥}.∃y. y ⋖ x`, i.e.
+** every element excluding bottom succeeds some atom:
+* every finite poset is atomic
+* ⚠ interesting for infinite posets, e.g.
+** nonnegative real numbers are not atomic (neither have atoms)
+
+.atoms and coatoms; coatomic poset
+* a poset, iff `∀x\{⊤}.∃y. x ⋖ y`, i.e.
+** a poset where every element excluding top preceeds some coatom:
+** i.e. `∀x. x ≤ c`, where `c` is a coatom
+* coatoms preceed coatoms by means of reflexivity
+
+.atoms and coatoms; atomistic poset
+* a poset where every element of the lattice is a join of atoms
+* relation resembles containment
+
+.atoms and coatoms; coatomistic poset
+* a poset where every element of the lattice is a meet of coatoms
+

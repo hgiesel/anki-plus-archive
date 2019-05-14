@@ -1,0 +1,28 @@
+= TRANSPORT LAYER
+
+.OSI MODEL
+. <<:1gna7qxj,Transport layer in OSI>>
+. <<:8l5yfneg,Application layer in OSI>>
+. <<:dy370mzw,Automatic Repeat Request (ARQ)>>
+. <<:eh2qqepz,Switching>>
+
+.TCP
+. <<:ov1sz2lp,TCP Basics and Segment Structure>>
+.. <<:ldvx49yf,TCP Protocol Operation>>
+.. <<:owqhm1wx,TCP Options>>
+.. <<:f5wwqdw7,TCP Heuristics>>
+
+. <<:kapjfkdg,TCP Connections in OS>>
+. <<:a2nxflps,TCP Congestion Control in a broad sense>>
+. <<:iz4lq9xa,TCP Congestion Control in a narrow sense>>
+
+
+.UDP and OTHER PROTOCOLS
+. <<:5et3cjeo,UDP>>
+. <<:h5ti79wk,Other transport layer protocols>>
+
+. <<:2f6z4esa,WebSockets>>
+
+.GENERAL
+. <<:al8lp5dh,Network sockets>>
+. <<:4q75hek7,Programs for analyzing sockets>>

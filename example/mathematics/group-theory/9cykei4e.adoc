@@ -1,0 +1,100 @@
+= Invertibility
+
+== Invertibility
+
+.invertibility; scope
+* works in a unital magma
+
+* `a ∗ b = e`
+* `b ∗ a = e`
+
+* `∗: X×X → X`, `a,b∈X`
+
+.inverbitility; intuition
+* retraction allows you to experiment
+* section allows you to retrace past steps
+
+:1545408122167:
+.invertibility; left-inverse
+* `b` is called a *left inverse*, or *retraction* of `a`, iff
+** `b ∗ a = e`
+
+:1545408147239:
+.invertibility; right-invertible
+* `b` is called a *right inverse*, or *section* of `a`, iff
+** `a ∗ b = e`
+
+.invertibility; invertible
+* an *inverse element* is an element
+** `∃g: Y → X`, such that `(a ∗ b = e) ∧ (g ∗ f = e)`
+
+* conversely, `g` is also called an *isomorphism*
+** `f,g` are called *isomorphic to each other*
+
+.partial left-inverses
+* for a function to have an inverse, it needs to be injective
+** if, you can restrict its domain to define a *partial inverse*
+
+* the multivalued function is then called the *full inverse*
+** the multiple values are then called *branches*
+** e.g. given `f(x) = x^2`, the full inverse `g(4) = {2,-2}`
+* very similar to *preimages* (!)
+
+== Invertibility: Weak invertibility
+
+.weak invertibility; scope
+* work in a semigroup
+** in semigroups, its also called pseudo-inverse
+** generally, it's also called quasi-inverse
+
+:1545407982777:
+.weak invertibility; left weak inverse
+* `y` is called a *left weak inverse* of `x`, iff
+** `(x∗y)∗x = x ∧ (y∗x)∗y = y`
+
+:1545408041625:
+.weak invertibility; right weak inverse
+* `y` is called a *right weak inverse* of `x`, iff
+** `x∗(y∗x) = x ∧ y∗(x∗y) = y`
+
+:1545408061096:
+.weak invertibility; *weak inverse*
+* `y` is both a left and right weak inverse
+** `x∗y∗x = x ∧ y∗x∗y = y`
+** if `∗` is associative, one implies the other
+
+:1545408079701:
+.weak invertibility; *pseudo inverse*
+* `y` is called a pseudo inverse of `x`, iff
+** `x∗y∗x = x`, but `y∗x∗y ≠ y`
+** you can also think of a left/right pseudo inverse
+
+'''
+
+.weak invertibility; giving rise to other structures
+* iff `x∗y∗x = x ∧ y∗x∗y = y`, then:
+** `x∗y`, and `y∗x` are idempotents
+** `x∗y` is the closure operator, or monad
+** `y∗x` is the kernel operator, or comonad
+
+== Invertibility: Cancellation properties
+
+.cancellation; definition
+* the notion of cancellative is a generalization of the notion of invertible
+* being inverse implies being cancellative
+
+:1545408809293:
+.cancellation; *left-cancellative*
+* `a` is left-cancellative, iff
+** `∀x,x′. a ∗ x = a ∗ x′ ⇔ x = x′`
+
+:1545409064169:
+.cancellation; *right-cancellative*
+* `a` is right-cancellative, iff
+** `∀x,x′. x ∗ a = x′ ∗ a ⇔ x = x′`
+
+.cancellation; *cancellative*
+* both left-cancellative and right-cancellative
+
+.cancellation; relation to uniqueness properties
+. property of injection: `∀x,x′. f(x) = f(x′) ⇔ x = x′`

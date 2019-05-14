@@ -1,0 +1,26 @@
+= HTTP Credentials
+:stats: web-development:0q9uzhh4,0,14
+
+== Credentials
+
+// SOURCE https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication
+
+.methods
+.. cookies
+*** see [Statelessness](###statelessness)
+.. authorization headers
+.. TLS client certificates
+
+.credentials; *basic access auth*:
+** method for HTTP user agent to provide username, and password
+** uses standard fields in HTTP header, doesn’t need handshake
+** `username:password` is sent
+
+.credentials; *digest access auth*:
+* client sends request to server
+* server response with nonce + encrypted version
+* client responds with nonce + encrypted user, password + realm
+* server responds whether matches
+
+// TODO OAuth
+// TODO how to actually do in javascript

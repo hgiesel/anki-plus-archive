@@ -1,0 +1,73 @@
+= UDP
+:tag: transport-layer::other-protocols-1
+:stats: 0,53
+
+== Attributes
+.UDP; features (2)
+* message-oriented/transaction-oriented transport layer protocol
+* minimum of protocol mechanisms:
+.. checksums for data integrity
+.. stateless and connectionless
+
+.use cases for UDP (6)
+* use cases for UDP include:
+.. suitable for simple-response protocols, such as DNS, or NTP
+.. works well for broadcasting information
+*** used in service discovery, like RIP
+
+.. stateless ∴ suitable for large number of clients:
+*** e.g. in streaming media applications
+.. lack of retransmission delays ∴  suitable for RT application:
+*** VoIP, online games, and protocols built upon RTSP
+
+.. simple ∴  suitable for bootstrapping without a full protocol stack:
+*** DHCP, TFTP
+.. provides datagrams ∴ suitable for modeling other protocols:
+*** IP tunneling, RPC, NFS
+
+== UDP datagram structure
+.UDP header structure; features (1,1,2)
+
+SrcPort (16 bit)::
+DstPort (16 bit)::
+* server likely uses well-know port
+* client likely uses ephemeral port
+
+Length (16 bit)::
+* length of UDP header and UDP data
+
+Checksum (16 bit)::
+* optional in IPv4, mandatory in IPv6:
+** carries all zeroes if unused
+* if used, works the same as the TCP checksum:
+** UDP pseudo header, and padded UPD data
+
+image::http://telescript.denayer.wenk.be/~hcr/cn/idoceo/images/udp_header.gif[Structure of UDP header]
+
+== Comparison to TCP
+.comparison with TCP on reliability, same-order delivery; overhead; PDU
+Reliablity::
+* UDP lacks reliability
+* UDP applications must be generally willing to accept some loss
+** e.g. TFTP adds some rudimentary reliability mechanisms
+* some application may not be hindered by it:
+** e.g. streaming media, realtime multiplayer, and VoIP are examples
+* TCP has acknowledgements, timeouts, or retransmissions:
+** multiple attempts to deliver message are made
+** if lost along the way, server will rerequest the lost part
+** either no missing data, or connection is dropped
+
+Ordering::
+* in UDP, the ordering cannot be predicted
+* in TCP, when data segments arrive in wrong order, TCP buffers delay the out-of-order data
+
+Weight::
+* UDP is a very lightweight, small transport layer protocol
+* TCP requires three packages to set up socket connection, before any user can send
+
+PDU::
+* in TCP, data is read as byte stream
+** no distinguishing indicatinons are transmitted to signal message boundaris
+* in UDP, packets are sent individually and checked for integrity if they arrive
+** packets have definite boundaries which are honored upon receipt
+** i.e. read operation at receiver socket will yield entire messge, as it was sent

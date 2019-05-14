@@ -1,0 +1,47 @@
+= Note-taking rules
+:stats: linguistics:fmsjvn7p,0,30
+
+== General
+
+** only work with papers *in* the notebook
+** throw them away as soon as they leave the notebook
+** avoid flipping the notebook by always writing in the same orientation
+*** makes it harder to write, but much easier to overview notes
+** always only keep *one* notebook busy
+** try to boil down to actual notebooks instead of college note pads
+
+== Better note taking
+
+.Cornell system
+* separate between:
+** header at the top
+** summary at the bottom
+** questions / headers at the side
+** main notes on the other side
+
+.Split-page method
+* split into main and sub ideas
+
+.Feynman method
+* write things down as if you're teaching somebody
+
+== Strong verbs
+
+* instead of "is about": describes
+* instead of "has to do with": refers to
+* instead of "is similiar to": correlates with
+* instead of "comes next", "comes after": succeeds, precedes
+
+.useful conjunctions; fanbois
+** for: presents rationale / reasons
+** and: non-contrasting item
+** nor: non-contrasting negative item
+** but: contrasting item
+** or: alternative item
+** if: causative item
+** so: consequent item
+
+== Where to take notes
+
+* where you won't lose them
+* in accessible and flexible format

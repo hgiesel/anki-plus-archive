@@ -1,0 +1,56 @@
+= Other transport layer protocols
+:stats: transport-layer:h5ti79wk,0,44
+
+== Overview
+
+.other protocols; Datagram Congestion Control Protocol (DCCP)
+* message-oriented transport layer protocol:
+.. acknowledged connectionless protocol
+.. teardown of connections
+.. ECN, and feature negotiation:
+*** no need to implement them at application layer
+
+* flow-like semantics like TCP without reliable in-order delivery:
+** sequenced delivery within multiple streams not possible
+** ∵ no handshake
+* implemented in Linux
+
+.other protocols; Stream Control Transmission Protocol (SCTP)
+* message-oriented like UDP
+** possible to tunnel SCTP over UDP
+* ensures reliable, in-sequence transport of messages with congestion control like TCP
+* provides:
+** multi-homing
+** redundant paths
+** increases resilience and reliability
+
+.other protocols; Resource Reservation Protocol (RSVP)
+* designed to reserve resources across a network for quality of service (QoS)
+* uses integrated services model
+** a precursor to DiffServ
+* does not transport application data, but is similiar to ICMP or IGMP
+
+.other protocols; Reliable Data Protocol (RDP)
+* connection oriented, but does not require sequenced delivery of segments
+
+.other protocols; Reliable User Datagram Protocol (RUDP)
+* extends UDP by:
+** Acknowledgement of received packets (reliability)
+** Windows and flow control
+** Retransmission of lost packets (ARQ)
+** Over buffering
+
+.other protocols; Quick UDP Internet Connections (QUIC)
+* heavily utilized in Chrome
+
+.other protocols; Quick UDP Internet Connections (QUIC); purpose
+* supports a set of multiplexed connections between two endpoints over UDP
+* main goal to improve perceived performance of web applications using TCP:
+.. reduce/compress redundant data transmissions (like headers)
+*** make numerous HTTP requests within single initial congestion window
+.. reduced connection and transport latency, and bandwidth estimation in each direction:
+*** to avoid congestion
+.. no congestion avoidance:
+*** moves algorithms into application space, rather than kernel spacel
+.. provides security protection equivalent to TLS:
+*** no need for TLS itself

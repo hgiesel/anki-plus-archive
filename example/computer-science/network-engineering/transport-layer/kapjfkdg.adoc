@@ -1,0 +1,59 @@
+= TCP Connections in OS
+:stats: transport-layer:kapjfkdg,0,40
+
+== TCP connections in the OS
+
+.TCP session identification in OS (2)
+* most implementations allocate table mapping sessions to OS processes
+** when packet received, lookup is performed on this table
+* ! TCP packets do not contain session identifiers:
+** ∴ use network sockets to identify
+
+.TCB; contents (2)
+* *TCB*, Transmission control block, are entries in the TCP connection table
+* contains various information about the endpoints:
+** e.g. status of connection, windows sizes, next seqno, ssthresh, MSS, etc.
+
+.TCP connection limit in OS (1,2,2)
+* server's number of sessions:
+.. only limited by memory
+*** can grow as new connections arrive
+
+* client's number of sessions:
+.. must allocate a random port before sending first SYN to server:
+*** this port remains allocated during the whole conversation
+*** effectively limits number of outgoing connection from each of client's IP addresses
+.. if application fails to properly close unrequired connections ⇒ client can run out of resources:
+*** become unable to establish new TCP connection
+
+* both endpoints must also allocate space for:
+** unacknowledged packets (transmit buffer)
+** received (but unread) data (receive buffer)
+
+== TCP connections in the OS: Forcing data delivery
+
+* ∃ ways to skip buffers and force data delivery:
+.. `TCP_NODELAY` socket option:
+*** disables *Nagle's algorithm*:
+*** normally, TCP has 200 ms send delays to group small messages into packet
+*** creates small, potentially serious delays during file transfer
+
+.. `PSH` bit:
+*** signals receiver to push data immediately to application
+*** ! no way to control in user space using Berkeley sockets
+
+* e.g. in `telnet` each keystroke echoed back ⇒ very annoying if it was grouped
+
+== Vulnerabilities
+
+.SYN flood attack (3)
+* send multiple SYN packets but don't reset ∴ TCP RST
+** connection table fills up
+** consumes large amounts of resources keeping track of bogus connections
+* possible countermeasure: real-time analysis of network by intelligent firewall
+* ∃ similiar attacks like PSH and ACK floods, or Sockstress
+
+TODO
+.Connection hijacking
+* attacker who is able to eavesdrop a TCP
+

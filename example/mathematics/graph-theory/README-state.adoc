@@ -1,0 +1,7 @@
+= State graphs
+:stats: graph-theory:README-state,0,3
+
+
+. <<:behl4q6l,Moore, and Mealy machines>>
+. <<:v01nc5fi,State monad>>
+. <<:a31bu7d5,State data type: Store>>

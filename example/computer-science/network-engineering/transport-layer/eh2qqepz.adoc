@@ -1,0 +1,63 @@
+= Switching
+:stats: transport-layer:eh2qqepz,0,44
+
+== Packet switching
+
+.packet switching
+* routing and transferring of data by means of:
+.. addressed packets with header and payload
+.. channel only occupied during transmission, made available after completion
+
+.packet switching; example
+* e.g. cellular communications
+
+.packet switching; how are they charactized
+* characterized by amount of data exchanged
+
+== Circuit switching
+
+.circuit switching
+* preallocates dedicated network bandwidth specifically for communication:
+.. incurs small overhead
+.. connection-oriented and reliable by nature
+.. constant bit rate and latency between nodes
+
+.circuit switching; example
+* e.g. cellular communications, or telephone network:
+
+.circuit switching; how are they characterized
+* characterized by fee per unit of connection time even without data exchange
+
+== Virtual circuits
+
+.virtual circuits
+* imitates dedicated physical link between hosts on packet-switched network:
+.. requires some sort of connection establishment and identifier:
+*** routing information associated with a *Virtual Circuit Identifier (VCI)*
+*** allows a bit stream to be delivered between nodes
+.. same-order delivery is emulated:
+*** e.g. reordering of segments via segment numbering
+
+.virtual circuits; synonyms
+* synomymous with *virtual connection*, or *virtual channel*
+
+.virtual circuits; similarities to circuit switching
+* both connection oriented:
+.. signaling overhead required during connection establishment
+.. same-order delivery
+* differences:
+.. circuit switching has a constant bit rate and latency:
+*** varying packet queue lengths, bit rates, or network loads alters those of virtual circuits
+.. virtual circuits are not necessarily reliable (ARQ)
+
+.virtual circuits; examples in TCP
+* e.g. TCP allows connection-mode delivery through connectionless IP:
+.. requires two-way synchronization
+.. uses segment sequence numbering, and packet buffering for packet reordering
+
+.virtual circuits; examples in L2/L3
+* e.g. virtual circuit on L2/L3 means:
+.. all data is sent over the _same path_, i.e. same nodes
+*** unlike L4, host can not reorder data before handing it over to application
+.. routers essentially become switches ∴ faster with higher capacity
+.. bandwidth reservation during connection establishment enables QoS procedures

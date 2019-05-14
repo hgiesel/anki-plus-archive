@@ -1,0 +1,101 @@
+= Complementation
+
+== Complementation: Pseudocomplements
+
+:1547403192043:
+.pseudocomplements; properties
+* in bounded lattice for element `x` an element `y`, s.t.
+.. pseudocomplement law: `x ∧ y = ⊥`, holds i.e.
+*** they are _disjoint_
+*** ⫦ an element may have more than one *pseudocomplement*
+
+:1547403264077:
+.pseudocomplements; *pseudocomplementation*
+* function `-^∗`, chooses greatest element in subset of disjoint elements:
+.. is antitone
+.. weak involution: `x^∗ = x^∗^∗^∗`
+.. partial De Morgan law: `(x ∨ y)^∗ = x^∗ ∧ y^∗`
+
+:ext:1547403264077:
+.pseudocomplements; pseudocomplementation; notation
+----
+-^*: L → L
+-^∗: x ↦ x^∗
+-^∗: x ↦ max{ y∈L | x ∧ y = ⊥ }
+----
+
+'''
+
+.pseudocomplements; pseudocomplemented lattice
+* a *pseudocomplemented lattice* has a pseudocomplement for every element:
+.. makes the lattice necessarily bounded
+* examples of pseudocomplemented lattices, e.g.
+** every finite distributive lattice
+** every Heyting algebra
+
+.pseudocomplements; skeleton
+* the subset `S(L) = { x^∗^∗ | x∈L }`
+** a join-semilattice
+
+== Complementation: Complements
+
+:1547403353309:
+.complements
+* in bounded lattice for element `x` an element `y`, s.t.
+.. complement law: `(x ∧ y = ⊥) ∧ (x ∨ y = ⊤)`, holds
+*** an element may have more than one *complement*
+
+:1547403377979:
+.complements; complementation
+* a function, iff the complement is unique:
+.. `y = ¬x`, and equivalently `x = ¬y`
+
+:ext:1547403377979:
+.complements; complementation; notation
+----
+¬-: L → L
+¬-: x ↦ ¬x+
+----
+
+.complements; complemented lattice
+* in a *complemented lattice* every element has a complement:
+** a distributive lattice is complemented iff bounded and relatively complemented
+
+* in a uniquely complemented lattice a unique complement:
+** gives rise to a function *complementation*, mapping elements to complements
+
+* e.g.
+** bounded, distributive lattices
+
+.complements; relation to orthocomplemented lattices
+* every complemented distributive lattice is also orthocomplemented
+* every complemented distributive lattice is also a Boolean algebra
+
+== Complementation: Relative complements
+
+.*relative complements*
+* a lattice is relatively complemented iff:
+.. given any interval of the lattice `[c,d]` (a bounded sublattice)
+.. `∀a.∃b. (a ∧ b = c) ∧ (a ∨ b = d)`
+* `b` is called a complement of a relative to the interval `[c,d]`
+
+== Complementation: Orthocomplements
+
+.orthocomplements; orthocomplementation
+* a  mapping `a ↦ a^⊥`, s.t.
+.. is a complement
+.. is a involution, `x = ¬¬x`
+*** `a^⊥` is called the *orthocomplement*
+
+.orthocomplements; ortholattices
+* orthocomplemented lattices, or *ortholattices* is a lattice with orthocomplementation
+* satisfies *De Morgan's laws*:
+.. `(a ∨ b)^⊥ = a^⊥ ∧ b^⊥`
+.. `(a ∧ b)^⊥ = a^⊥ ∨ b^⊥`
+
+.orthocomplements; orthomodular lattices
+* puts another condition on orthocomplementation
+* a weaker form of the modular definition:
+.. `∀a,b,c. a ≤ c ⇒ a ∨ (b ∧ c) = (a ∨ b) ∧ c`
+* a orthomodular lattice is an ortholattice, s.t.:
+.. `∀a,c.   a ≤ c ⇒ a^⊥    ∧ c  = c`

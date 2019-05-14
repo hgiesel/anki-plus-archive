@@ -1,0 +1,11 @@
+= Domains
+
+== Integral domains
+== Integrally closed domain
+== Unique factorization domains
+== Principal ideal domains
+== Euclidean domains
+
+
+== Polynomial rings
+// REF https://www.youtube.com/watch?v=_RTHvweHlhE

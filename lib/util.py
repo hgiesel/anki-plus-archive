@@ -38,9 +38,11 @@ ark() {
             cd "${entry}"
 
         elif [[ -f ${entry} ]]; then
+            cd "$(dirname ${entry})"
             $EDITOR "${entry}"
 
         elif [[ "${entry}" =~ ^(.*):(.*): ]]; then
+            cd "$(dirname ${entry})"
             $EDITOR "${BASH_REMATCH[1]}" +${BASH_REMATCH[2]} -c 'normal! zz'
         fi
     fi

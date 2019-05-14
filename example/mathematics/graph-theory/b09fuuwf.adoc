@@ -1,0 +1,261 @@
+= Properties of homogeneous relations
+
+== Relations
+
+.relations
+* a relation is a subset of the Cartesian product `X×Y`:
+** a *homogeneous relation*, or endorelation is a relation, where `X = Y`
+** a *heterogeneous relation* is a relation, where `X ≠ Y`
+
+.relations; heterogenous relations as functions
+* heterogeneous naturally give rise to functions:
+.. however arbitrary relations usually don't fulfill any properties
+* relations don't tend to fulfill uniqueness properties (being one-to-one):
+.. transitivity and totality imply non-uniqueness
+
+.relations; homogeneous relations as functions
+* homogeneous can give rise to functions, e.g.
+.. identity functions are reflexive
+.. involutions are symmetric
+
+.relations; notation
+* `R_X: X×X` is an endorelation over `X`
+* `x R_X x′ ⇔ (x,x′) ∈ R_X`, where
+.. `x` is related with `x′`
+.. `x′` however doesn't need to be related with `x`
+
+.relations; example of a total order
+----
+R_ℕ: ℕ×ℕ
+n R_ℕ n+1, ∀n∈ℕ
+(n,n+1) ∈ R_ℕ, ∀n∈ℕ
+----
+
+.relations; example of an equivalence
+----
+f: X → Y, g: X → Y
+
+R_Y: Y×Y
+f(x) R_ℕ g(x), ∀x∈X
+(f(x),g(x)) ∈ R_ℕ, ∀x∈X
+----
+
+'''
+
+.relations; special meaning of homogeneous relation
+* endorelations fulfilling certain conditions can give rise to:
+.. graphs
+.. equivalences
+.. lattices
+
+// endorelations form a _monoid under composition_
+
+.Terminology for rest of document
+* note that for the rest of this document:
+** `R: X×X`, where `R = R_X` is not a function, but a relation
+*** i.e. a subset of the Cartesian product
+** `∀x,y,z ∈ X`
+
+=== Reflexivity properties
+
+.reflexivity properties
+* determine if elements relate to itself, i.e. *identities*:
+
+.reflexivity properties; reflexive
+* `∀x.xRx`
+* requires identities
+
+.reflexivity properties; irreflexive
+* `∀x.x ¬R x`
+* prohibits identities
+
+=== Symmetry properties
+
+.symmetry properties; list (5)
+* restricts the set of possible relations
+** `if relation exists ⇒ condition`
+** prohibits one or multiple of:
+... one-way relatedness
+... two-way relatedness (excluding identities)
+... identities
+
+.symmetry properties; symmetric
+* `∀x,y. xRy ⇒ yRx`
+* prohibits one-way relatedness
+
+.symmetry properties; antisymmetric
+* `∀x,y. xRy ∧ x'Rx ⇒ x = y`
+* prohibits two-way relatedness:
+** two isomorphic single elements are resolved to one
+
+.symmetry properties; asymmetric
+* `∀x,y. xRy ⇒ y ¬R x`
+* prohibits identity and two-way relatedness:
+.. implies irreflexivity
+.. implies antisymmetry as a vacuous truth (condition is never given)
+
+.symmetry properties; coreflexive
+* `∀x,y. xRy ⇒ x = y`
+* prohibits one-way and two-way relatedness
+** ⇒ only identities
+
+.symmetry properties; dense
+* `∀x,y. xRy ⇒ (∃z. xRz ∧ zRy)`
+* i.e. the order is not finite
+
+=== Transitivity properties
+
+.transitivity properties; list (2)
+* determine the composability of relations
+
+.transitive
+* `∀x,y,z. xRy ∧ yRz ⇒ xRz`
+* relations are composable
+
+.intransitive
+* `∀x,y,z. ¬(xRy ∧ yRz ⇒ xRz)`
+* lack of compasibility, but may be
+
+=== Totality properties
+
+.totality properties; list (3)
+* determine how relations cover the whole set:
+** symmetry properties restricts relations, totality properties mandates them
+
+.total
+* `∀x,y. xRy ∨ yRx`
+* every pair of elements is related in some way:
+** ! implies reflexivity
+
+.connex
+* `∀x,y. xRy ∨ yRx ∨ (x = y)`
+* every pair of distinct elements is related in some way
+
+.trichotomous
+* `∀x,y. xRy ⊻ yRx ⊻ (x = y)`
+* every pair of distinct elements is related in one direction:
+** ! implies irreflexivity and asymmetry
+
+== Endorelations
+
+.endorelations; notation
+* *reflexive relations* are abbreviated ≤
+* *irreflexive relations* are abbreviated <
+
+=== Intransitive relations
+
+.intransitive relations; list
+. directed graphs
+. undirected graphs
+. discrete orders
+. dependencies
+. tournaments
+. oriented graphs
+
+'''
+
+.intransitive relations; directed graphs, `R`
+* intransitive
+
+.intransitive relations; undirected graphs, `R`
+* symmetric, intransitive
+
+.intransitive relations; discrete orders, `R`
+* reflexive and coreflexive, OR reflexive, symmetric and antisymmetric
+* nothing but identity relations
+
+'''
+
+.intransitive relations; tournaments, `R`
+* reflexive, antisymmetric, intransitive
+* _intransitive poset_
+
+.intransitive relations; dependencies, `R`
+* reflexive, symmetric, intransitive
+* _intransitive equivalence_
+
+.intransitive relations; oriented graphs, `R`
+* irreflexive, asymmetric, intransitive
+* _intransitive strict partial order_
+
+=== Non-total orders
+
+.non-total orders; list of non-total orders
+. partial preorder/quasiorder
+. equivalence
+. non-strict partial order / poset
+. strict partial order
+
+.non-total orders; partial preorder/quasiorder, `≼`
+* reflexive, transitive
+
+.non-total orders; non-strict partial order / poset, `≼`
+* reflexive, antisymmetric, transitive
+* weak orderings are posets, with transitivity of incomparability
+* not all elements are necessarily connected in any way
+* but elements that are have a notion of order
+* are depicted with Hasse diagrams
+
+.non-total orders; equivalence, `∼`
+* reflexive, symmetric, transitive
+
+.non-total orders; strict partial order, `≺`
+* irreflexive, asymmetric, transitive
+
+=== Total orders
+
+.total orders; list
+. total preorder/quasiorder
+. total equivalence
+. non-strict total order
+. strict total order
+
+.total orders; total preorder/quasiorder, `≼`
+* reflexive, transitive, total
+
+.total orders; non-strict total order, `≼`
+* reflexive, antisymmetric, transitive, total
+* this is one step above a *distributive lattice*
+
+.total orders; total equivalence, `∼`
+* reflexive, symmetric, transitive, total
+* similiar to a monoid
+
+.total orders; strict total order, `≺`
+* irreflexive, asymmetric, transitive, total
+
+=== Examples of relations
+
+.endorelations; example of a love triangle
+. nothing can be said about reflexivity
+. nothing can be said about symmetry
+. intransitive
+** i.e. a directed graph
+
+.endorelations; example of having kissed
+. irreflexive, because you can't kiss yourself
+. symmetric, because kissing is reciprocated
+. intransitive
+** i.e. a undirected graph
+
+.endorelations; example of a person being taller-equal than another
+. reflexive, because you have equal height as yourself
+. nothing can be said about symmetry
+. transitive
+. totality
+** i.e. a total preorder
+
+.endorelations; example of person being taller than another
+. irreflexive, because you're not taller than yourself
+. asymmetric
+. transitive
+. total
+. trichotomous
+** i.e. a strict total order
+
+.endorelations; example of a number being greater-equal than another number
+. reflexive, because a number is equal to itself
+. antisymmetric, as there are only unique elements with a certain _bigness_
+. transitive
+. totality
+** i.e. a non-strict total order

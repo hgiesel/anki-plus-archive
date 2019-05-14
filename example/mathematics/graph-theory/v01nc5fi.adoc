@@ -1,0 +1,136 @@
+= State computations
+:stats: graph-theory:v01nc5fi,3,89
+
+== Definition
+
+:1549914293534:
+.state computation; notation
+* computations of the type `s -> (a, s)`, a combination of:
+... writer computation `(a, w)`
+... reader computation `r ->  a`
+
+== Connnection to state machines
+
+.connection to state machines; state
+* every value inhabiting type *state monad* is defined on:
+** represents a state in the state machine machine
+
+:1549914314678:
+.state computation vs state machines; considered sets
+* considering `State s a`
+** "states": data type, the state is defined over, `s`
+** "input alphabet": state functions
+** "output alphabet": result type of the State type, `a`
+
+:1549914325929:
+.state computation vs state machines; functions
+* coming from a state machines:
+.. `T`, the transition function, and
+.. `G`, the output function, turn into:
+*** state transformer function `F: S×Σ → S×Λ`
+
+.connection to state machines; difference of outputs
+* in a *Mealy machine* all outputs are collected in a sequence
+* in a *state monad* you can combine the outputs in whatever way
+** this means, it is _much more powerful_:
+*** the output type can change during the passage of the monad
+*** outputs can decide the next inputs (inputs aren't static, but can be)
+
+.example
+----
+include::assets/8flv7kwi.hs[DimmerStates in State Monad]
+----
+
+== State data type: Definition
+
+* abstraction over a function `s -> (a, s)`
+
+.Top-down explanation
+* models computations that acts upon state:
+** one or more variables that are required to perform some computation but are not among the arguments:
+** makes these dependencies explicit
+
+* OO languages encourage successive state in the form of _object fields_
+* procedural languages use variables declared _outside the current scope_
+* this behavior would be at odds with functional purity
+
+.Bottom-up explanation
+* `State s a` is an example of a state Type:
+** `s` is the state type
+** `a` is the result type
+
+*  `s -> (a, s)` the type isomorphic to a State type:
+** herein `a` represents the result, and `s` represents the state
+** i.e. the other way arround
+
+
+.Basic implementation
+* `return 5` becomes `(5, s) :: State s Int`
+
+----
+return :: a -> State s a
+return a s = state (\s -> (a, s))
+
+(>>=) :: State s a -> (a -> State s b) -> State s b
+m >>= k = state $ \s -> let (a, s') = runState m s
+                        in runState (k a) s'
+----
+
+. runState m s
+* is executed, which is feeding the first monad with the state, the monad will eventually be fed
+
+. (a, s')
+* the result of this first monad is (a, s')
+
+. k a => k'
+* the a is fed to `k` to output the second state monad
+
+. k' s'
+* the state which was altered from the first monad is fed into the second monad
+
+== State data type: Differences to Reader monad
+
+* the function that is abstracted produces two outputs:
+.. the result
+.. the new state
+* the result is equivalent to the result of the reader monad, which is subsequently fed to all other monads
+* the new state is different to the reader monad, where every function reads from the same environment
+** whereas the state changes
+
+.State functions
+. `runState :: State s a -> s -> (a, s)`
+** get both the result and the new state according to a certain state +
+  record function to get isomorphic value
+. `execState :: State s a -> s -> s`
+** get the new state according to a certain state
+. `evalState :: State s a -> s -> a`
+** get the result according to a certain state
+
+== MonadState functions
+
+.MonadState
+* `MonadState` is a typeclass that abstracts the behavior of `State` types
+* `MonadState` models _things that maintain state_
+* instead of working with actual functions, you create State monads, that return a function that model the wanted behavior
+** `get` functions, that look like `State a s`, that produce some output `a`
+** `put` functions, that look like `s -> State s ()`, that set the state `s`
+
+.MonadState; state
+* `s` is the state, `a` is the result
+* wraps function into State
+.. `state :: MonadState s m => (s -> (a, s)) -> m a`
+
+.MonadState; get
+* leave state unmodified; set result to state
+.. `get :: MonadState s m => m s`
+.. `get = state $ \s -> (s,s)`
+
+.MonadState; put
+* set state to argument; set result to `()`
+.. `put :: MonadState s m => s -> m ()`
+.. `put s = state $ \s1 -> ((), s)`
+
+.MonadState; modify
+* modify state with argument; set result to `()`
+.. `modify :: MonadState s m => (s -> s) -> m ()`
+.. `modify f = state $ \s -> ((), f s)`

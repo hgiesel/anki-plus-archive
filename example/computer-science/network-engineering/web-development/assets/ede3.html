@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>CSS selector test</title>
+    <style>
+      body .foo {
+        font-weight: bold;
+      }
+
+      body > .foo {
+        text-align: center;
+      }
+
+      #second + p {
+        color: white;
+      }
+
+      #second ~ p {
+        background-color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <p class="foo" id="first">Hello</p>
+      <p class="foo" id="second">World</p>
+      <p class="foo" id="third">How</p>
+      <p class="bar" id="fourth">Are</p>
+      <p class="baz" id="fifth">You</p>
+    </div>
+    <p class="foo" id="sevent">Doing</p>
+  </body>
+</html>

@@ -1,0 +1,111 @@
+= TCP Options
+:stats: transport-layer:owqhm1wx,0,81
+
+== TCP Options
+
+.TCP options structure; location (1;3)
+* appended to the TCP segment
+* options have up to three fields:
+
+Option-Kind (1-byte)::
+** only mandatory field
+** some options only settable during connection establishment
+Option-Length (1-byte)::
+** length of complete option (≥ 2)
+Option-Data (variable)::
+
+.EOL, and NOP options (2)
+End of options List (0)::
+** not sure when this is actually used
+NOP (1)::
+** used as padding
+** maybe used to align option fields on word boundaries for better performance
+
+== TCP Timestamps
+
+.TCP timestamps; adaption (2;1)
+* helps TCP determine order in which packets were sent:
+.. normally might start at random value, i.e. not aligned to system clock
+.. usually incremented by miliseconds
+* adaption stagnated at about 40 percent of routers
+
+.structure of TCP timestamp option (2)
+Timestamp (8,10,TTTT,EEEE)::
+** ∃ two timestamp fields:
+... 4-byte sender timestamp value
+... 4-byte echo reply timestamp value (most recent timestamp received)
+
+.PAWS; connection to TCP timestamps (1;1)
+* timestamps are used in an algorithm called PAWS:
+** Protection Against Wrapped Sequence numbers
+* when receive window crosses the sequence number wraparound boundary:
+** "Is this packet in the first 4 GB or second?"
+
+== Sliding window algorithm
+
+.selective acknowledgements
+* generally, TCP uses Go-Back-N ARQ:
+** ! can use Selective-Repeat ARQ (SACK)
+** enabled with `SACK permitted option`
+
+* negotiated during connection establishment i.e. not mandatory:
+** ! use of SACK has become widespread, all popular TCP stacks support it
+
+.selective acknowledgements; operation
+* *SACK blocks* are the received out-of-order packages
+* defined in ACKs in the `SACK` option, with:
+
+.selective acknowledgements; edges
+. Left edge:
+** starting sequence number of hold-on package
+. Right edge:
+** ending sequence number of hold-on package
+
+* retransmits ACK with `SACK` option, until all blocks received, then:
+.. drops the SACK
+.. acknowledges right edge
+
+.selective acknowledgements; D-SACK
+* TCP sender can interpret SACKs as sign of packet loss:
+** ∴ slows data delivery rate
+** ! can also be because of other reasons:
+*** e.g. was in previous transmission, aquired data another way, etc.
+
+* *D-SACK* (duplicate SACK) is an extension to SACK option:
+** if sent, sender can reinstate higher transmission rate
+
+.selective acknowledgements; D-SACK; options in TCP
+. "SACK permitted (4,2)":
+** only settable during connection establishment
+** selective acknowledges are permitted for connection
+
+. "SACK (5,N,BBBB,CCCC,[DDDD,EEEE,FFFF,GGGG,HHHH,IIII])":
+** N is `n8 + 2`, where `n ∈ {1,2,3,4}`
+** up to 4 sequence number ranges of already received data
+
+== Maximum segment size
+
+.MSS; connection to fragmentation (2;2)
+* largest amount of data bytes TCP is willing to receive in single segment
+* one MSS value for each direction
+** e.g. one device participating may have extremely limited memory reserved
+
+* IP fragmentation causes packet loss, and  excessive transsmission
+** ∴ MSS is set to avoid IP fragmentation and better performance
+
+.MSS differences and relation to MTU (2)
+* ↯ unlike MTU, it doesn't contain the header (TCP, nor IP)
+* default (minimum, MTU - IP header - TCP header), e.g.:
+.. 536 (576 - 20 - 20) for IPv4
+.. 1220 (1280 - 40 - 20) for IPv6
+
+.MSS agreement (2)
+* MSS option is set during connection establishment:
+.. either derived from data link layer MTU (e.g. path MTU discovery)
+.. set with TCP MSS option
+
+.structure of MSS option (2)
+Maximum segment size/MSS (2,4,SS)::
+** only settable during connection establishment
+** largest amount of data receivable within single segment
+*** i.e. similiar to MTU for L3
