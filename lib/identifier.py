@@ -38,16 +38,16 @@ class Mode(enum.Enum):
 class Identifier:
 
     @staticmethod
-    def to_rel_path(path):
+    def to_rel_path(path, rel_path):
         '''
         can transform:
         abs_path -> rel path from archive root
         '''
-        result = os.path.relpath(path, os.path.join(self.config['archive_root'], '..'))
+        result = os.path.relpath(path, os.path.join(rel_path, '..'))
         return result
 
     @staticmethod
-    def to_identifier(path, omit_section=None):
+    def to_identifier(path, omit_section=None) -> str:
         '''
         can transform:
         abs_path -> section
@@ -67,9 +67,9 @@ class Identifier:
             page, _ = os.path.splitext(file_name)
 
             if omit_section:
-                result = ':'+page
+                result = ':%s' % (page)
             else:
-                result = section+':'+page
+                result = '%s:%s' % (section, page)
 
         return result
 

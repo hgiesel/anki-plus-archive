@@ -9,18 +9,18 @@ def paths(config, argv, printer):
     result = getattr(addr, argv.cmd)()
 
     if argv.paths == 'rel':
-        printed = [(Identifier.to_rel_path(path[0]), path[1]) for path in result]
+        printed = [(Identifier.to_rel_path(path[0], config['archive_root']), path[1], path[2], path[3]) for path in result]
     elif argv.paths == 'id':
-        printed = [(Identifier.to_identifier(path[0]), path[1]) for path in result]
+        printed = [(Identifier.to_identifier(path[0]), path[1], path[2], path[3]) for path in result]
     elif argv.paths == 'shortid':
-        printed = [(Identifier.to_identifier(path[0], omit_section=True), path[1])
+        printed = [(Identifier.to_identifier(path[0], omit_section=True), path[1], path[2], path[3])
                    for path in result]
     elif argv.paths == 'none':
         printed = []
 
     if argv.delimiter == 'default':
         printed = [(path[0] + ':' + str(path[2]) + ':',)
-                   if path[2] is not None else (path[0],) for path in result]
+                if path[2] is not None else (path[0],) for path in printed]
 
     Printer.print_stats(printed, delimiter=argv.delimiter)
 
@@ -35,7 +35,7 @@ def stats(config, argv, printer):
     if argv.paths == 'full':
         pass
     elif argv.paths == 'rel':
-        result = [(Identifier.to_rel_path(e[0]),) + e[1:] for e in result]
+        result = [(Identifier.to_rel_path(e[0], config['archive_root']),) + e[1:] for e in result]
     elif argv.paths == 'shortid':
         result = [(Identifier.to_identifier(e[0], omit_section=True),) + e[1:] for e in result]
     elif argv.paths == 'none':
@@ -57,7 +57,7 @@ def headings(config, argv, printer):
     if argv.paths == 'full':
         pass
     elif argv.paths == 'rel':
-        lines = [(Identifier.to_rel_path(line[0]),) + line[1:] for line in lines]
+        lines = [(Identifier.to_rel_path(line[0], config['archive_root']),) + line[1:] for line in lines]
     elif argv.paths == 'id':
         lines = [(Identifier.to_identifier(line[0]),) + line[1:] for line in lines]
     elif argv.paths == 'shortid':
@@ -79,7 +79,7 @@ def pagerefs(config, argv, printer):
     if argv.paths == 'full':
         pass
     elif argv.paths == 'rel':
-        lines = [(Identifier.to_rel_path(line[0]),) + line[1:] for line in lines]
+        lines = [(Identifier.to_rel_path(line[0], config['archive_root']),) + line[1:] for line in lines]
     elif argv.paths == 'id':
         lines = [(Identifier.to_identifier(line[0]),) + line[1:] for line in lines]
     elif argv.paths == 'shortid':
@@ -111,7 +111,7 @@ def verify(config, argv, printer):
     if argv.paths == 'full':
         pass
     elif argv.paths == 'rel':
-        lines = [(Identifier.to_rel_path(entry['file_name']), error['type'],error['info'], error['lineno']) for entry in result for error in entry['errors']]
+        lines = [(Identifier.to_rel_path(entry['file_name'], config['archive_root']), error['type'],error['info'], error['lineno']) for entry in result for error in entry['errors']]
     elif argv.paths == 'id':
         lines = [(Identifier.to_identifier(entry['file_name']), error['type'],error['info'],error['lineno']) for entry in result for error in entry['errors']]
     elif argv.paths == 'shortid':
@@ -133,7 +133,7 @@ def match(config, argv, printer):
     if argv.paths == 'full':
         pass
     elif argv.paths == 'rel':
-        result = list(map(lambda t: (Identifier.to_rel_path(t[0]), t[1], t[2]), result))
+        result = list(map(lambda t: (Identifier.to_rel_path(t[0], config['archive_root']), t[1], t[2]), result))
     elif argv.paths == 'id':
         result = list(map(lambda t: (Identifier.to_identifier(t[0]), t[1], t[2]), result))
     elif argv.paths == 'shortid':
