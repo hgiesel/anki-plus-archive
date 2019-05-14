@@ -36,11 +36,3 @@ Will test the integrity of the archive provided under `<ark-uri>`.
 * `ark decloze`
 
 * `ark stdlib`
-
-== Managing pagerefs
-
-* `ark tocs`
-
-* `ark pagerefs`
-
-* `ark revrefs`

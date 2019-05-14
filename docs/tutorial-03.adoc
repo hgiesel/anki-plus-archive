@@ -1,27 +1,38 @@
 = Tocs and pagerefs
 
+.hierarchy
+* this topic is inspired by systems like *ConnectedText* or *Zettelkasten*
 * using sections can only give you so much freedom
-* basically, the hierarchy is a tree where the leafs are topics with content
+* basically, the hierarchy is a tree where the leafs are pages with their content
+* *rooted tree hierarchy of height 2*
 
-* what if you:
-** want to have one file under two topics?
-** want to create subhierarchies without moving files, destroying links
+.what if you...
+* …want to have one file under two topics?
+* …want to create subhierarchies without moving files, destroying links, etc.?
+* …want to leave open the exact hierarchy until you've actually figured it out?
 
+.solution
+* you create a new hierachy system using *pagerefs* and *tocs*
 
-* solution:
-** using tocs and pagerefs
+.what are pagerefs?
+* a pageref is a link that points to another page in your archive
+** you can link to pages outside of the current section
+** they usually contain the ark URI, e.g. "graph-theory::abcdefgh", and
+*** are enclosed within formatting according to the file type
 
-
+.what are tocs?
 * a toc is special page, which is identified by a keyword in its name
-* the keyword is the same, that identifies a section:
-** by default "README"
+* the default keyword is "README"
+* tocs, together with the pages they reference, create a hierarchy of a *directed acyclic graph* (*DAG*)
+** this is made possible, because tocs can reference other tocs, and multiple tocs can refer to the same file
+* imagine your content pages, where tocs open a window onto this content
+* if you want to create a link that should not contribute to this hierarchy, e.g to avoid cycles within your hierarchy:
+** you "neutralise" it by prepending a `!` character
 
+== Managing pagerefs with `ark`
 
-Tocs create, next to the *rooted tree hierarchy* of sections and pages, the hierarchy of a *directed acyclic graph* (*DAG*)
+* `ark pagerefs <uri>`
+** shows you all pagerefs within a file
 
-
-* tocs create *pagerefs* which point to other pages
-* these pages might be *tocs* as well
-
-* you can also create referencing pagerefs, which still link one page to another, but doesn't contribute to the hierarchy
-
+* `ark revrefs`
+** finds all mentions of a file within the archive
