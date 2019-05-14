@@ -1,5 +1,4 @@
 = Irreducible and prime elements
-:stats: graph-theory:m1fx19k6,4,32
 
 == Irreducible elements
 

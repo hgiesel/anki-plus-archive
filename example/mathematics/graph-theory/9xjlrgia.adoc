@@ -1,5 +1,4 @@
 = Monotonic functions and lattice homomorphisms
-:stats: graph-theory:7d36e5d0,0,127
 
 == Monotonic functions
 

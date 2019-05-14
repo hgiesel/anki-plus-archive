@@ -1,5 +1,4 @@
 = Anchors
-:stats: graph-theory:zw9hk4no,0,58
 
 == Anchors
 

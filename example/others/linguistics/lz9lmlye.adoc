@@ -1,5 +1,4 @@
 = Valency
-:stats: linguistics:lz9lmlye,0,63
 
 == Valency
 

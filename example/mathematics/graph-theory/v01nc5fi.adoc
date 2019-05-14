@@ -1,5 +1,4 @@
 = State computations
-:stats: graph-theory:v01nc5fi,3,89
 
 == Definition
 

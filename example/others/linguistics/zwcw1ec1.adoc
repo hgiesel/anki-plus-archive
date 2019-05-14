@@ -1,5 +1,4 @@
 = Aspects
-:stats: linguistics:zwcw1ec1,0,72
 
 == Lexical aspect
 

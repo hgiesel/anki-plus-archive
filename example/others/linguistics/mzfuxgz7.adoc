@@ -1,5 +1,4 @@
 = Questions
-:stats: linguistics:mzfuxgz7,0,9
 
 == Types of questions: Yes-no-questions
 

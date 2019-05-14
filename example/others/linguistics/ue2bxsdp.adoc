@@ -1,3 +1,3 @@
 = Yes and no
-:tag: linguistics::yes-and-no
-:stats: 0,5
+
+// TODO

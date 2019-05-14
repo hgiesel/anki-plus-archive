@@ -1,5 +1,4 @@
 = Modularity and distributivity
-:stats: graph-theory:8xis3kfz,0,53
 
 == Modularity: Upper semimodularity
 

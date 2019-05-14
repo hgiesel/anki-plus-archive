@@ -1,5 +1,4 @@
 = Characters
-:stats: graph-theory:qhlt7be4,0,54
 
 == Definition
 

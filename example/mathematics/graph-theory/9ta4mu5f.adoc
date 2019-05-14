@@ -1,5 +1,4 @@
 = Degrees, walks, and cuts
-:stats: graph-theory:27a259b7,0,149
 
 == Graphs
 

@@ -1,5 +1,4 @@
 = Residuated lattices
-:stats: graph-theory:36e0bcf1,0,62
 
 == Residuated lattice
 

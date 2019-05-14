@@ -1,5 +1,4 @@
 = Modes and advanced features
-:stats: graph-theory:qe2r4ykg,0,21
 
 == Modes and flags
 

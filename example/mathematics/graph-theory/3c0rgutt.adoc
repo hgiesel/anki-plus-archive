@@ -1,5 +1,4 @@
 = Implementations
-:stats: graph-theory:3c0rgutt,0,28
 
 == Examples of regular expression engines
 
@@ -26,7 +25,7 @@
 ** in magic syntaxes, many characters have a special meaning
 ** in non-magic syntaxes, few charachters have special meaning
 
-:mat HighlightGroup 
+:mat HighlightGroup
 
 .PCRE
 * `\d`, and syntax like `(?:)` is PCRE exclusively

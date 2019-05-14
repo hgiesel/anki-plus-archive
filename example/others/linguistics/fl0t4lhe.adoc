@@ -1,5 +1,4 @@
 = Moods
-:stats: linguistics:fl0t4lhe,0,9
 
 Realis moods::
 * indicative mood: factual statements, beliefs

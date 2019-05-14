@@ -1,4 +1,4 @@
-= Linguistics
+= LINGUISTICS
 
 .OVERVIEW
 . <<linguistics:5hyq1xxn,Grammar>>

@@ -1,5 +1,4 @@
 = Group theory
-:stats: group-theory:README,0,15
 
 .GROUP-LIKE STRUCTURES; toc
 . <<:h971cued,Identitites and absorbing elements>>

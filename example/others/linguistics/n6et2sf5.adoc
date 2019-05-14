@@ -1,5 +1,4 @@
 = Morphosyntactic alignment
-:stats: linguistics:n6et2sf5,0,11
 
 grammatical relationship between arguments
 

@@ -1,5 +1,4 @@
 = Regexes
-:stats: graph-theory:README-regexes,0,7
 
 .REGULAR EXPRESSIONS
 . <<:qhlt7be4,Characters>>
