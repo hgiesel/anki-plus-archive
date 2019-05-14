@@ -98,17 +98,14 @@ class AnkiConnection:
           tags = [list(filter(lambda tag: re.match('.*::.*', tag), entry['tags']))
             for entry in outsider_info_json['result']]
 
-          displayed_tags = [ ':'.join(re.match('(.*)::(.*)', ts[0]).groups())
-            if len(ts) == 1 else '???:???' for ts in tags]
+          displayed_tags = [ ':'.join(re.match('(.*)::(.*)', ts[0]).groups()) if len(ts) == 1 else '???:???' for ts in tags]
 
           if self.config['card_sets'][option]['qid_field']:
-            quest_fields = [entry['fields'][self.config['card_sets'][option]['qid_field']]['value']
-              for entry in outsider_info_json['result']]
+            quest_fields = [entry['fields'][self.config['card_sets'][option]['qid_field']]['value'] for entry in outsider_info_json['result']]
 
-            qid_regex = re.compile("^:?([0-9]+):?")
+            qid_regex = re.compile(r'^:?([0-9]+):?')
 
-            quest_ids = [re.sub('(?:<[^>]*>)*?' + qid_regex + '.*', r'\g<1>', entry)
-              for entry in quest_fields]
+            quest_ids = [re.sub(r'(?:<[^>]*>)*?%s.*' % (qid_regex), r'\g<1>', entry) for entry in quest_fields]
 
           else:
             quest_ids = [entry['noteId'] for entry in outsider_info_json['result']]
