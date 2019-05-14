@@ -13,6 +13,12 @@
 * if you're looking for examples of qids, go to `example/mathematics/graph-theory/behl4q6l.adoc`
 ** but there are way more, just `grep` for lines starting with `:15`
 
+.explanation; my tools
+* I mainly edit my archive with `vim`, and for this purpose I created:
+.. link:https://github.com/hgiesel/vim-ankify[vim-ankify]
+.. a vim plugin offering an easy interface to the vim-plus-archive tool `ark`
+.. for more information on `vim-ankify`, see that repo
+
 == Overview
 
 .overview; sections
