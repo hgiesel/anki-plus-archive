@@ -963,7 +963,9 @@ class Identifier:
                 for t in tuple(zip(stats, remote_qcounts))], []]
 
         else:
-            remote_qcount, _ = db.anki_query_count([' '.join(self.query())])
+            the_query = ' '.join(self.query())
+            remote_qcount, _ = db.anki_query_count([the_query])
+
             if remote_qcount is None:
                 self.printer('you probably need to select a profile')
 

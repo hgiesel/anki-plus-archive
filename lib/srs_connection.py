@@ -139,7 +139,7 @@ class AnkiConnection:
 
         queries = [{
             'action': 'findNotes',
-            'params': {'query': q + ' deck:{}*'.format(deck_name)}
+            'params': {'query': '%s deck:%s*' % (q, deck_name)}
             } for q in query_list]
 
         query = json.dumps({
