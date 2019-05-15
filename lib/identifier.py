@@ -1006,13 +1006,13 @@ class Identifier:
         if ac:
             result.append(ac)
 
-        pageid_prefix = self.config['card_sets'][option]['pageid_prefix'] + '::' if self.config['card_sets'][option]['pageid_prefix'] else ''
-        pageid_suffix = '::' + self.config['card_sets'][option]['pageid_suffix'] if self.config['card_sets'][option]['pageid_suffix'] else ''
+        pageid_prefix = self.config['card_config']['pageid_prefix'] + '::' if self.config['card_config']['pageid_prefix'] else ''
+        pageid_suffix = '::' + self.config['card_config']['pageid_suffix'] if self.config['card_config']['pageid_suffix'] else ''
 
         result.append('"tag:%s%s::%s%s"' % (pageid_prefix, section_comp, page_comp, pageid_suffix))
 
-        if self.config['card_sets'][option]['qid_field']:
-          result.append('"%s:*%s"' % (self.config['card_sets'][option]['qid_field'], qc))
+        if self.config['card_config']['qid_field']:
+          result.append('"%s:*%s"' % (self.config['card_config']['qid_field'], qc))
         else:
           result.append('"nid:%s"' % (qc))
 

@@ -14,7 +14,7 @@ from .util import *
 
 from . import pyperclip
 
-def on_command_replace(text, archive_root, section, page, qid, content):
+def on_command_replace(text, archive_root, section, page, qid):
     for dirname, _, bases in os.walk(archive_root):
         if os.path.basename(dirname) == section:
             for base in bases:
@@ -26,13 +26,11 @@ def on_command_replace(text, archive_root, section, page, qid, content):
                                     lambda x: re.sub('\$BASE', base, x), map(
                                         lambda x: re.sub('\$SECTION', section, x), map(
                                             lambda x: re.sub('\$PAGE', page, x), map(
-                                                lambda x: re.sub('\$CONTENT', content, x), map(
-                                                    lambda x: re.sub('\$CONTENT_DECLOZE', decloze_util(content), x), map(
-                                                        lambda x: re.sub('\$QID', qid, x), text)))))))))
+                                                lambda x: re.sub('\$QID', qid, x), text)))))))
 
-def on_command(editor, archive_root: str, card_sets, comm) -> None:
+def on_command(editor, archive_root: str, card_config, comm) -> None:
     ### get qid
-    qid_field_name = card_sets[0]['qid_field']
+    qid_field_name = card_config['qid_field']
 
     if qid_field_name:
         try:
@@ -48,26 +46,26 @@ def on_command(editor, archive_root: str, card_sets, comm) -> None:
             qid = re.search(qid_regex, qid_unclean).group(1) # only match inner group
         except:
             showInfo('Quest field %s does not contain quest tag specified by this regex: '
-                    '"^:([0-9]+):(?: .*)?"' % (card_sets[0]['qid_field']))
+                    '"^:([0-9]+):(?: .*)?"' % (card_config['qid_field']))
 
             return None
     else:
         qid = str(editor.note.id)
 
-    ### get content
-    content_field_name = card_sets[0]['content_field']
-
-    try:
-        content_field = editor.note.keys().index(content_field_name)
-    except:
-        showInfo('Note type does not have content field: ' + content_field_name)
-        return None
-
-    content = editor.note.fields[content_field]
+    ### DEACTIVATED because:
+    ### * not really useful, and
+    ### * hard to implement because of different card sets
+    # content_field_name = card_sets[0]['content_field']
+    # try:
+    #     content_field = editor.note.keys().index(content_field_name)
+    # except:
+    #     showInfo('Note type does not have content field: ' + content_field_name)
+    #     return None
+    # content = editor.note.fields[content_field]
 
     ### get section and page
-    pageid_prefix = card_sets[0]['pageid_prefix'] + '::' if card_sets[0]['pageid_prefix'] else ''
-    pageid_suffix = '::' + card_sets[0]['pageid_suffix'] if card_sets[0]['pageid_suffix'] else ''
+    pageid_prefix = card_config['pageid_prefix'] + '::' if card_config['pageid_prefix'] else ''
+    pageid_suffix = '::' + card_config['pageid_suffix'] if card_config['pageid_suffix'] else ''
     pageid_regex = re.compile(pageid_prefix + '(?:.*::)?([^:]*)::([^:]*)' + pageid_suffix)
 
     # first tag that is found that contains a sign of being hierarchical is taken to be section
@@ -93,11 +91,11 @@ def on_command(editor, archive_root: str, card_sets, comm) -> None:
     # showInfo("%s::%s#%s" % (section, page, qid))
 
     if comm['type'] == 'shell':
-        result = on_command_replace(comm['arguments'], archive_root, section, page, qid, content)
+        result = on_command_replace(comm['arguments'], archive_root, section, page, qid)
         proc = Popen(result, env={})
 
     elif comm['type'] == 'clipboard':
-        result = on_command_replace([comm['text']], archive_root, section, page, qid, content)[0]
+        result = on_command_replace([comm['text']], archive_root, section, page, qid)[0]
         pyperclip.copy(result)
 
     else:
@@ -113,22 +111,22 @@ def main(config, icons):
 
     def on_command0(editor):
         nonlocal config
-        on_command(editor, config['archive_root'], config['card_sets'], config['commands'][0])
+        on_command(editor, config['archive_root'], config['card_config'], config['commands'][0])
     def on_command1(editor):
         nonlocal config
-        on_command(editor, config['archive_root'], config['card_sets'], config['commands'][1])
+        on_command(editor, config['archive_root'], config['card_config'], config['commands'][1])
     def on_command2(editor):
         nonlocal config
-        on_command(editor, config['archive_root'], config['card_sets'], config['commands'][2])
+        on_command(editor, config['archive_root'], config['card_config'], config['commands'][2])
     def on_command3(editor):
         nonlocal config
-        on_command(editor, config['archive_root'], config['card_sets'], config['commands'][3])
+        on_command(editor, config['archive_root'], config['card_config'], config['commands'][3])
     def on_command4(editor):
         nonlocal config
-        on_command(editor, config['archive_root'], config['card_sets'], config['commands'][4])
+        on_command(editor, config['archive_root'], config['card_config'], config['commands'][4])
     def on_command5(editor):
         nonlocal config
-        on_command(editor, config['archive_root'], config['card_sets'], config['commands'][5])
+        on_command(editor, config['archive_root'], config['card_config'], config['commands'][5])
 
     on_command_list = [
         on_command0,

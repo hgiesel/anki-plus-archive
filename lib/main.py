@@ -122,7 +122,7 @@ def verify(config, argv, printer):
     Printer.print_stats(lines, delimiter=argv.delimiter)
 
 def match(config, argv, printer):
-    anki_connection = AnkiConnection(config, printer=printer)
+    anki_connection = AnkiConnection(config['card_config'], config['card_sets'], printer=printer)
 
     addr = Identifier(config, argv.uri, printer=printer)
     result, outsiders = getattr(addr, argv.cmd)(anki_connection)
@@ -152,7 +152,7 @@ def match(config, argv, printer):
     Printer.print_stats(all_results)
 
 def add(config, argv, printer):
-    anki_connection = AnkiConnection(config, printer=printer)
+    anki_connection = AnkiConnection(config['card_config'], config['card_sets'], printer=printer)
 
     ident = Identifier(config, argv.uri, printer=printer)
     if ident.mode == Mode.QUEST_I or ident.mode == Mode.PAGE_I:
@@ -165,7 +165,7 @@ def add(config, argv, printer):
         printer('uri must designate a single quest or page')
 
 def browse(config, argv, printer):
-    anki_connection = AnkiConnection(config, printer=printer)
+    anki_connection = AnkiConnection(config['card_config'], config['card_sets'], printer=printer)
 
     addr = Identifier(config, argv.uri, printer=printer).query()
     result = anki_connection.anki_browse(addr)
