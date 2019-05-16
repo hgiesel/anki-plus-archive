@@ -33,9 +33,14 @@ def paths(config, argv, printer):
     Printer.print_stats(result, delimiter=argv.delimiter)
 
 def stats(config, argv, printer):
-    addr = Identifier(config, argv.uri, printer=printer)
+    addr = Identifier(config, argv.uri, expand_tocs=argv.expand_tocs, printer=printer)
 
     result = getattr(addr, argv.cmd)()
+
+    if argv.tocs:
+        result = [f for f in result if config['archive_syntax']['tocs'] in f[0]]
+    elif argv.no_tocs:
+        result = [f for f in result if not config['archive_syntax']['tocs'] in f[0]]
 
     if argv.paths == 'default':
         argv.paths = 'id'
@@ -54,9 +59,20 @@ def stats(config, argv, printer):
     Printer.print_stats(result, delimiter=argv.delimiter)
 
 def headings(config, argv, printer):
-    addr = Identifier(config, argv.uri, printer=printer)
+    addr = Identifier(config, argv.uri, expand_tocs=argv.expand_tocs, printer=printer)
 
     result = getattr(addr, argv.cmd)()
+
+    if argv.tocs:
+        result = [f for f in result if config['archive_syntax']['tocs'] in f['file_name']]
+    elif argv.no_tocs:
+        result = [f for f in result if not config['archive_syntax']['tocs'] in f['file_name']]
+
+    if argv.only_top_level:
+        for entry in result:
+            entry['headings'] = [entry['headings'][0]]
+
+
     lines = [(val['file_name'],heading[0],heading[1]) for val in result for heading in val['headings']]
 
     if argv.paths == 'default':

@@ -31,16 +31,16 @@ def setup_parser(config):
   subparsers_dict = {}
 
   subparsers_dict['paths'] = subparsers.add_parser('paths')
-  subparsers_dict['paths'].add_argument('-t', '--tocs', action='store_true',
-      help='only display tocs in result')
-  subparsers_dict['paths'].add_argument('-n', '--no-tocs', action='store_true',
-      help='exclude tocs in result')
+  subparsers_dict['paths'].add_argument('uri', nargs='?', default='',
+      help='archive uri you want to query')
   subparsers_dict['paths'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
       default='default', help='decide how paths should be printed')
   subparsers_dict['paths'].add_argument('-d', '--delimiter',
       default='default', help='decide the delimiter for the output')
-  subparsers_dict['paths'].add_argument('uri', nargs='?', default='',
-      help='archive uri you want to query')
+  subparsers_dict['paths'].add_argument('-t', '--tocs', action='store_true',
+      help='only display tocs in result')
+  subparsers_dict['paths'].add_argument('-n', '--no-tocs', action='store_true',
+      help='exclude tocs in result')
   subparsers_dict['paths'].add_argument('-e', '--expand-tocs', action='store_true',
       help='expand pagerefs that point to tocs')
 
@@ -51,6 +51,12 @@ def setup_parser(config):
       default='\t', help='decide the delimiter for the output')
   subparsers_dict['stats'].add_argument('uri', nargs='?', default='',
       help='archive uri you want to query')
+  subparsers_dict['stats'].add_argument('-t', '--tocs', action='store_true',
+      help='only display tocs in result')
+  subparsers_dict['stats'].add_argument('-n', '--no-tocs', action='store_true',
+      help='exclude tocs in result')
+  subparsers_dict['stats'].add_argument('-e', '--expand-tocs', action='store_true',
+      help='expand pagerefs that point to tocs')
 
 
   subparsers_dict['headings'] = subparsers.add_parser('headings')
@@ -60,6 +66,14 @@ def setup_parser(config):
       default='default', help='decide the delimiter for the output')
   subparsers_dict['headings'].add_argument('uri', nargs='?', default='',
       help='archive uri you want to query')
+  subparsers_dict['headings'].add_argument('-o', '--only-top-level', action='store_true',
+      help='display only the first heading in the file')
+  subparsers_dict['headings'].add_argument('-t', '--tocs', action='store_true',
+      help='display only tocs in result')
+  subparsers_dict['headings'].add_argument('-n', '--no-tocs', action='store_true',
+      help='exclude tocs in result')
+  subparsers_dict['headings'].add_argument('-e', '--expand-tocs', action='store_true',
+      help='expand pagerefs that point to tocs')
 
   subparsers_dict['verify'] = subparsers.add_parser('verify')
   subparsers_dict['verify'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
