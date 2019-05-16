@@ -73,7 +73,7 @@ class Identifier:
 
         return result
 
-    def __init__(self, config, uri=None, preanalysis=None, printer=None, hypothetical=False, expand_tocs=None):
+    def __init__(self, config, uri=None, preanalysis=None, printer=None, hypothetical=False, tocfilter_options=None):
         ''' (self) -> ([ResultDict], mode: Mode, summary_name: String)
         * Analzyes uri and returns one of the following:
 
@@ -118,10 +118,13 @@ class Identifier:
         # e.g. for making match tests against Anki
         self.hypthetical = hypothetical
 
-        if expand_tocs is None:
+        if tocfilter_options is None:
             self.expand_tocs = False
+            self.nonhierarchical_refs = False
+
         else:
-            self.expand_tocs = expand_tocs
+            self.expand_tocs = tocfilter_options['expand_tocs']
+            self.nonhierarchical_refs = tocfilter_options['nonhierarchical_refs']
 
         component_regex = compile(# optional filter component
                            r'^(?:([^#/]+)//)?'
@@ -322,7 +325,10 @@ class Identifier:
             result = []
 
             theid = Identifier(self.config, uri='@:@', printer=self.printer)
-            pagerefs = theid.pagerefs(self.filter_component, expand_tocs=self.expand_tocs)
+            pagerefs = theid.pagerefs(
+                    self.filter_component,
+                    # these come from tocfilter_options argument
+                    expand_tocs=self.expand_tocs, nonhierarchical_refs=self.nonhierarchical_refs)
             summary_name = Identifier(self.config, uri=self.filter_component, printer=self.printer).paths()[0][0]
 
             files = map(lambda t: os.path.split(t), [i[2] for p in pagerefs for i in p['pagerefs']])
@@ -583,8 +589,9 @@ class Identifier:
 
         return result
 
-    def pagerefs(self, paths_searched, expand_tocs=None, further_refs=None, fixed_lineno=None):
+    def pagerefs(self, paths_searched, expand_tocs=None, nonhierarchical_refs=None, fixed_lineno=None):
         '''
+        only works with pageids, not sectionids or qids
         returns list of pagerefs defined in file
         self: paths considered for completion
         -> if they are not contained within there: error?
@@ -602,10 +609,10 @@ class Identifier:
         }]
         '''
 
-        if further_refs is None or not further_refs:
-            further_refs = False
+        if nonhierarchical_refs is None or not nonhierarchical_refs:
+            nonhierarchical_refs = False
         else:
-            further_refs = True
+            nonhierarchical_refs = True
 
         if expand_tocs is None or not expand_tocs:
             expand_tocs = False
@@ -617,7 +624,14 @@ class Identifier:
         toc_regex = compile('^%s.*' % self.config['archive_syntax']['tocs'])
         result = []
 
-        for f in [t[0] for t in Identifier(self.config, preanalysis=self.analysis, uri=paths_searched).paths()]:
+        id_with_paths_searched = Identifier(self.config, preanalysis=self.analysis, uri=paths_searched)
+
+        if not id_with_paths_searched.page_component:
+            self.printer('needs page component')
+        elif id_with_paths_searched.quest_component:
+            self.printer('must not have quest component')
+
+        for f in [t[0] for t in id_with_paths_searched.paths()]:
             pagerefs = []
 
             with open(f, "r") as fx:
@@ -632,7 +646,7 @@ class Identifier:
 
                         # dealing with further pagerefs
                         if pageref_matched.startswith('!'):
-                            if further_refs:
+                            if nonhierarchical_refs:
                                 pageref_matched = pageref_matched[1:]
                             else:
                                 continue
@@ -646,7 +660,7 @@ class Identifier:
                         file_name, pageref, _, _ = prov_identifier.paths()[0]
 
                         if expand_tocs and toc_regex.search(os.path.basename(file_name)):
-                            inter_result = self.pagerefs(file_name, expand_tocs=True, further_refs=further_refs, fixed_lineno=lineno)
+                            inter_result = self.pagerefs(file_name, expand_tocs=True, nonhierarchical_refs=nonhierarchical_refs, fixed_lineno=lineno)
                             result += inter_result
                             continue
 
@@ -659,7 +673,7 @@ class Identifier:
 
         return result
 
-    def pagerefs_keyby(self, paths_searched, expand_tocs=None, further_refs=None, fixed_lineno=None):
+    def pagerefs_keyby(self, paths_searched, expand_tocs=None, nonhierarchical_refs=None, fixed_lineno=None):
         '''
         returns list of pagerefs defined in file
         self: paths considered for completion
@@ -672,10 +686,10 @@ class Identifier:
         }]
         '''
 
-        if further_refs is None or not further_refs:
-            further_refs = False
+        if nonhierarchical_refs is None or not nonhierarchical_refs:
+            nonhierarchical_refs = False
         else:
-            further_refs = True
+            nonhierarchical_refs = True
 
         if expand_tocs is None or not expand_tocs:
             expand_tocs = False
@@ -688,7 +702,14 @@ class Identifier:
 
         result = {}
 
-        for f in [t[0] for t in Identifier(self.config, preanalysis=self.analysis, uri=paths_searched).paths()]:
+        id_with_paths_searched = Identifier(self.config, preanalysis=self.analysis, uri=paths_searched)
+
+        if not id_with_paths_searched.page_component:
+            self.printer('needs page component')
+        elif id_with_paths_searched.quest_component:
+            self.printer('must not have quest component')
+
+        for f in [t[0] for t in id_with_paths_searched.paths()]:
             with open(f, "r") as fx:
                 searchlines = fx.readlines()
 
@@ -701,7 +722,7 @@ class Identifier:
 
                         # dealing with further pagerefs
                         if pageref_matched.startswith('!'):
-                            if further_refs:
+                            if nonhierarchical_refs:
                                 pageref_matched = pageref_matched[1:]
                             else:
                                 continue
@@ -715,7 +736,7 @@ class Identifier:
                             self.printer('file contains invalid pageref')
 
                         if expand_tocs and toc_regex.search(os.path.basename(file_name)):
-                            inter_result = self.pagerefs_keyby(file_name, expand_tocs=True, further_refs=further_refs, fixed_lineno=lineno)
+                            inter_result = self.pagerefs_keyby(file_name, expand_tocs=True, nonhierarchical_refs=nonhierarchical_refs, fixed_lineno=lineno)
                             print('inter_result: ' + inter_result)
                             ## TODO
                             continue
@@ -728,7 +749,7 @@ class Identifier:
 
         return result
 
-    def revrefs(self, paths_searched, prepagerefs=None, forbidden_pagerefs=None, further_refs=None, k=None):
+    def revrefs(self, paths_searched, prepagerefs=None, forbidden_pagerefs=None, nonhierarchical_refs=None, k=None):
         '''
         traces back all pagerefs to a specific file
         self: paths considered for completion
@@ -745,7 +766,7 @@ class Identifier:
         result := [{
             'pageref': '/path/to/archive/group-like-2.adoc',
             'traceback': [
-                [('/path/to/toc', 23)],
+                [('/path/to/toc', 23, 'pat)],
                 [('/path/to/file', 99)],
                 [('/path/to/toc2', 9), ('/path/to/toc', 23)],
                 [('/path/to/toc3', 69), ('/path/to/toc', 23)],
@@ -756,23 +777,28 @@ class Identifier:
 
         result = []
 
-        if further_refs is None or not further_refs:
-            further_refs = False
+        if nonhierarchical_refs is None or not nonhierarchical_refs:
+            nonhierarchical_refs = False
         else:
-            further_refs = True
+            nonhierarchical_refs = True
 
-        if k is -1 and further_refs:
+        if (k is -1 or k is None) and nonhierarchical_refs:
             k = 1
-        elif k is -1 and not further_refs:
+        elif (k is -1 or k is None) and not nonhierarchical_refs:
             k = 20
 
-        paths = Identifier(self.config, uri=paths_searched, preanalysis=self.analysis, printer=self.printer).paths()
+        paths = Identifier(self.config, uri=paths_searched, preanalysis=self.analysis, printer=self.printer)
 
-        for file_name, qid, _, _ in paths:
+        if not paths.page_component:
+            self.printer('needs page component')
+        elif paths.quest_component:
+            self.printer('must not have quest component')
+
+        for file_name, qid, _, _ in paths.paths():
 
             if k >= 1:
                 if not prepagerefs:
-                    pagerefs = self.pagerefs_keyby(paths_searched='@:@', further_refs=further_refs)
+                    pagerefs = self.pagerefs_keyby(paths_searched='@:@', nonhierarchical_refs=nonhierarchical_refs)
                 else:
                     pagerefs = prepagerefs
 
@@ -813,7 +839,7 @@ class Identifier:
 
         return result
 
-    def verify(self, test_uri, further_refs=True):
+    def verify(self, test_uri, nonhierarchical_refs=True):
         '''
         returns list of integrity errors of files
         [{
@@ -879,7 +905,7 @@ class Identifier:
                         pageref_matched = pageref_match.group(1)
                         # dealing with further pagerefs
                         if pageref_matched.startswith('!'):
-                            if further_refs:
+                            if nonhierarchical_refs:
                                 pageref_matched = pageref_matched[1:]
                             else:
                                 continue

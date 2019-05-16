@@ -6,7 +6,12 @@ from lib.util import decloze_util, stdlib_util
 from lib.srs_connection import AnkiConnection
 
 def paths(config, argv, printer):
-    addr = Identifier(config, argv.uri, expand_tocs=argv.expand_tocs, printer=printer)
+    addr = Identifier(
+            config, argv.uri,
+            tocfilter_options={
+                'expand_tocs': argv.expand_tocs,
+                'nonhierarchical_refs': argv.nonhierarchical_refs},
+            printer=printer)
 
     result = getattr(addr, argv.cmd)()
     # [(file, pageid, lineno, qid)]
@@ -33,7 +38,12 @@ def paths(config, argv, printer):
     Printer.print_stats(result, delimiter=argv.delimiter)
 
 def stats(config, argv, printer):
-    addr = Identifier(config, argv.uri, expand_tocs=argv.expand_tocs, printer=printer)
+    addr = Identifier(
+            config, argv.uri,
+            tocfilter_options={
+                'expand_tocs': argv.expand_tocs,
+                'nonhierarchical_refs': argv.nonhierarchical_refs},
+            printer=printer)
 
     result = getattr(addr, argv.cmd)()
 
@@ -59,7 +69,12 @@ def stats(config, argv, printer):
     Printer.print_stats(result, delimiter=argv.delimiter)
 
 def headings(config, argv, printer):
-    addr = Identifier(config, argv.uri, expand_tocs=argv.expand_tocs, printer=printer)
+    addr = Identifier(
+            config, argv.uri,
+            tocfilter_options={
+                'expand_tocs': argv.expand_tocs,
+                'nonhierarchical_refs': argv.nonhierarchical_refs},
+            printer=printer)
 
     result = getattr(addr, argv.cmd)()
 
@@ -94,7 +109,7 @@ def headings(config, argv, printer):
 def pagerefs(config, argv, printer):
     addr = Identifier(config, '@:@', printer=printer)
 
-    result = getattr(addr, argv.cmd)(argv.uri, expand_tocs=argv.expand_tocs, further_refs=argv.further)
+    result = getattr(addr, argv.cmd)(argv.uri, expand_tocs=argv.expand_tocs, nonhierarchical_refs=argv.nonhierarchical_refs)
 
     lines = sorted([
         (val['file_name'], pageref[0], pageref[1], pageref[2])
@@ -116,7 +131,7 @@ def pagerefs(config, argv, printer):
 
 def revrefs(config, argv, printer):
     result = getattr(Identifier(config, '@:@', printer=printer), argv.cmd)(
-        argv.uri, further_refs=argv.further, k=argv.k)
+        argv.uri, nonhierarchical_refs=argv.nonhierarchical_refs, k=argv.k)
     print(json.dumps(result, indent=2, sort_keys=True))
 
 def query(config, argv, printer):
