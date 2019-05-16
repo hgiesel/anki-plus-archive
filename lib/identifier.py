@@ -73,7 +73,7 @@ class Identifier:
 
         return result
 
-    def __init__(self, config, uri=None, preanalysis=None, printer=None, hypothetical=False):
+    def __init__(self, config, uri=None, preanalysis=None, printer=None, hypothetical=False, expand_tocs=None):
         ''' (self) -> ([ResultDict], mode: Mode, summary_name: String)
         * Analzyes uri and returns one of the following:
 
@@ -117,6 +117,11 @@ class Identifier:
         # queries that don't need to check against the archive
         # e.g. for making match tests against Anki
         self.hypthetical = hypothetical
+
+        if expand_tocs is None:
+            self.expand_tocs = False
+        else:
+            self.expand_tocs = expand_tocs
 
         component_regex = compile(# optional filter component
                            r'^(?:([^#/]+)//)?'
@@ -261,7 +266,7 @@ class Identifier:
                 ancestor_regex = compile('(.*/' + self.filter_component.replace('-','[^./]*-') + '[^-./]*)/?')
 
             first_dir = True
-            toc_regex = compile(self.config['archive_syntax']['tocs'])
+            toc_regex = compile('^%s.*' % self.config['archive_syntax']['tocs'])
 
             for root, dirs, files in os.walk(summary_name):
                 files[:] = [f for f in files if not f.startswith('.')]
@@ -317,7 +322,7 @@ class Identifier:
             result = []
 
             theid = Identifier(self.config, uri='@:@', printer=self.printer)
-            pagerefs = theid.pagerefs(self.filter_component, expand_tocs=True)
+            pagerefs = theid.pagerefs(self.filter_component, expand_tocs=self.expand_tocs)
             summary_name = Identifier(self.config, uri=self.filter_component, printer=self.printer).paths()[0][0]
 
             files = map(lambda t: os.path.split(t), [i[2] for p in pagerefs for i in p['pagerefs']])
@@ -609,7 +614,7 @@ class Identifier:
 
         paths_under_consideration = [p[0] for p in self.paths()]
         pageref_regex = compile(self.config['archive_syntax']['pagerefs'])
-        toc_regex = compile(self.config['archive_syntax']['tocs'])
+        toc_regex = compile('^%s.*' % self.config['archive_syntax']['tocs'])
         result = []
 
         for f in [t[0] for t in Identifier(self.config, preanalysis=self.analysis, uri=paths_searched).paths()]:
@@ -679,7 +684,7 @@ class Identifier:
 
         paths_under_consideration = [p[0] for p in self.paths()]
         pageref_regex = compile(self.config['archive_syntax']['pagerefs'])
-        toc_regex = compile(self.config['archive_syntax']['tocs'])
+        toc_regex = compile('^%s.*' % self.config['archive_syntax']['tocs'])
 
         result = {}
 
@@ -785,7 +790,7 @@ class Identifier:
 
                 add_result = []
 
-                toc_regex = compile(self.config['archive_syntax']['tocs'])
+                toc_regex = compile('^%s.*' % self.config['archive_syntax']['tocs'])
 
                 for elem in pre_result:
                     if toc_regex.search(os.path.basename(elem[0][0])):

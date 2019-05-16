@@ -31,12 +31,18 @@ def setup_parser(config):
   subparsers_dict = {}
 
   subparsers_dict['paths'] = subparsers.add_parser('paths')
+  subparsers_dict['paths'].add_argument('-t', '--tocs', action='store_true',
+      help='only display tocs in result')
+  subparsers_dict['paths'].add_argument('-n', '--no-tocs', action='store_true',
+      help='exclude tocs in result')
   subparsers_dict['paths'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
       default='default', help='decide how paths should be printed')
   subparsers_dict['paths'].add_argument('-d', '--delimiter',
       default='default', help='decide the delimiter for the output')
   subparsers_dict['paths'].add_argument('uri', nargs='?', default='',
       help='archive uri you want to query')
+  subparsers_dict['paths'].add_argument('-e', '--expand-tocs', action='store_true',
+      help='expand pagerefs that point to tocs')
 
   subparsers_dict['stats'] = subparsers.add_parser('stats')
   subparsers_dict['stats'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
@@ -91,8 +97,8 @@ def setup_parser(config):
 
 
   subparsers_dict['pagerefs'] = subparsers.add_parser('pagerefs')
-  subparsers_dict['pagerefs'].add_argument('-t', '--tocs', action='store_true',
-      help='expand pagerefs to tocs')
+  subparsers_dict['pagerefs'].add_argument('-e', '--expand-tocs', action='store_true',
+      help='expand pagerefs that point to tocs')
   subparsers_dict['pagerefs'].add_argument('-f', '--further', action='store_true',
       help='include further pagerefs')
   subparsers_dict['pagerefs'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],

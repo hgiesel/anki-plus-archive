@@ -1,12 +1,20 @@
 import json
+import pprint
 
 from lib.identifier import Mode, Identifier, Printer
 from lib.util import decloze_util, stdlib_util
 from lib.srs_connection import AnkiConnection
 
 def paths(config, argv, printer):
-    addr = Identifier(config, argv.uri, printer=printer)
+    addr = Identifier(config, argv.uri, expand_tocs=argv.expand_tocs, printer=printer)
+
     result = getattr(addr, argv.cmd)()
+    # [(file, pageid, lineno, qid)]
+
+    if argv.tocs:
+        result = [f for f in result if config['archive_syntax']['tocs'] in f[1]]
+    elif argv.no_tocs:
+        result = [f for f in result if not config['archive_syntax']['tocs'] in f[1]]
 
     if argv.paths == 'rel':
         result = [(Identifier.to_rel_path(path[0], config['archive_root']), path[1], path[2], path[3]) for path in result]
@@ -70,17 +78,18 @@ def headings(config, argv, printer):
 def pagerefs(config, argv, printer):
     addr = Identifier(config, '@:@', printer=printer)
 
-    result = getattr(addr, argv.cmd)(argv.uri, expand_tocs=argv.tocs, further_refs=argv.further)
-    lines = sorted([(val['file_name'],pageref[0],pageref[1]) for val in result for pageref in val['pagerefs']], key=lambda t: t[2])
+    result = getattr(addr, argv.cmd)(argv.uri, expand_tocs=argv.expand_tocs, further_refs=argv.further)
 
-    if argv.paths == 'default':
-        argv.paths = 'id'
+    lines = sorted([
+        (val['file_name'], pageref[0], pageref[1], pageref[2])
+        for val in result
+        for pageref in val['pagerefs']], key=lambda t: t[2])
 
     if argv.paths == 'full':
         pass
     elif argv.paths == 'rel':
         lines = [(Identifier.to_rel_path(line[0], config['archive_root']),) + line[1:] for line in lines]
-    elif argv.paths == 'id':
+    elif argv.paths == 'id' or argv.paths == 'default':
         lines = [(Identifier.to_identifier(line[0]),) + line[1:] for line in lines]
     elif argv.paths == 'shortid':
         lines = [(Identifier.to_identifier(line[0], omit_section=True),) + line[1:] for line in lines]

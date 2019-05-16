@@ -53,4 +53,7 @@ alias noq="awk '{ if(\$2 == 0) { print \$0 } }'"
 
 alias noma="awk '{ if(\$2 != \$3 ) { print \$0 } }'"
 alias miss="awk '{ if(\$3 != 1) { print \$0 } }'"
+
+# for use with ark headings (getting the document title)
+alias dt="grep '^[^=]*$'"
 ''')
