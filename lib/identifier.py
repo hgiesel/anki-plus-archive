@@ -1,9 +1,7 @@
 import enum
 import os
-import sys
 from re import compile
 from copy import deepcopy
-import pprint
 from itertools import groupby
 
 class Printer:
@@ -13,7 +11,7 @@ class Printer:
         if delimiter is None:
             delimiter = '\t'
 
-        lines = '\n'.join([ delimiter.join([ str(v) for v in list(val) ]) for val in vals ])
+        lines = '\n'.join([delimiter.join([str(v) for v in list(val)]) for val in vals])
         if lines:
             print(lines)
 
@@ -1016,7 +1014,9 @@ class Identifier:
 
             for d in self.analysis:
                 for f in d['files']:
-                    prep_ac.append('"tag:{0}::{1}"'.format(os.path.basename(d['dir_name']), os.path.splitext(f['file_name'])[0]))
+                    prep_ac.append(
+                        '"tag:{0}::{1}"'.format(os.path.basename(d['dir_name']),
+                                                os.path.splitext(f['file_name'])[0]))
 
             ac = '(' + ' or '.join(prep_ac) + ')'
 
@@ -1045,8 +1045,8 @@ class Identifier:
         result.append('"tag:%s%s::%s%s"' % (pageid_prefix, section_comp, page_comp, pageid_suffix))
 
         if self.config['card_config']['qid_field']:
-          result.append('"%s:*%s"' % (self.config['card_config']['qid_field'], qc))
+            result.append('"%s:*%s"' % (self.config['card_config']['qid_field'], qc))
         else:
-          result.append('"nid:%s"' % (qc))
+            result.append('"nid:%s"' % (qc))
 
         return result
