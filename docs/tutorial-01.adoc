@@ -2,24 +2,25 @@
 
 == Managing your archive
 
-* `ark paths <ark-uri>`
+* `ark paths <sectionid/pageid/noteid>`
 
 Will print the files associated with a specific ark locator
 This might be directories for sections, files for pages, or
-files and lines for quests.
+files and lines for notes
 
-* `ark stats <ark-uri>`
+* `ark stats <sectionid/pageid/noteid>`
 
 Will print stats for a specific ark locator.
 Section ark locators summarize the stats for pages.
 Quest ark locators have their own set of available stats.
 
-* `ark verify <ark-uri>`
+* `ark verify <pageid>`
 
-Will test the integrity of the archive provided under `<ark-uri>`.
+Will test the integrity of the pages provided under `<pageid>`.
 
-* `ark headings`
+* `ark headings <pageid>`
 
+Will print the headings used in the file.
 
 == Interaction with Anki
 

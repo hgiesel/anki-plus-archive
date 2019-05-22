@@ -1,42 +1,41 @@
-= Section, page, and quest identifiers
+= Section, page, and note identifiers
 
-=== Section identifiers
+=== Section identifiers / Sectionids
 
-Section identifiers can either signify an individual section, or a section group
+Section identifiers, or short *sectionids*, can either signify an individual section, or a section group
 a section corresponds to a directory in the filesystem, and contains possible pages.
 A section cannot contain another section.
-It is marked by containing a `README` file.
+It is marked by containing a `README` file. It also may have an `assets` directory for assets.
 
 Section identifers have the form:
 
 .Section identifier
 ----
-[ancestor//][section]
+[ancestor//]section
 ----
 
-=== Page identifiers
+=== Page identifiers / Pageids
 
 Each section can contain multiple pages. A page corresponds to a file in the filesystem.
 
-Section identifers have the form:
+Page identifers, or short *pageids*, have the form:
 
 .Page identifier
 ----
-[section][:page]
+section:page
 ----
 
-=== Quest identifiers
+=== Note identifiers / Noteids
 
-Each
+Each page can contain multiple noteids, which refer to Anki notes.
+The Anki note, in return, points to this file.
 
-Quest identifers have the form:
+Note identifers, or short noteids, have the following form:
 
-.Quest identifiers
+.Note identifiers
 ----
-[section][:page][#quest]
+section:page#note
 ----
-
-=== Examples
 
 ==== Example filesystem
 
@@ -59,45 +58,37 @@ archive
         └── rings.adoc
 ----
 
-==== Example identifiers
-
+.Example identifiers with sectionids
 . `(nothing)`
-** denotes directory 'archive'
+** denotes the archive root under 'archive'
 . `mathematics//`
-** denotes directory 'mathematics'
+** denotes all sections in 'mathematics'
 . `cryptography`
-** denotes directory 'cryptogrphy'
+** denotes the section 'cryptogrphy'
 . `mathematics//@`
-** denotes directories 'graph-theory', and 'group-theory'
-. `graph-theory:graphs-1`
-** denotes file 'graphs-1.adoc'
-. `graph-theory:graphs-@`
-** denotes files 'graphs-1.adoc', and 'graphs-2.adoc'
-. `graph-theory:@`
-** denotes files 'graphs-1.adoc', 'graphs-2.adoc', 'lattices.adoc'
-. `graph-theory:graphs-1#4`
-** denotes the quest number '4' in the file 'graphs-1.adoc'
-** it is not sure, whether it even exists
-. `graph-theory:graphs-1#@`
-** denotes all quest defined within 'graphs-1.adoc'
-** might be none at all
+** denotes the sections 'graph-theory', and 'group-theory'
 . `@`
-** denotes all directories within 'archive' that contain a 'README' file
+** denotes all sections in the archive
+
+.Example identifiers with pageids
+. `graph-theory:graphs-1`
+** denotes page 'graphs-1.adoc'
+. `graph-theory:graphs-@`
+** denotes pages 'graphs-1.adoc', and 'graphs-2.adoc'
+. `graph-theory:@`
+** denotes pages 'graphs-1.adoc', 'graphs-2.adoc', 'lattices.adoc'
+. `in-se:sy-1`
+** denotes page 'symmetric-key-encryption-1.adoc'
+** as long as they remain uniquely identifying, you can shorten sections, pages and notes
 . `@:@`
 ** denotes all files within 'archive', that are in directories together with a 'README' file
+
+.Example identifiers with noteids
+. `graph-theory:graphs-1#4`
+** denotes noteid '4' or a noteid ending in '1' in the file 'graphs-1.adoc'
+** it is not sure, whether it even exists
+. `graph-theory:graphs-1#@`
+** denotes all noteids defined within 'graphs-1.adoc'
+** might be none at all
 . `@:@#@`
-** denotes all quests defined within the 'archive'
-
-==== Example filesystem inspired by Zettelkasten
-
-----
-archive
-└── zk
-    ├── 201901231653.adoc
-    ├── 201901211225.adoc
-    ├── 201812231348.adoc
-    └── 201812122021.adoc
-----
-
-
-
+** denotes all noteids defined within the 'archive'
