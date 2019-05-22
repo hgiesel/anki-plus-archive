@@ -51,6 +51,12 @@ link:https://orgmode.org/[Emacs org-mode].
 . adds a set of buttons in the Anki editor for commands to interact with your notes
 . offers the command-line tool `ark`
 
+.For more information, see here
+. For more about the different kinds of ids, link:docs/tutorial-ids[see here]
+. For more about connecting to Anki, link:docs/tutorial-anki.adoc[see here]
+. For more about pagerefs, and tocs, link:docs/tutorial-pagerefs[see here]
+. For more about the assets directory and assetrefs, link:docs/tutorial-assetrefs[see here]
+
 == Setup
 
 // TODO
