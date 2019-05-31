@@ -7,11 +7,11 @@ from lib.srs_connection import AnkiConnection
 
 def paths(config, argv, printer):
     addr = Identifier(
-            config, argv.uri,
-            tocfilter_options={
-                'expand_tocs': argv.expand_tocs,
-                'nonhierarchical_refs': argv.nonhierarchical_refs},
-            printer=printer)
+        config, argv.uri,
+        tocfilter_options={
+            'expand_tocs': argv.expand_tocs,
+            'nonhierarchical_refs': argv.nonhierarchical_refs},
+        printer=printer)
 
     result = getattr(addr, argv.cmd)()
     # [(file, pageid, lineno, qid)]

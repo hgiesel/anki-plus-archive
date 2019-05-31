@@ -439,6 +439,8 @@ class Identifier:
 
         return topics
 
+
+
     def paths(self, pages=None, tocs=None):
         ''' resturns [(abs_file_name, ark_loc, lineno, qid)] '''
 
@@ -945,7 +947,6 @@ class Identifier:
         return result
 
     def match(self, db, type=None):
-
         stats = self.stats(tocs=False)
         result = []
 
@@ -1004,7 +1005,6 @@ class Identifier:
         return result
 
     def query(self, option=0):
-
         result = []
         result.append('"card:1"')
 

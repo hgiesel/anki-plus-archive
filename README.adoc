@@ -39,28 +39,44 @@ which does not need to be a note itself or part of the note.
 ==== The solution
 
 This addon is a tool suite to help you create two-way
-connections between Anki with your digital notes.
-It assumes you have notes written in plain text, which
-contain content you want to add as questions to your Anki deck.
+connections between Anki with your digital note archive.
+It assumes you have text files written in plain text, which
+contain content you want to add as notes to your Anki deck.
 They might be written in plain text formats, including
 link:https://en.wikipedia.org/wiki/Markdown[Markdown],
 link:https://asciidoctor.org/docs/what-is-asciidoc[Asciidoc] (my recommendation!), or
 link:https://orgmode.org/[Emacs org-mode].
 
 .It does so in mainly two ways:
-. adds a set of buttons in the Anki editor for commands to interact with your notes
+. allows you to create buttons in the Anki editor and define commands
 . offers the command-line tool `ark`
 
-.For more information, see here
-. For more about the different kinds of ids, link:docs/tutorial-ids[see here]
+== For more information, see here
+
+. For more about the command line tool, link:docs/tutorial-ark.adoc[see here]
+. For more about the different kinds of ids, link:docs/tutorial-ids.adoc[see here]
 . For more about connecting to Anki, link:docs/tutorial-anki.adoc[see here]
 . For more about pagerefs, and tocs, link:docs/tutorial-pagerefs[see here]
-. For more about the assets directory and assetrefs, link:docs/tutorial-assetrefs[see here]
+. For more about the assets directory and assetrefs, link:docs/tutorial-assetrefs.adoc[see here]
+. For more about the Anki config file, link:docs/tutorial-config-file.adoc[see here]
+
+== Prerequisities
+
+This addon requires multiple other Anki addons to be installed and needs some
+technological know-how on the side of the user. The required addons include
+
+.Necessary add-ons
+. link:https://ankiweb.net/shared/info/2055492159[AnkiConnect]
+// TODO Add full note id
+
+.Advised add-ons
+. link:https://ankiweb.net/shared/info/1642550423[Refocus card when reviewing]
 
 == Setup
 
 // TODO
-// You can create such a connection by adding 'quest identifers' into the file. For an example of such a file, see
-// link:https://raw.githubusercontent.com/hgiesel/archive/master/mathematics/abstract-algebra/graph-theory/lattices-2.adoc[here]
-// The easiest to create Anki cards from your plain text is using
-// link:https://en.wikipedia.org/wiki/Cloze_test[cloze deletions].
+// Install from Ankiweb
+// Setup config file
+// Setup a fitting archive
+// Test out ark command
+// // Install a fitting outside tool (like vim-arkify)
