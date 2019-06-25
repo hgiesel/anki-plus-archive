@@ -21,12 +21,12 @@ def on_command_replace(text, archive_root, section, page, qid):
                 if re.match(page, base):
 
                     return list(map(
-                            lambda x: re.sub('\$ROOT', archive_root, x), map(
-                                lambda x: re.sub('\$DIR', dirname, x), map(
-                                    lambda x: re.sub('\$BASE', base, x), map(
-                                        lambda x: re.sub('\$SECTION', section, x), map(
-                                            lambda x: re.sub('\$PAGE', page, x), map(
-                                                lambda x: re.sub('\$QID', qid, x), text)))))))
+                        lambda x: re.sub('\$ROOT', archive_root, x), map(
+                            lambda x: re.sub('\$DIR', dirname, x), map(
+                                lambda x: re.sub('\$BASE', base, x), map(
+                                    lambda x: re.sub('\$SECTION', section, x), map(
+                                        lambda x: re.sub('\$PAGE', page, x), map(
+                                            lambda x: re.sub('\$QID', qid, x), text)))))))
 
 def on_command(editor, archive_root: str, card_config, comm) -> None:
     ### get qid
@@ -102,7 +102,6 @@ def on_command(editor, archive_root: str, card_config, comm) -> None:
         showInfo('Invalid command type!')
         return
 
-
 def main(config, icons):
 
     if len(config['commands']) > 6:
@@ -147,8 +146,8 @@ def main(config, icons):
             buttons.insert(-1, editor._addButton(
                 icons[i],
                 command['title'],
-                command['description'],
-                ))
+                command['description']
+            ))
 
         return buttons
 

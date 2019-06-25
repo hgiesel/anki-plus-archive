@@ -37,7 +37,7 @@ def setup_parser(config):
 
     subparsers_dict['paths'] = subparsers.add_parser('paths')
     subparsers_dict['paths'].add_argument('uri', nargs='?', default='',
-        help='archive uri you want to query')
+                                          help='archive uri you want to query')
     subparsers_dict['paths'].add_argument('-p', '--paths', choices=['default','none','full','rel','id','shortid'],
       default='default', help='decide how paths should be printed')
     subparsers_dict['paths'].add_argument('-d', '--delimiter',

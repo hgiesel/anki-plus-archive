@@ -7,11 +7,14 @@ from lib.srs_connection import AnkiConnection
 
 def paths(config, argv, printer):
     addr = Identifier(
-        config, argv.uri,
+        config,
+        argv.uri,
         tocfilter_options={
             'expand_tocs': argv.expand_tocs,
-            'nonhierarchical_refs': argv.nonhierarchical_refs},
-        printer=printer)
+            'nonhierarchical_refs': argv.nonhierarchical_refs
+        },
+        printer=printer,
+    )
 
     result = getattr(addr, argv.cmd)()
     # [(file, pageid, lineno, qid)]
@@ -22,18 +25,21 @@ def paths(config, argv, printer):
         result = [f for f in result if not config['archive_syntax']['tocs'] in f[1]]
 
     if argv.paths == 'rel':
-        result = [(Identifier.to_rel_path(path[0], config['archive_root']), path[1], path[2], path[3]) for path in result]
+        result = [(Identifier.to_rel_path(path[0], config['archive_root']), path[1], path[2], path[3])
+                  for path in result]
     elif argv.paths == 'id':
-        result = [(Identifier.to_identifier(path[0]), path[1], path[2], path[3]) for path in result]
+        result = [(Identifier.to_identifier(path[0]), path[1], path[2], path[3])
+                  for path in result]
     elif argv.paths == 'shortid':
         result = [(Identifier.to_identifier(path[0], omit_section=True), path[1], path[2], path[3])
-                   for path in result]
+                  for path in result]
     elif argv.paths == 'none':
         result = []
 
     if argv.delimiter == 'default':
         result = [(path[0] + ':' + str(path[2]) + ':',)
-                if path[2] is not None else (path[0],) for path in result]
+                  if path[2] is not None else (path[0],)
+                  for path in result]
 
     Printer.print_stats(result, delimiter=argv.delimiter)
 
@@ -199,7 +205,9 @@ def add(config, argv, printer):
         _, path, _, qid = ident.paths()[0]
 
         result = anki_connection.anki_add(path.replace(':', '::'), qid, argv.content.read())
-        print(result['result'] if result['result'] else result['error'])
+        print(result['result']
+              if result['result']
+              else result['error'])
 
     else:
         printer('uri must designate a single quest or page')
@@ -233,4 +241,4 @@ FUNCTION_DICT = {
     'revrefs': revrefs,
     'decloze': decloze,
     'stdlib': stdlib,
-    }
+}

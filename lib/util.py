@@ -9,8 +9,10 @@ def decloze_util(text):
     cloze_anki_regex = re.compile(r'\{\{c[0-9]+::([^(::)(\}\})]*)(?:::[^(?:\}\})]*)?\}\}')
     cloze_overlapper_regex = re.compile(r'\[\[oc[0-9]+::([^(::)(\]\])]*)(?:::[^(?:\]\])]*)?\]\]')
 
-    result = cloze_overlapper_regex.sub(r'\1',
-            cloze_anki_regex.sub(r'\1', text))
+    result = cloze_overlapper_regex.sub(
+        r'\1',
+        cloze_anki_regex.sub(r'\1', text),
+    )
 
     return result
 
@@ -56,4 +58,5 @@ alias miss="awk '{ if(\$3 != 1) { print \$0 } }'"
 
 # for use with ark headings (getting the document title)
 alias dt="grep '^[^=]*$'"
-''')
+'''
+)
