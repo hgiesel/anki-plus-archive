@@ -264,7 +264,7 @@ class Identifier:
         if not ':' in self.filter_component:
             if self.filter_component:
                 matched_ancestors = []
-                ancestor_regex = compile('(.*/' + self.filter_component.replace('-','[^./]*-') + '[^-./]*)/?')
+                ancestor_regex = compile('(.*/' + self.filter_component.replace('-','[^./]*-') + '[^./]*)/?')
 
             first_dir = True
             toc_regex = compile('^%s.*' % self.config['archive_syntax']['tocs'])

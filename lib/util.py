@@ -36,10 +36,10 @@ ark() {
          [[ ! $exitstatus == '0' ]] && return $exitstatus
         read -a entry <<< "${arr[@]}"
 
-        if [[ -d ${entry} ]]; then
+        if [[ -d "${entry}" ]]; then
             cd "${entry}"
 
-        elif [[ -f ${entry} ]]; then
+        elif [[ -f "${entry}" ]]; then
             cd "$(dirname ${entry})"
             $EDITOR "${entry}"
 
