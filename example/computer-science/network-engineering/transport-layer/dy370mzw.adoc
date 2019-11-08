@@ -1,0 +1,73 @@
+= Automatic Repeat Request (ARQ)
+:stats: transport-layer:dy370mzw,0,56
+
+== Automatic Repeat Request (ARQ)
+
+.arq
+* *automatic rpepeat request* is an error-control method
+* especially used in virtual circuits:
+.. guarantees reliable transmission over unreliable connection:
+.. used for flow control (form of TCP congestion control)
+
+.arq; sliding window protocol
+* based on the *sliding window protocol* and its primitives:
+
+.arq; sliding window protocol; primitives
+. ∃ three kinds of *control frames*:
+.. "ACKs": positive acknowledgement
+.. "NAKs": negative acknowledgement
+.. "ENQs": commands receiver to report status
+. ∃ two kinds of windows:
+.. "Transmit window": amount of messages sendable without having an ACK
+.. "Receive/Congestion window": amount of messages receivable after missing out one
+. timeouts
+
+.arq; disadvantages
+* needs a back channel
+* higher latency due to retransmissions
+* requires maintenance of buffers (windows) and timers
+
+== ARQ protocols
+
+.arq protocols; Stop-and-wait
+* sends one frame at a time:
+.. transmit window = 1
+.. receive window  = N ≥ 1
+* sender retransmits if it doesn't get an ACK before timeout:
+** does so until it receives an ACK or fails a predefined number of retransmissions
+** no need for NAK, or ENQ
+
+.arq protocols; Stop-and-wait; amiguities
+.. ACK is lost:
+*** causes duplicate frame to be sent
+.. premature timeout:
+*** frame 0 is accepted by receiver and ACK is sent, but after sender already resent it
+*** sender will resend frame 0 and get first ACKs
+*** sender sends frame 1, which is lost, and gets ACK for second frame 0
+*** sender sends frame 2...
+
+* can be solved by using either:
+... ENQ control frames (that are echoed with ACK, or NAK)
+... sequence numbers
+
+.arq protocols; Go-Back-N
+* requires sequence numbering
+* sender continues to send N frames even without ACK:
+.. transmit window = N ≥ 1
+.. receive window = 1
+
+* if message is lost, receiver will either:
+.. stop sending ACKs: produces a timeout
+.. send a NAK, e.g. in form of a DUPACK
+* sender will send jump back N, if it misses out N ACKs
+
+.arq protocols; Selective Repeat
+* other forms of ARQ must resend every frame after initial error
+* here, receiver will buffer and acknowledge out of order frames after error:
+.. transmit window = N ≥ 1
+.. receive window = M ≥ 1
+
+* requires NAK messages:
+** receiver may selectively reject single frames, which are retransmitted alone
+* SACKs work like inverse NAKs:
+** everything not selectively ACKed is implicitly rejected

@@ -1,0 +1,114 @@
+= Posets
+
+== Posets
+
+.posets; definition
+** properties are reflexive, antisymmetric, transitive
+* fomalizes and generalizes the notion of ordering, sequencing, or arranging
+
+== Posets: Special elements in `L`
+
+.special elements; in respect to whole poset
+. minimal element
+. least element
+. maximal element
+. greatest element
+
+'''
+
+.special elements in poset; *minimal element*
+* an element `l∈L`, s.t. `∄x ∈ L. x ≺ l`, i.e.
+** it has no elements beneath it
+
+.special elements in poset; *least element*
+* an element `l∈L`, s.t. `∀x ∈ L. l ≼ x`, i.e.
+** it is the smallest element in the poset
+
+.special elements in poset; relation between minimal element and least element
+* the least element is unique in the poset
+* all least elements are also minimal
+
+'''
+
+.special elements in poset; *maximal element*
+* an element `g∈L`, s.t. `∄x ∈ L. g ≺ x`, i.e.
+** it has no elements above it:
+
+.special elements in poset; *greatest element*
+* an element `g∈L`, s.t. `∀x ∈ L. x ≼ g`, i.e.
+** it is the biggest element in the poset
+
+.special elements in poset; relation between maximal element and greatest element
+* the greatest element is unique in the poset
+* all greatest elements are also maximal
+
+== Posets: Special elements in `S ⊆ L`
+
+.special elements in order theory in respect to a subset `S ⊆ L`
+. lower bound
+. infimum
+. upper bound
+. supremum
+
+'''
+
+.special elements in subset; *lower bound* of `S`
+* an element `l∈L`, s.t. `∀s∈S. l ≼ s`, i.e.
+** `l` it would least in `S`
+* `S` is said to be "bounded below" by `l`
+
+.special elements in subset; *infimum* of `S`
+* greatest in the subset of lower bounds, `inf(S)`, i.e.
+** biggest element of `L`, that is still a lower bound to `S`
+
+.special elements in subset; infimum; in totally ordered sets and empty sets
+* in totally ordered sets: infimum is least within the subset of lower bounds
+* if `S = ∅`, the infimum is the least element, iff it exists
+
+'''
+
+.special elements in subset; *upper bound* of `S`
+* an element `g∈L`, s.t. `∀s∈S. s ≼ g`, i.e.
+** `g` it would be greatest in `S`
+* `S` is said to be "bounded above" by `g`
+
+.special elements in subset; *supremum* of `S`
+* least in the subset of upper bounds, `sup(S)`, i.e.
+** smallest element of `L`, that is still an upper bound to `S`
+
+.special elements in subset; supremum; in totally ordered sets and empty sets
+* in totally ordered sets: supremum is least within the subset of upper bounds
+* if `S = ∅`: surpremum is the greatest element, iff it exists
+
+== Posets: Meet and join
+
+.meet and join; meet function
+* binary operator defined on lattices
+* points out the infimum of a subset of `L`:
+
+----
+∧: L×L → L
+l ∧ l′ ↦ inf({l,l′})
+----
+
+.meet and join; join function
+* binary operator defined on lattices
+* points out the supremum of a subset of `L`:
+
+----
+∨: L×L → L
+l ∨ l′ ↦ sup({l,l′})
+----
+
+'''
+
+.meet and join; laws
+* meet and join are:
+** associative
+** commutative
+** idempotent
+*** allows you to treat posets as group-like objects
+
+.meet and join; defined on posets
+* meet and join are _partial, multivalued functions_ for posets:
+** ⫦ following is always true: `x ≼ y ⇒ (x ∧ y = x) ∧ (x ∨ y = y)`

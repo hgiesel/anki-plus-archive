@@ -1,0 +1,89 @@
+= Modularity and distributivity
+
+== Modularity: Upper semimodularity
+
+.upper semimodularity
+* also called just *semimodular* lattice:
+.. `∀x,y. r(x ∧ y) + r(x ∨ y) ≤ r(x) + r(y)`
+.. `∀x,y. (x ∧ y ⋖ x) ∧ (x ∧ y ⋖ y) ⇒ (x ⋖ x ∨ y) ∧ (y ⋖ x ∨ y)`:
+*** elements cover their meet ⇒ elements are covered by their join
+
+.upper semimodularity; visually...
+
+.upper semimodularity; example
+image::https://en.wikipedia.org/wiki/File:Centred_hexagon_lattice_D2.svg[D2]
+
+* coming from bottom, every seperation is immediately brought together again
+* the dual of D2 is a lower semimodular lattice
+
+== Mdodularity: Lower semimodularity
+
+.lower semimodularity (2)
+* the dual notion of upper semimodularity:
+.. i.e. `∀x,y. r(x) + r(y) ≤ r(x ∧ y) + r(x ∨ y)`
+.. i.e. `∀x,y. (x ⋖ x ∨ y) ∧ (y ⋖ x ∨ y) ⇒ (x ∧ y ⋖ x) ∧ (x ∧ y ⋖ y)`:
+*** elements are covered by their join ⇒ elements cover their meet
+
+.lower semimodularity; visually...
+
+== Modularity
+
+.modularity (1,2,2)
+* weaker form of distributivity
+* finite lattice is modular iff both upper semimodular ∧ lower semimodular, ∴
+.. `∀x,y. r(x) + r(y) = r(x ∧ y) + r(x ∨ y)`
+.. `∀x,y. (x ∧ y ⋖ x) ∧ (x ∧ y ⋖ y) ⇔ (x ⋖ x ∨ y) ∧ (y ⋖ x ∨ y)`:
+*** elements cover their meet ⇔ elements are covered by their join
+
+* alternatively, it needs to hold:
+.. modular law
+.. modular identity
+
+.modularity; modular law
+. `a ≼ c ⇒ (a ∨ b) ∧ c ≼ a ∨ (b ∧ c)`, i.e.
+** a restricted associative law:
+
+.modularity; modular identity
+. `(a ∧ c) ∨ (b ∧ c) = ((a ∧ c) ∨ b) ∧ c`, i.e.
+** constructable from modular law, by substituting `a` with `a ∧ c`:
+
+.modularity; visually...
+
+== Distributitivy
+
+.distributivity; isomorphism (3)
+* a lattice where:
+.. operations of join and meet _distribute over each other_
+.. alternatively, any lattice without sublattices isomorphic to `M3` or `N5`
+.. alternatively,  every distributive lattice isomorphic to:
+*** lattice of sets under union and intersection
+
+.distributivity laws
+----
+-- meet operation preserves nonempty finite joins
+a ∧ (b ∨ c) = (a ∧ b) ∨ (a ∧ c)
+-- join operation preserves nonempty finite meets
+a ∨ (b ∧ c) = (a ∨ b) ∧ (a ∨ c)
+----
+
+.distributivity; visually...
+
+'''
+
+.N5 lattice
+image::https://bit.ly/2wPhc4O[N5]
+* non-distributive, non-modular lattice
+* also called *diamon lattice*
+
+.M lattices
+image::https://bit.ly/2rPJ0Bx[M3]
+image::https://bit.ly/2Gkn7hZ[M4]
+* non-distributive, but modular lattices
+
+== Distributivity: Total order
+
+* are connex, i.e. `a ≼ b ∨ b ≼ a`
+* distributivity gives rise to total orders
+* just a single chain
+
+// TODO total order examples

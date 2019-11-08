@@ -1,0 +1,18 @@
+= Morphological Topology
+
+.analytical
+* contain very little inflection
+* rely on syntax and auxiliary words to convey meaning
+
+.synthetic; agglutinative
+* rely on discrete particles (affixes)
+
+.synthetic; fusional
+* rely on fusing inflectional categories together
+* original root can be difficult to extract
+
+.synthetic; polysynthetic
+* create entire senteces just by synthetic constructions
+
+.transitiion
+* analytical -> agglutinative -> fusional -> analytical

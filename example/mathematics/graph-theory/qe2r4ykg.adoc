@@ -1,0 +1,40 @@
+= Modes and advanced features
+
+== Modes and flags
+
+.modes
+* mode modifiers change the mode of operation inside the regex engine
+* difference between modes and flags:
+.. modes can be turned on and off inside the regex
+.. flags count for the whole regex expression
+
+.modes; free spacing (?x)
+* regexes become easier to read because whitespace looses meaning
+* character classes are single tokens
+* most things however can be broken up
+
+.modes; other modes
+. *case insensitivity* (?iatom)
+. *case sensitivity* (?Iatom)
+. *confirm before replacing* c
+
+== Branching
+// TODO
+
+* conditionals:
+** (?(if)then|else)
+** it can be a lookaround or capture group (tests whether they exist)
+
+== Looping
+// TODO
+
+* normally, regular expressions are regular
+** i.e. they cannot match recursive expressions
+** ↯ many modern regexp engines support recursive expressions anyway
+
+* balancing groups (could match `oocc` in `ooccccc` by counting the 'o')
+* regex subroutines
+* regex recursion
+
+== Catastrophic backtraching
+// TODO

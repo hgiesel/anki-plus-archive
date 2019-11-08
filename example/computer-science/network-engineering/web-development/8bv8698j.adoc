@@ -1,0 +1,46 @@
+= HTTP servers
+:stats: web-development:8bv8698j,0,34
+
+== Nginx
+
+* consists of several modules
+* each module has directives and predefined variables
+
+* log-module:
+** access_log:
+** error_log (actually core-module):
+** open_log_file_cache:
+** log-format:
+
+* try_files
+* $uri: normalized URI string
+* alias path;
+* 4 authentication method:
+** access_module
+** auth_request_module
+** auth_basic
+** auth_jwt
+
+* etags
+
+== Tomcat
+
+* has different parts:
+** Catalina:
+*** a servlet container
+*** a realm object inside Catalina represents:
+**** usernames
+**** passwords
+**** roles
+**** similiar to Unix users
+** Jasper:
+*** JSP engine and parser
+
+* seven basic config files:
+** `web.xml`
+** `server.xml`
+** `content.xml`
+** `tomcat-users.xml`
+** `catalina.policy`
+** `catalina.properties`
+** `logging.properties`

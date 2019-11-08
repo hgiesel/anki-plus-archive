@@ -1,0 +1,50 @@
+= Graph theory
+
+.GRAPHS
+* `Grph`, with graph homomorphisms
+
+.GRAPHS; toc
+. <<:b09fuuwf,Properties of homogeneous relations>>
+. <<:9ta4mu5f,Degrees, walks, and cuts>>
+. <<:l4n8g70q,Parts, colorings, trees>>
+. <<:6zyqx1p9,Special Weighted graphs>>
+
+'''
+
+.LATTICES
+* `Poset`, with monotone functions
+* `Lattice`, with lattice homomorphisms
+* up to, exclusively, Heyting algebras
+** for everything above, see logic
+
+.LATTICES; precursors to lattices
+. <<:casjq5kt,Directed sets>>
+. <<:broqmyva,Posets>>
+. <<:ii893mwx,Semilattice>>
+
+.LATTICES; properties of lattices
+. <<:m1fx19k6,Irreducible and prime elements>>
+. <<:1cu5p55p,Covers, chains, and atoms>>
+. <<:8xis3kfz,Modularity and distributivity>>
+
+. <<:qx9ge7b3,Completeness>>
+. <<:3culk469,Complementation>>
+
+.LATTICES; extra
+. <<:c3nyv00b,Residuated lattices>>
+. <<:9xjlrgia,Monotonic functions and lattice homomorphisms>>
+
+.LATTICES; see further
+. <<logic:README,Logic>>
+** leads on a lot of topics from here
+
+'''
+
+.REGEXES
+* special kind of algebra
+. <<:README-regexes,Regexes>>
+
+.STATE DIAGRAMS
+* special types of graphs
+* very specific
+. <<:README-state,State graphs>>

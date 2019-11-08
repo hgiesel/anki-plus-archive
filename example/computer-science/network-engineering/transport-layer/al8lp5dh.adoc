@@ -1,0 +1,92 @@
+= Network sockets
+:stats: transport-layer:al8lp5dh,0,67
+:stats: 0,68
+
+== Ports
+.port 0
+* port 0 is reserved,
+** ! permissible source port, if no messages are expected in response
+
+.port ranges; 0-1023
+* well-known ports, for common services
+* require sudo on Linux
+
+.port ranges; 1024-49151
+* registered ports, for IANA-registered services
+
+.port ranges; 49152-65535
+* private/dynamic ports, not designated for any specific purpose,
+* software running on host may randomly choose a port in order to define itself
+* used as temporary ports primarily by clients when communicating with server
+
+== Network sockets
+
+.network socket
+* internal endpoint for two-way communication link between two programs
+** need to run on the network
+** bound to IP address and port number:
+*** transport layer protocols can identify program data is sent to
+
+.difference network socket and port numbers (1-2)
+* sockets are local, unlike port numbers
+* internet socket is characterized by:
+.. local socket address (IP address + port number)
+.. protocol:
+*** e.g.TCP port 53, UDP port 53 are distinct sockets; raw IP doesn't have ports
+
+.network sockets; in OS terms
+* form of system resource
+** in form entry in a table (listing protocol, destination, status, etc.)
+** offers programming interface for applications
+* constitutes a form of interprocess communication (IPC)
+** next to message queues, shared memory, pipes, etc.
+
+.background of term "socket"
+* name is analogous to female connectors
+** two male connector plugging into sockets at each node
+** similiarly "port" is used for external edpoints at a node
+** socket is also used for an internal endpoint of local IPC
+
+.define plug, connector, ports, jack, socket regarding computer hardware (5)
+* *plug* is the end of a cable that connect to something
+* *connector* is the unique end of a plug, or edge of a card
+* *ports* are the endpoints on machine/device:
+** sometimes also called *jack* (e.g. audio jack)
+* *socket* is an opening designed to fit another device
+
+== Use in application programs
+
+.socket descriptors (2)
+* *socket descriptors* used by processes to refer to sockets
+** type of handle (abstract reference, usually integer)
+* process requests socket from OS / protocol stack:
+** stack returns descriptor, so process can identify socket
+** process passes descriptor to protocol stack when receiving/sending data
+
+.Blocking and non-blocking mode
+* a blocking socket does not return control until it has sent/received some of
+* all data specified for operation
+
+.blocking sockets
+* with blocking sockets, special consideration must be given to accept():
+** may still block after indicating readability
+** only one may be active at any time in one thread
+** easier than non-blocking sockets (not asynchronous)
+** creating more threads with each one socket creates a lot of overhead
+
+.non-blocking sockets; methods (3)
+* non-blocking sockets return receive buffer and immediately continue
+* if not written correctly, susceptible to race conditions 
+** ∵ variances in network link speed
+
+* different ways to implement them
+.. polling
+.. event-based
+.. overlapped I/O
+
+== Tools
+
+.list of tools for network sockets (3)
+nmap::
+lsof::
+netstat::

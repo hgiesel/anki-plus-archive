@@ -1,0 +1,205 @@
+= Phonology
+
+== Phonetics
+
+.phonetics
+* concerned about phones:
+** which are part of humanely possibly sounds made with the trachea
+
+:1545179670610:
+.phonetics; phone
+* notation: `[a]`, `[b]`
+* any distinct speech sound or gesture:
+** opposed to phonemes: whether exact sound matters for meaning of words irrelevant
+
+== Phonology
+
+.phonology
+* concerned about phonemes:
+** entities that are distinguished by humans
+** notation: /phonem/
+
+:1545180079035:
+.phonology; phonemes
+* notation: `/a/`, `/b/`
+* the smallest unit of sound in phonology, has e.g.
+** sounds, tone, stress
+* opposed to phones: used to distinguish one word from another in a particular language
+
+== Phonology: Allophones
+
+:1545180399411:
+.phonology; allophones
+* one of a set of phones used to pronounce a phoneme in a particular language
+
+:1545180633177:
+.phonology; positional variation
+* specific allophone is predictable from the phonetic context
+
+:1545180864888:
+.phonology; free variation
+* the allophone can be chosen freely from the set of sounds
+
+== Consonants
+
+* a consonant is a sound made with the complete or partial closure of
+  the vocal tract
+
+== Consonants: Articulation types
+
+.obstruents
+* a speech sound that is produced obstructing airflow:
+.. stops, or plosives
+.. affricatives
+.. fricatives
+
+.obstruents; stops, or plosives
+* complete closure
+
+.obstruents; affricatives
+* transitioning from plosives into fricatives
+
+.obstruents; fricatives
+* limited closure making it turbulent
+
+'''
+
+.sonorants
+* a speech sound produced with a continuous, non-turbulent airflow:
+
+.sonorants; nasals
+* airflow through the nose
+
+.sonorants; flaps, or taps
+* single constraction of the muscle
+
+.sonorants; approximants
+* articulators approching each other, but not quite closing:
+** fall between fricatives and vowels
+
+.sonorants; approximants; list
+* palatal: i j
+* labio-palatal: y ɥ
+* velar: ɯ ɰ
+* labio-velar: u w
+* alveolar: - ɹ
+* retroflex: ɚ ɻ
+
+.sonorants; vowels
+* without closure
+* a vowel is a sound without closure of the vocal tract
+
+== Consonants: Labial consonants
+
+.consonants by articulation; labial consonants
+* produced with the lips
+.. bilabial
+.. labiodental
+.. dentolabial
+
+.consonants by articulation; bilabial sounds
+* nasal: m
+* stops: p b
+* fricatives: ɸ β
+
+.consonants by articulation; labio-dental sounds
+* nasal: ɱ
+* stops: p̪ b̪
+* fricatives: f v
+
+== Consonants: Coronal consonants
+
+.consonants by articulation; coronal consonants
+* produced with the flexible tip of the tongue
+.. dental
+.. alveolar
+.. postalveolar consonants
+
+.consonants by articulation; dental sounds
+* fricatives: θ ð
+
+.consonants by articulation; alveolar sounds
+* fricatives: s z
+
+'''
+
+.consonants by articulation; postalveolar sounds
+* from most palatalization to least, or lowest to highest-pitched:
+.. alveolo-palatal
+.. palato-alveolar
+.. retroflex
+
+.consonants by articulation; alveolo-palatal sounds
+* fricatives: ɕ ʑ
+
+.consonants by articulation; palato-alveolar sounds
+* fricatives: ʃ ʒ
+
+.consonants by articulation; retroflex sounds
+* fricatives: ʂ ʐ
+
+== Consonants: Dorsal consonants
+
+.consonants by articulation; dorsal consonants
+* produced with the back of the tongue (the dorsum)
+. palatal
+. velar
+. uvular
+
+.consonants by articulation; palatal sounds
+* nasal: ɲ
+* stops: c ɟ
+* fricatives: ç ʝ
+
+.consonants by articulation; velar sounds
+* nasal: ŋ
+* stops: k ɡ
+* fricatives: x ɣ
+
+.consonants by articulation; uvular sounds
+* nasal: ɴ
+* stops: q ɢ
+* fricatives: χ ʁ
+
+== Consonants: Laryngeal consonants
+
+.consonants by articulation; laryngeal consonants
+* sounds with the primary articulation in the larynx (Kehlkopf)
+.. pharyngeal, or epiglottal
+.. glottal
+
+.consonants by articulation; pharyngeal, or epiglottal sounds
+* stops: ʡ -
+* fricatives: ħ ʕ
+
+.consonants by articulation; glottal sounds
+* stops: ʔ -
+* fricatives: h ɦ
+
+== Vowels
+
+.how to write a vowel
+* VowelType VowelClass Roundedness "vowel"
+** e.g. open-mid front rounded vowel
+
+.vowel types
+* close
+* near-close
+* close-mid
+* mid
+* open-mid
+* near-open
+* open
+
+.vowel class
+* front
+* central
+* back
+
+.rounding
+. unrounded
+. rounded
+.. compressed
+.. protruded, "rounded vowel" usually implies protrusion
+
+== Syllables

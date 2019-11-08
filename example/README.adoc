@@ -1,0 +1,61 @@
+= Notes
+
+== Explanation
+
+.explanation
+* this is an example archive for use with `anki-plus-archive`
+* it illustrates how I use my own addon
+** it may be to interest to other people, it may not be
+** if you're interested:
+*** you can read some information about it in the remainder of the document
+
+.explanation; qids
+* if you're looking for examples of qids, go to `example/mathematics/graph-theory/behl4q6l.adoc`
+** but there are way more, just `grep` for lines starting with `:15`
+
+.explanation; my tools
+* I mainly edit my archive with `vim`, and for this purpose I created:
+.. link:https://github.com/hgiesel/vim-ankify[vim-ankify]
+.. a vim plugin offering an easy interface to the vim-plus-archive tool `ark`
+.. for more information on `vim-ankify`, see that repo
+
+== Overview
+
+.overview; sections
+* divided into several *sections*, which are directories containing:
+.. a `README.adoc`
+.. an optional `assets` directory containing diagrams, scripts, etc.
+.. files containing information on the topic of the section, called pages
+
+.overview; blocks
+* each file is divided into questions, which usually are a block
+** the block answers the question posed
+
+== Guidelines
+
+.guidelines; code and math
+* for inline: always use `foo`!
+* for block: always use
+
+.guidelines; code and math; foo
+----
+foo
+----
+
+.guidelines; blocks
+* blocks which are not just listings, usually have the `:ext:` tag
+
+.guidelines; other
+* don't use "dlists"!
+** use `a: b` instead, make `a` bold if appropriate
+
+.guidelines external sources
+* for assets, become content: only allowed in fences:
+.. `include::`: for literally importing files, usually within `----` block
+* for assets, become content: only allowed as standalone blocks:
+.. `image::`: for placing a picture, can only have a block title, no bullets!
+.. `video::`: same as image
+
+* not for assets, not content!! allowed in flowing text
+.. `link:`: references other files (topics) / urls / sources
+*** often used with `//`

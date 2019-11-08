@@ -1,0 +1,22 @@
+= Morphosyntactic alignment
+
+grammatical relationship between arguments
+
+
+absolutive-ergative alignment
+
+nominative-accusative alignment
+
+
+== Other aligments
+
+.fluid alignment
+* => active-stative language
+* can be both absolutive-egative, or nominative accusative alignment
+
+.direct alignment
+* no alignment
+* leaves it up to context and common sense
+
+.tripartite language
+* use a different case for each case

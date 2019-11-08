@@ -1,0 +1,54 @@
+= Group-like: Operations
+
+== Operations with groups: Direct Product
+
+.group operations; direct product
+* categorical product in both `Grp, Ab`
+* given `G = (X,∗)`, `H = (Y,◇)`, it is `G×H`, or `G∏H`
+
+.group operations; direct product; notation
+----
+G×H = (X×Y, ○)
+(x,y) ○ (x′,y′) = (x ∗ x′, y ◇ y′)]
+----
+
+.group operations; internal central product
+.group operations; external central product
+
+.group operations; semidirect product
+.group operations; wreath product
+
+== Operations with groups: Direct sum
+
+.group operations; direct sum
+* categorical coproduct in `Ab`
+* given `G = (X,∗)`, `H = (Y,◇)`, it is `G⊕H`
+
+* for two operands, it is the same as the direct product
+
+== Operations with groups: Free product
+
+.group operations; free product
+* categorical coproduct in `Grp`
+* given `G = (X,∗)`, `H = (Y,◇)`, it is `G∗H`
+
+.group operations; free product; properties
+* contains both G, and H as subgroups
+* the most general groups containing these groups
+* unless one of the two groups is trivial, it is always an infinite group
+* similar to creating a free group
+
+.group operations; free product; construction
+* a *word* is a product in the form `s_1 s_2 ... s_n`:
+** each `s_i` is either an element of G or an element of H
+
+* a word may be *reduced* by:
+.. removing an instance of the identity element
+.. replacing a pair `g_1 g_2` by its product in `G`, and similarly for `H`
+* every reduced word is an alternating product of elements of G,H:
+** `g_1 h_1 g_2 h_2 ...`
+
+* the free product `G⋇H` is the group whose:
+.. elements are all reduced words in `G` and `H`
+.. operation is concatenation followed by reduction
+

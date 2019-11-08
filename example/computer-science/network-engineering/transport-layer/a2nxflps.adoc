@@ -1,0 +1,128 @@
+= TCP Congestion Control in a broad sense
+:stats: transport-layer:a2nxflps,0,96
+
+== Congestion
+
+.signs of congestion (5)
+* ∃ signs of congestion:
+.. packet loss
+.. long waiting time
+.. frequent retransmissions
+.. performance degredation
+.. network/congestive collapse
+
+.possible causes of network congestion (2)
+* ∃ two possible causes for congestions:
+** both are addressed separately
+
+.motivation for flow control; examples (2;1)
+Receiver capacity::
+* receiver cannot process data fast enough ∴ receive window becomes full:
+** flow control prevents sender from overwhelming receiver & buffer overrun
+
+* includes e.g.
+.. ARQ with NAKs, or missing ACKs:
+*** ! ARQ may keep network in congested state (no congestion control)
+
+.motivation for congestion control; examples (2;3)
+Network capacity::
+* utilization of network exceeds capabilities:
+** reduction of data rate is only useful reaction
+** ∴ *congestion control*
+
+* includes e.g.:
+.. Active queue management (AQM)
+.. Explicit congestion notification (ECN)
+.. TCP congestion control
+*** TCP tries by changing window size dynamically
+
+== Congestion window
+
+.congestion window; relation to other buffers (2)
+* maintained by sender
+* measure to stop link from becoming overloaded with too much traffic:
+** determines number of bytes that can be outstanding at any time
+** calculated by estimating current congestion on link
+** limits transmit window
+
+Transmit window::
+* how much can I send out without having an ACK
+* been sent, but not yet ACKed
+* ready to be sent
+
+Advertised Receive window (rwnd)::
+* advertises the amount of data destination side can receive:
+** especially, buffer after receiving an out-of-order segment
+* if receive window is full, sender is blocked until TCP window update
+
+Congestion window (cwnd)::
+* limits amount of data you can send into network before receiving an ACK
+* how much do I want to sent as not to overwhelm my server
+
+* keeps increasing up to maximum receiver window, or until network reaches its limit
+* ! rate of sending data is bound to congestion window
+* congestion is detected either by receipt of duplicate acknowledgement or
+* timeout signal
+* once happens, sender decreases send rate by decreasing congestion window size
+* by a factor determined by the algorithm
+
+image::https://blog.stackpath.com/hubfs/Glossary/cwnd-and-rwnd-glossary.gif?t=1524157785533[]
+
+.effective window
+** the effective window is "advertised receive window ∧ congestion window"
+
+.silly window syndrome (2)
+* a problem in networking caused by poorly implemented TCP flow control
+* if receiver window is small:
+** large number of segments with very little data are sent
+** increases the overall load on the network and the receiver
+* if receive window full, shouldn't be notified until maybe a quarter free
+
+.TCP tuning (2)
+* system administrator may:
+.. adjust maximum size limit of congestion window
+.. adjust constant added during additive increase
+
+== Fairness measure
+
+* TCP fairness
+TODO
+
+== Classification
+
+.network congestion mechanisms; criteria for classification
+* ∃ different ways to classify congestion control algorithms:
+.. by *incremental deployability*:
+*** sender, receiver, router, or all need modification
+.. by *type and amount of feedback*:
+*** Loss, delay, single-bit, multiple-bit explicit signals
+
+.. by *addressed performance aspects*:
+*** high bandwidth-delay, lossy link, fairness, advantage to short flows
+.. by *fairness measure*:
+*** max-min, proportional, etc.
+
+.network congestion mechanisms; list by incremental deployability (5)
+. *Reliability*:
+** a necessity
+** see <<!:1gna7qxj,Transport layer in OSI>>
+. *ARQ*:
+** constitutes *sender protocols*
+** ensures reliable same-order delivery over unreliable links
+** see <<!:dy370mzw,Automatic Repeat Request (ARQ)>>
+
+. *AQM*:
+** constitutes *router protocols*
+** regulates the arbitrary reorder or drop of network packets under load
+** mainly operating at IP layer
+** see <<!network-layer:glfuo57m,Active Queue Management (AQM)>>
+
+. *ECN*:
+** constitutes a *sender-router-receiver protocol*
+** adds a flow control mechanism to TCP/IP
+** see <<!network-layer:glfuo57m,Active Queue Management (AQM)>>
+
+. *TCP Congestion Control*:
+** constitutes *sender protocols*
+** how much of advertised receive buffer is utilized in sender
+** see <<!:iz4lq9xa,TCP Congestion Control in a narrow sense>>

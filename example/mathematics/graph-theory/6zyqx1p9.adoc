@@ -1,0 +1,21 @@
+= Special Weighted graphs
+
+== Flow networks
+
+* a graph `G` with two special elements, and two functions:
+.. `s ∈ V`, the source vertex
+.. `t ∈ V`, the sink vertex
+.. `cap: E → ℝ`, the *capacity function*
+.. `flow: E → ℝ`, the *flow function*
+
+* it follows the axioms:
+.. `∄(v,u) ⇒ cap(v,u) = 0`
+.. `flow(u,v) ≤ flow(v,u)`, called *skew symmetry*
+.. `flow(u,v) ≤ cap(u,v)`, called *capacity constraint*
+.. optionally: the net flow for each vertex is zero, except for source and sink, called *flow conservation*
+
+== Matrices as weighted graphs
+
+== Multigraphs
+
+* edges are defined like in categories

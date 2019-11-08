@@ -1,0 +1,81 @@
+= Anchors
+
+== Anchors
+
+.anchor; definition as opposed to characters
+* anchors match a position before, after, or between characters:
+** i.e. they are *zero-width*, also called *non-matching*
+** `pos1 char1 pos2 char2 pos3 ...`
+
+.anchor; special notice
+* when zero length characters, like anchors match:
+** regex engine doesn't move on
+
+.does `%s/^/> /` delete the first character?
+* depends on the regex engine:
+** in some regex engines, empty zero-width matches match following character
+
+.anchors; types of anchors
+. string anchors
+. line anchors
+
+. outer word boundaries
+. inside-word boundaries
+. attempt anchors
+
+== Anchors: String and line anchors
+
+.anchor types; *string anchors*
+* only ever match at the start, and end of a _string_, not line; e.g.:
+.. `\A` and `\Z`
+.. '\`' and `\'` (GNU ERE)
+.. `\%^` and `\%$` (Vim)
+
+.anchor types; literal end versus practical end of string
+. `\z` matches after newlines at end of string
+. `\Z` also matches before newlines at end of string
+** independent of multi-line mode
+
+.anchor types; *line anchors*
+* usually, `^` and `$`
+* iff the whole string is a single line, equal to string anchors
+* when working with strings with multiple lines, e.g. `"hello\nworld"`
+
+.anchor types; multiline mode
+* in Perl and similar regex engines:
+** to enable `^` and `$` as line anchors, you need to use multiline mode
+** usually uses the `m` flag
+
+.anchor types; reason for multiline mode
+* specifying a requirement `/^abc$/` would allow:
+** 'abc\ndangerous_script();'
+** that's why Perl uses multiline mode
+
+.anchor types; line anchors; restrictions
+* you cannot match character before `^`, or after `$`:
+** use `\n` instead
+
+== Anchors: Other anchors
+
+.anchor types; *outer word boundaries*
+. `\b` in GNU ERE; `\<`, `\>` in Vim
+* ∃ three different positions qualify as word boundaries:
+.. before first character of word, iff word character
+.. after last character character of word, iff word character
+.. between two characters in word, with one word character, one not
+* shorthand class `\w` defines word characters
+
+.anchor types; *inside-word boundary*
+. `\B` in GNU ERE
+* matches between word characters
+
+.anchor types; *zoom anchors*
+. `\zs`, `\ze`
+** set the start and end of the match
+** work like a combination of positive lookbehind and lookahead
+
+.anchor types; *attempt anchor*, or *match anchors*
+* `\G`
+* match at the start or end of the previous regex attempt
+* making global regexes and iterating over the result achieves the same
+

@@ -9,12 +9,33 @@ Copyright: (c) 2019 Henrik Giesel <https://github.com/hgiesel>
 License: GNU AGPLv3 <https://www.gnu.org/licenses/agpl.html>
 """
 import importlib.util
+import os
+
+def check_for_ark(addon_path):
+    home = os.path.expanduser('~')
+
+    install_dir = os.path.join(home, '.local/bin')
+    install_path = os.path.join(install_dir, 'ark')
+
+    if os.path.isdir(install_dir) and not os.path.isfile(install_path):
+        os.symlink('%s/__init__.py' % addon_path, install_path)
+        os.chmod(install_path, 0o755)
 
 if importlib.util.find_spec('aqt') is not None:
-    from .lib import context
+    from aqt import mw
+    from .lib.context import main
+
+    CONFIG = mw.addonManager.getConfig(__name__)
+
+    ADDON_PATH = os.path.abspath(os.path.dirname(__file__))
+    ICON_PATH = os.path.join(ADDON_PATH, "icons")
+
+    ICONS = [os.path.join(ICON_PATH, "looks_%i.png" % i) for i in range(0, 6)]
+
+    check_for_ark(ADDON_PATH)
+    main(CONFIG, ICONS)
 
 elif __name__ == '__main__':
-    import os
     from lib.parser import setup_parser, setup_config
     from lib.main import FUNCTION_DICT
 
@@ -24,6 +45,6 @@ elif __name__ == '__main__':
     ARGV = PARSER.parse_args()
 
     if ARGV.cmd is not None:
-      FUNCTION_DICT[ARGV.cmd](CONFIG,
-          ARGV,
-          SUBPARSER_DICT[ARGV.cmd].error) # error printer for parser
+        FUNCTION_DICT[ARGV.cmd](CONFIG,
+            ARGV,
+            SUBPARSER_DICT[ARGV.cmd].error) # error printer for parser

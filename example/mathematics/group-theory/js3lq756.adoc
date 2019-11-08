@@ -1,0 +1,76 @@
+= Rings and fields
+
+== Ring-like
+
+.rings
+* the triple `(M,+,⋅)`, where
+.. `M` is an abelian group under `+`
+.. `M` is a monoid under `⋅`
+.. `⋅` is distributive over `+`
+
+.rings; distributivity
+* an asymetric relation between two operators:
+.. left distributivity:  `∀a,b,c. a⋅(b+c) = (a⋅b) + (a⋅c)`
+.. right distributivity: `∀a,b,c. (b+c)⋅a = (b⋅a) + (c⋅a)`
+
+== Ring-like: Related structures
+
+.rings; semirings or rigs
+* a ring without additive inverses:
+.. `M` is a commutative monoid under `+`
+.. `M` is a monoid under `⋅`
+.. `⋅` is distributive over `+`
+
+.rings; rngs
+* a ring without a multiplicative identity:
+.. `M` is a abelian group under `+`
+.. `M` is a semigroup under `⋅`
+.. `⋅` is distributive over `+`
+
+.rings; commutative rings
+* a ring with multiplicative commutativity
+.. an abelian group under `+`
+.. a commutative monoid under `⋅`
+.. `⋅` is distributive over `+`
+
+.rings; commutative rings; example
+* integers, `ℤ`
+
+.rings; division Ring, or skew fields
+.. an abelian group under `+`
+.. `M\{0}` forms a group under `⋅`
+.. `⋅` is distributive over `+`
+
+* a ring where division is possible
+** `∀m ∈ M\{0}. ∃m⁻¹ ∈ M. m⋅m⁻¹ = e`
+
+.rings; division rings, or skew fields; example
+* e.g. division ring of *quaternions*, `ℍ`
+
+== Ring-like: Examples
+
+.examples; zero ring, or trivial ring
+* `{0}` obeys all ring axioms
+** only ring where additive identity equals multiplicative identity
+
+== Fields
+
+.fields
+* the triple `(M,+,⋅)`, where
+.. `M` is an abelian group under `+`
+.. `M` is an abelian group under `⋅`
+.. `*` is distributive over `+`
+
+.fields; alternative definitions with 4 operators
+. a binary operation, *subtraction*: `−: M×M → M`
+. a binary operation, *division*: `÷: M×M\{e} → M`
+. a unary operation, *negation*: `(−): M → M`
+** where `(-)m` is inverse to `m` according to `+`
+. a unary operation, *reciprocal* `-⁻¹: M → M`
+** where `m⁻¹` is inverse to `m` according `⋅`
+
+.fields; examples
+. *rational numbers*, `ℚ`
+. *real numbers*, `ℝ`
+. *complex numbers*, `ℂ`
+** any field may be used as the scalars for a *module*

@@ -1,0 +1,5 @@
+= State data type: Store
+
+* comonad to `State`
+
+`(s -> a, s)`

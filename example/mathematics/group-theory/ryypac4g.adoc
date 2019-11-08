@@ -1,0 +1,156 @@
+= Kernels
+
+== Kernels
+
+//- this should go to group theory, etc.
+* examples include:
+** kernels of linear maps (between vector spaces)
+** kernels of group homomorphisms (between groups)
+** kernels of ring homomorphisms (between rings)
+
+.Kernels of group homomorphisms
+----
+f: G -> H
+ker(f) = {x in X | f(x) = e_Y }
+----
+
+.Example 1
+`|ker f| > 1`
+* in group theory this equates to `f: X -> Y` and `a,b in X. a != b vv f(a) = f(b) = c`
+* this means `f(x ** y^(-1)) = f(x) \diamond f(y{-1}) = c \diamond c^{-1} = e_Y`
+* let's take the group homomorphisms `f: (QQ, `) -> (ZZ, `)` with
+
+----
+∀x, n ∈ ℤ f(n) = f(x/n) = n
+"..then we can say.."
+f(8/5) ` (- 5/5) = f(8/5) ` (-5/5) = 5 - 5 = 0
+"..this means that.."
+8/5 + (- 5/5) in ker f = -3/5 in ker f
+----
+
+* actually in this case `ℚ sub ker f`
+
+.Example 2:
+`|ker f| = 1`
+* let's take  `g: (ℤ, +) → ({n∈ℕ} | n ∨ 1⌟n }, ∘)` , with
+
+----
+∀n ∈ ℕ₀.
+g:  n ↦ n + 1
+g: -n ↦ 1⌟(n + 1)
+-- then we can say
+g((-1) ` 1) = g(-1) ` g(1) = 1/2 @ 2 = 1 = e_Y
+-- however
+g((-1) + 1) = g(0) = g(e_X) = e_Y
+----
+
+* this implies `ker f = {0}`, which means this group homomorphism is *injective*
+
+== Introduction
+
+* the *order* of a group is the cardinality of the underlying set
+
+.additive group
+** a group with a group operation similar to addition
+
+.multiplicative group
+** a group with a group operation similar to multiplication
+
+.trivial group
+* a *one element group*, usually written `{e}`
+** this element is the neutral element `e ◇ e = e`
+** same applies to the *trivial monoid*, basically the empty list
+
+Simple multiplication tables::
+. 1 group with order 1: `ℤ/2ℤ`, also called the *trivial group*
+. 1 group with order 2: `ℤ/2ℤ`
+. 1 group with order 3: `ℤ/3ℤ`
+. 4 group with order `4`
+** where 3 are isomorphic:
+** basically when thinking about an additive operation `1,3` are exchangeable
+** only the placement of `2` counts
+
+== Free objects
+
+. consider the collection of all possible words formed from an alphabet
+. one imposes a set of equivalence relations upon the words, where the relations are the defining relations of the algebraic object
+. the free objects now consists of a set of equivalence classes
+
+.free objects; magmas
+* members of such sets are called *generators*
+* free magma on a set of generators is the set of all bracketed words
+* another way of thinking about it, is the set of binary complete, planar, rooted trees
+
+.free objects; semigroups and monoids
+* the free monoid on a set is the monoid whose elements are all finite sequences of zero
+  or more elements from that set, with string concatenation as the monoid operation and
+  the empty string as the identity element (denoted `epsilon`)
+* the free monoid is denoted `A^*`
+* the free semigroup is the subsemigroup of all elements except `ε`, denoted `A^`+`
+
+* free monoids:
+* they are even simpler:
+** a free monoid on a set $$X$$ is the monoid of all finite strings using $$X$$ as an alphabet, with operation being concatenation
+** identity is the empty string
+** simply the set of all word, with no equivalence relations imposed
+** this is what is symbolized by the *Kleene star*
+** free semigroups are then symbolized by the *Kleene plus*
+
+.free objects; groups
+* called `F_S`
+* we add an identity element, and inverse elements for all *generators*
+* e.g. `{a,b,c}` could produce `abb^(-1)ab^(-1)ccc^(-1) = aab^(-1)c`
+* the free group of the one-element set are the integers
+
+* e.g. free groups in two generators:
+.. one starts with $$\{e, a, b, a^{-1}, b^{-1}\}$$
+*** there is not yet any assigned meaning to the letters $$a^{-1}, b^{-1}$$
+.. thus one could equally start with $$S = \{a, b, c, d, e\}$$
+*** set of all words $$W(S)$$ includes strings like "aebedce", or "abcd", etc. of arbitrary finite length with letters arranged in any order
+.. one imposes a set of equivalence relations
+*** denoting the congruence by $$\~$$, the free object is the collection of equivalence classes
+*** in this example, the free group in two generators is the quotient:
+.. $$F_2 = W(S) / \~$$ or $$F_2 = W(S) / E$$, where:
+*** $$W(S) = \{a_1, a_2, ..., a_n \| a_k \in S; n finite \}$$
+*** $$E = \{a_1, a_2, ..., a_n \| e = a_1 a_2 ... a_n ; a_k \in S; n finite \}$$
+
+.free objects; abelian group
+* basically a multiset
+* you can model the integers, complex numbers, etc. with this
+
+== Small groups
+
+:1547346993857:
+.small groups; types
+. `Zₙ`, or additive group of `ℤ/nℤ`, the *cyclic group* of order `n`
+** there is a cyclic group for every order
+. `Dihₙ`, or `D₂ₙ`, the *dihedral group* of order `2n`
+** the *Klein-four group* `K₄` is equal to `Dih₂`
+. `Dicₙ`, or `Q₄ₙ`, the *dicyclic group* of order `4n`
+** the *quaternion group* `Q₈` is equal to `Dic₂`
+. `Sₙ`, the *symmetric group* of degree `n`
+. `Aₙ`, the *alternating group* of degree `n`
+. `Eₙ`, the *elementary abelian group* of degree `n`
+
+:1547347232421:
+.small groups; order ≤ 8
+. order 1: `Z₁`
+. order 2: `Z₂ = Dih₁`
+. order 3: `Z₃ = A₃`
+. order 4: `Z₄ = Dic₁`, `Dih₂ = K₄ = Z₂×Z₂`
+. order 5: `Z₅`
+. order 6: `Z₆`, `Dih₃ = S₃`
+. order 7: `Z₇`
+. order 8: `Z₈`, `Z₂×Z₄`, `Dih₄`,  `Dic₂ = Q₈`, `E₈`
+
+.small groups; order ≤ 16
+. order 9: `Z₉`, `E₉ = Z₃×Z₃`
+. order 10: `Z₁₀`, `Dih₅`
+. order 11: `Z₁₁`
+. order 12: `Z₁₂`, `Dic₃`, `A₄`, `Dih₆`, `Z₆×Z₂`
+. order 13: `Z₁₃`
+. order 14: `Z₁₄`, `Dih₇`
+. order 15: `Z₁₅`
+. order 16: `Z₁₆`, `Z₈×Z₂`, `Z₄×Z₂²`, `Z₂⁴ = K₄²`,
+** `K₄ ⋊ Z₂`, `(Z₄ × Z₂) ⋊ Z₂`, `Z₄ ⋊ Z₄`, `Z₈ ⋊ Z₂`, `(Z₄ × Z₂) ⋊ Z₂`,
+** `Dih₈`, `QDih₈`, `Dic₄`, `Dih₄ × Z₂`, `Dic₂ × Z₂`

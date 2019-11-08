@@ -1,0 +1,205 @@
+= Automorphism groups
+
+== Automorphism groups
+
+.automorphism groups
+* an automorphism is an isomorphism from an object to itself
+** in some sense, a symmetry:
+** a way of mapping to itself, whilst preserving all structure
+* the set of all automorphism of an object forms the *automorphism group*
+
+.automorphism groups; in Set
+* called *symmetric group*
+* automorphisms are permutations
+
+.automorphism groups; in Met
+* called *isometry group*
+* automorphisms are isometries
+
+.automorphism groups; in Vect
+* called *general linear group*, `GLₙ`
+* automorphisms are bijective linear transformations
+
+.automorphism groups; in Top
+* called *homeomorphism group*
+* automorphisms are homeomorphisms
+
+== Automorphism groups: Inner, and outer automorphisms
+
+* in some categories, it is possible to separate automorphisms into two types:
+* inner automorphism `Inn(G)`
+** conjugation action by a fixed element, called the conjugating element
+* outer automorphisms, `Out(G)`
+** any automorphism, that is not inner, is outer
+
+* exact sequence
+
+== Symmetric group
+
+.symmetric groups
+* the symmetric group `S_n` on a finite set `X` is the group with:
+** elements being all *bijective function* `X → X`, called *permutations*
+** *function composition* being the group operation
+** symmetric groups are *non-abelian* for `n > 2`
+
+.symmetric groups; example of S₃
+----
+M = {a,b,c}
+S_3 = {
+  stay_same,
+  cycle_left,
+  cycle_righ,
+  switch_first_two,
+  switch_last_two,
+  switch_first_and_last }
+----
+
+== Symmetric group: Notation of permutations
+
+.Notation of a single permutation
+----
+1 stays on its place,
+2 is put to fourth place,
+3 is put two second place,
+4 is put fifth place,
+5 is put to third place
+----
+
+.with Cauchys two-line notation
+* treating permutations as functions:
+** first line shows the input order,
+** second line shows the output order
+
+----
+( (1,2,3,4,5)
+, (1,4,2,5,3) )
+----
+
+.with permutation matrix
+* alternatively, permutations can be visualized with *permutation matrices*:
+** square matrices of size n for each element of the set
+** there is one 1 in every row and column
+** they show where the elements are switched
+** arrows go from center right / left to the outer bounds
+
+----
+[ [1,0,0,0,0]
+, [0,0,0,1,0]
+, [0,1,0,0,0]
+, [0,0,0,0,1]
+, [0,0,1,0,0]
+]
+----
+
+.with cycles
+* see below
+
+== Symmetric groups: Elements
+
+.transposition
+* a permutation, which exchanges two elements and keeps the others fixed 
+* this representation is not unique
+* every permutation can be written as a product of transpositions:
+** e.g. `(1 3)` is a transposition:
+
+.transposition; example
+----
+( (1,2,3,4,5)
+, (1,4,2,5,3) )
+= (2 4) (3 2) (3 5)
+----
+
+.adjacent transposition
+* any transposition in the form `(a a`1)+
+* this representation is also not unique
+* *Bubble sort* is an application of this fact
+
+.parity of permutations
+* an *even permutation* is a permutation consisting of an even number of transpositions
+* an *odd permutation* is a permutation consisting of an odd number of transpositions
+* from this we can define a functions `sgn`
+
+----
+sgn: S_n → {+1, -1}
+sgn f ↦ +1, iff f is even
+sgn f ↦ -1, iff f is odd
+----
+
+* the kernel of this homomorphism is calle the alternating group `A_n`
+** i.e. the set of even permutations
+** a normal subgroup of the Symmetric group
+
+.cycle
+* a cycle of length `k` is a permutation, where:
+** `x, f(x), f^2(x), (f^k(x) = x)` are the only elements moved by the permutation
+** we define a cycle with e.g. `(1 3 5)`, instead of using multiple transpositions
+** order of a cycle is equal to its length
+** two cycles are disjoint, if they move disjoint subsets of elements, i.e. they commute
+* a transposition is a degenerate cycle of order 2
+
+.derangement
+* a derangement is a permutation without fixed points
+* i.e. no element appears in its original position
+* the *subfactorial* function maps `n ↦ !n`, where `!n` is:
+** the amount of derangements in `S_n`
+** as opposed to the factorial, which shows all permutations
+
+.circular permutations
+
+.order-reversing permutation
+* a permutation, that reverses the order in a symmetric group
+* can be given by n/2 transposition as `(1 n), (1 n-2), …`
+** or, given in Cauchy notation:
+
+----
+( (1 2   … n)
+, (n n-1 … 1))
+----
+
+== Conjugacy classes
+
+* correspond to the cycle structures of permutations
+* two element in S_n are conjugate, iff:
+** they consist of the same number of disjoint cycles of the same length
+
+.Example
+----
+(1 2 3)(4 5), (1 4 3)(2 5) => conjugate
+(1 2 3)(4 5), (1 2)(4 5) => not conjugate
+----
+
+* a conjugating element of S_n can be constructed in Cauchy two-line notation, by:
+** placing the cycle notations of the two conjugate elements on top of each other:
+
+----
+( (1 2 3 4 5)
+, (1 4 3 2 5))
+
+"can be written as the product of cycles:"
+
+  (2    4)
+(1 2 3)(4 5)
+  (2    4)
+= (2 4)∘(1 2 3)(4 5)∘(2 4) = (1 4 3)(2 5)
+----
+
+== Permutation group
+
+* a *permutation group* is a subgroup of the symmetric group
+* the order of a symmetric group of an underlying set `X` is `|X|!`
+
+== Alternating group
+
+* a special subgroup of the symmetric group
+
+* the group of even permutations of a finite set
+* the alternating group of a set of n elements is the alternating group of degree n
+** `A_n`
+
+* for n > 1, `A_n` is the commutator subgroup of `S_n` with index 2
+** so, it has `n!/2`
+** kernel of the signature group `S_n -> {1, -1}`
+
+== Cayley's theorem
+
+* every group `G` is isomorphic to a subgroup of the symmetric group acting on `G`

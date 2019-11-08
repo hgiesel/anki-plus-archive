@@ -1,0 +1,70 @@
+= Identitites and absorbing elements
+
+== Identities
+
+.identity
+* special element `z` for binary function, `∗: X × X → X`, i.e.
+** combining absorbing element with any element of set is absorbing element
+* can also be defined on a per element basis, i.e.
+** each element has its own identity, or only some
+
+.identity; scope
+* identity can be defined in any magma
+* unital magmas and monoids have a unique unit element
+** sometimes called the *unit* or *unit element*
+
+.identity; types
+* *left-identity*:  `∀a. ∃e. e ∗ a = a`
+* *right-identity*: `∀a. ∃e. a * e = a`
+* *identity*: `∀a. ∃e. a * e = a = a ∗ e`
+
+== Identities: Idempotence
+
+.idempotence
+* generalization of identity, i.e.
+** element is its own identity
+* necessarily an endomorphism
+
+.idempotence; notions
+. idempotent element
+. idempotent unary function
+. idempotent binary function
+
+.idempotence; idempotent element
+* `x ∗ x = x`, where `∗: X × X → X`, i.e.
+** element multiplied by itself equals itself
+** also called an *idempotent*
+
+.idempotence; *idempotent unary function*
+* `f(f(x)) = f(x) ⇔ f ∘ f = f`, where `f: X → X` i.e.
+** `f` is an idempotent element under function composition
+
+.idempotence; *idempotent binary function*
+* `∀x∈X. x ∗ x = x`, where `∗: X × X → X` i.e.
+** all elements in `X` are idempotent elements under `∗`
+
+== Identities: Involutions
+
+.involution
+* generalization of identity, i.e.
+** element is its own inverse
+* necessarily an endomorphism, and isomorphism
+
+.involution; notation
+* `x ∗ x = e`, where `∗: X × X → X`, i.e.
+** element multiplied by itself equals its identity
+
+== Absorbing elements
+
+.absorbing elements
+* special element `z` for binary function, `∗: X × X → X`, i.e.
+** combining absorbing element with any element of set is absorbing element
+* defining on a per element basis doesn't really happen
+
+.absorbing elements; alternative names
+* also called *zero element*, or *annihilating element*
+
+.absorpting elements; types of zero elements
+* *left-absorbing element*: `∀a.∃z. z ∗ a = z`
+* *right-absorbing element*: `∀a.∃z. a ∗ z = z`
+* *absorbing element*: `∀a.∃z. z ∗ a = z = a ∗ z`

@@ -1,10 +1,7 @@
 {
-  "debug": false,
-
-  "archive_root": "/Users/hgiesel/Developer/archive",
-
+  "archive_root": "/Users/yourname/Developer/archive",
   "archive_syntax": {
-    "tocs": "^README.*",
+    "tocs": "README",
     "pagerefs": "<<([^>,]+).*>>",
     "qidrefs": "^:ext:([0-9]+):(?: .*)?$",
     "headings": "^=(?: )?(.*)",
@@ -13,25 +10,43 @@
       "^(\\.[^. ]+|\\.+ .+|\\*+ .+|[^\\n\\'\":=/\\-+< ]+)"
     ]
   },
-
-  "card_sets": [{
-    "deck_name": "misc::head",
-    "model_name": "Cloze (overlapping)",
-    "quest_field": "Title",
-    "content_field": "Original",
-    "qid_regex": "^:([0-9]+):(?: .*)?",
-    "pageid_regex": "(?:.*::)?([^:]*)::([^:]*)$"
-  }],
-
-  "editor_command": [
-    "/usr/local/bin/vimr",
-    "$ROOT/$FILE",
-    "--nvim",
-    "-c",
-    "'bd!'",
-    "-c",
-    "'/^:$QUEST:.*$/'",
-    "-c",
-    "normal! zz"
-  ]
+  "card_config": {
+    "deck_name": "mydecks::archive",
+    "pageid_prefix": "",
+    "pageid_suffix": "",
+    "qid_field": "noteid",
+    "qid_use_prefill": false
+  },
+  "card_sets": [
+    {
+      "content_field": "Original",
+      "model_name": "Cloze (overlapping)",
+      "deck_subdeck": ""
+    }
+  ],
+  "commands": [
+    {
+      "type": "shell",
+      "title": "VimR",
+      "description": "Show the question in VimR",
+      "arguments": [
+        "/usr/local/bin/vimr",
+        "$ROOT/$FILE",
+        "--nvim",
+        "-c",
+        "'bd!'",
+        "-c",
+        "'/^:$QID:.*$/'",
+        "-c",
+        "normal! zz"
+      ]
+    },
+    {
+      "type": "clipboard",
+      "title": "Copy URI",
+      "description": "Copy URI to clipboard ",
+      "text": "$SECTION::$PAGE#$QID"
+    }
+  ],
+  "debug": false
 }

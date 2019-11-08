@@ -1,0 +1,111 @@
+= Programs for analyzing sockets
+:stats: transport-layer:4q75hek7,0,87
+
+== Berkeley sockets
+.Berkeley sockets header files; origin (5)
+----
+sys/socket.h -- core socket functions and data structures
+netinet/in.h -- address families and protocol families constants
+             -- includes standard port numbers and IP addresses
+sys/un.h     -- PF_UNIX and PF_LOCAL address family
+             -- for Unix domain sockets
+arpa/inet.h  -- manipulating numeric IP addresses
+netdb.h      -- translating protocol names and hostnames to numeric address
+             -- uses local data as well as name services
+----
+
+* API for Internet sockets and Unix domain sockets, used for IPC
+* originated with 4.2BSD Unix in 1983
+
+=== Connection establishment and termination API functions
+.list of connection establishment and termination function (5)
+.socket() function (3)
+socket(domain, type, protocol)::
+* creates new socket of certain socket type identified by integer number:
+** system resource allocation
+* returns -1 for error, integer for socket descriptor otherwise
+
+. `domain`:
+** +AF_INET+, +AF_INET6+, +AF_UNIX+
+. `type`:
+** e.g. +SOCK_STREAM+, +SOCK_DGRAM+, +SOCK_SEQPACKET+, +SOCK_RAW+
+. `protocol`:
+** `IPPROTO_TCP`, `IPPROTO_UDP`, `IPPROTO_DCCP`, 0 (default from domain + type)
+
+.bind() function (3)
+bind(sockfd, my_addr, addrlen)::
+* assign socket to address
+* returns -1 for error, 0 otherwise
+
+. `sockfd`:
+** socket descriptor to perform bind on
+. `my_addr`:
+** pointer to `sockaddr` structure representing address
+. `addrlen`:
+** `socklen_t` specifying size of `my_addr`
+
+.close() function
+close(fd)::
+* closes network socket
+* but also closes other connection
+
+.functions specific to connection-oriented modes (3)
+.listen() function (2)
+listen(sockfd, backlog)::
+* used on server side for connection-oriented modes:
+** i.e. `SOCK_STREAM`, `SOCK_SEQPACKET`)
+* after socket has been associated, listen() prepares for incoming connections
+* returns -1 for error, 0 otherwise
+
+. `sockfd`:
+** socket descriptor to perform listen on
+. `backlog`:
+** integer representing number of pending connections that can be queued up
+
+.connect() function
+connect(sockfd, remaddr, addrlen)::
+* used on the client side for connection-oriented modes
+* establishes direct communication link to specific remote host:
+.. for connection-oriented modes: establishes a connection
+.. for connectionless modes: defines remote address, allowing data transfer
+* returns -1 for error, 0 otherwise
+
+.accept() function (3)
+accept(sockfd, cliaddr, addrlen)::
+* used on the server side for connection-oriented modes
+* listening application must initialize connection using accept()
+* creates new socket for each connection & removes connection from listen queue
+* returns -1 for error, new socket descriptor otherwise
+
+. `sockfd`:
+** socket descriptor to listening socket
+. `cliaddr`:
+** pointer to `sockaddr` structure to receive client address
+. `addrlen`:
+** pointer to `socklen_t` to fill in length
+
+.Data transmission
+.data transmission functions; differences
+sendto()/recvfrom()::
+* used with UDP or raw sockets
+* takes parameter specifying destination address of packet
+send()/recv()::
+* used with TCP and connected UDP sockets:
+** connection has been established
+write()/read()::
+* alternative for `send`, and `recv`
+* deprecated:
+** lacks the flags parameter
+** doesn't return same set of errors
+
+TODO
+.Connection management API functions
+select()::
+poll()::
+
+getsockopt()::
+setsockopt()::
+gethostbyname()::
+gethostbyaddr()::
+getaddrinfo()::
+getnameinfo()::

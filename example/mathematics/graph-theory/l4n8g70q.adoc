@@ -1,0 +1,124 @@
+= Parts, colorings, trees
+
+== Colorings
+
+.vertex coloring
+* each vertex is assigned a color
+* the amount of colors required to color a graph is `χ(G)`
+
+.edge colorings
+* each edge is assigned a color
+* a vertex coloring of its *line graph* `L(G)`
+
+.face colorings
+* each *face* of a planar graph is a assigned a color
+* a vertex coloring of its *dual graph*
+* `χ(G)` can't be above 4
+** ∵ `K_5` cannot possible be planar
+
+.line graphs and dual graphs
+
+.signs
+
+== Trees
+
+* an undirected graph both:
+.. connected
+.. acyclic
+
+* `v_0` is defined as the *root*
+
+.Search algorithms
+
+.search algorithms
+. depth first search (DFS)
+.. preorder
+.. postorder
+.. inorder
+. breadth first search (BFS)
+* all of the searches can be done l2r, or r2l
+
+.Spanning tree
+
+a spanning tree `T` of a graph `G`, is a subgraph, which includes all vertices
+of G, with a minimum possible number of edges
+
+.minimum spanning trees
+* computational task
+
+.Djkstra's algorithm
+* you start from a certain vertex
+* you look at the weight of the different edges
+* you choose the smallest weight
+* this way you select all the smallest weight, until you cover the whole tree
+
+.Prim's algorithm
+
+.Kruskal's algorithm
+
+== Optimization problems
+
+.graph combinatorial structures optimization problems
+packing problems:: biggest, such that `⋂i = ∅`
+covering problems:: smallest, such that `⋃i = U`
+
+== Optimization problems: Covering problems
+
+.covering problems
+* asking whether a certain combinatorial structure covers another
+** or big it needs to be (minimal)
+
+.coverings; vertex cover
+* subset of vertices, such that ∀edge. ∃vertex. edge is incident to vertex
+* finding the *minimum vertex cover* is a classical problem
+
+.coverings; edge cover
+* subset of edges, such that ∀vertex. ∃edge. vertex is incident to edge
+* finding the *minimum edge cover* is a classical problem
+
+.coverings; set cover
+* generalization of edge covers, and vertex covers:
+** given a set `U`, the universe, and a subset of its powerset `S ⊆ 𝒫(U)`
+** we search for a subset of `S`, such that union is `U`
+
+== Optimization problems: Packing problems
+
+.packing problems
+* asking how to pack a structure into a container as densely as possible
+** or big it can be (maximal)
+
+.packings; matching
+* also called *vertex packing*
+* a set of edges without common vertices
+* finding the *maximum matching* is a classical problem
+
+.packings; independent set
+* also called *stable set*, or *edge packing*
+* set of vertices, where no two are adjacent or there is no edge connecting the two
+* finding the *maximum independent set* is a classical problem
+
+.packings; set packing
+* generalization of edge covers, and vertex covers:
+** given a set `U`, the universe, and a subset of its powerset `S ⊆ 𝒫(U)`
+** we search for a subset of `S`, such that intersection is `∅`
+
+== Parts
+
+* a graph whose vertices can be divided into `k` disjoint sets is *k-partite*:
+.. vertices in one set cannot be connected among each other
+.. but may be connected to vertices in others sets
+* these sets are called *parts* of the graph
+
+* called *bipartite* iff `k=2`, *tripartite* iff `k=3`, etc.
+
+.connected multipartite graphs; naming scheme
+* a multipartite graph with edges between every pair of vertices from different parts
+* have a naming scheme: `K_5`, `K_(3,3)`, etc.
+
+...images...
+
+== Weighted graphs
+
+* graphs where vertices, or edges might be associated with a value
+
+== Tensor product

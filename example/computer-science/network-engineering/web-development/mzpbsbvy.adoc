@@ -1,0 +1,268 @@
+= HTTP Methods
+:stats: web-development:mzpbsbvy,0,183
+
+== General
+
+* sequence of requests / responses
+* request methods / verbs:
+* what it means specifically depends on server
+* corresponds to file or executable on server
+* no limit on methods; you can define them yourself
+* builds on a persistent connection (TCP)
+* with 1.1 keep-alive:
+** one connection can be reused
+* HTTP is stateless, but it can be mimicked with cookies, hidden vars, etc.
+* HTTP by default doesn't send information about the origin of a request
+* a name collision describes an attempt to resolve a private name, that leaks to a public DNS
+
+* Host:
+** a host is a computer connected to a network:
+*** each has their own IP address
+*** offers information, resources, services, etc.
+*** can be identified by a domain, or an IP address
+** a port is an endpoint in an operating system:
+*** can be identified by a port number
+
+== Request message
+
+* request line
+* request header fields
+* host header
+* empty line
+* optional message body
+
+== Request methods
+
+* also called HTTP methods
+
+|---------|--------------|---------------|------|------------|-----------|
+|         | request body | response body | safe | idempotent | cacheable |
+|---------|--------------|---------------|------|------------|-----------|
+| GET     | x            | o             | o    | o          | o         |
+| HEAD    | x            | x             | o    | o          | o         |
+| OPTIONS | opt          | o             | o    | o          | x         |
+| TRACE   | x            | o             | o    | o          | x         |
+| PUT     | o            | o             | x    | x          | x         |
+| DELETE  | x            | o             | o    | o          | x         |
+| POST    | o            | o             | x    | o          | o         |
+| PATCH   | o            | o             | x    | x          | o         |
+| CONNECT | x            | o             | x    | x          | x         |
+|---------|--------------|---------------|------|------------|-----------|
+
+* `GET`    : safe
+* `HEAD`   : safe
+* `OPTIONS`: safe
+* `TRACE`  : safe
+
+* `PUT`     : idempotent
+* `DELETE`  : idempotent
+* `POST`    : unsafe
+* `PATCH`   : unsafe
+* `CONNECT` : ??
+
+- question: Are changes made to the world
+** no: safe
+** changes are done, but the function can be repeated without any further changes: idempotent
+** yes, every time it's called: unsafe
+
+
+safe method: getters, get information, querying `(f a) => a is still the same as before` i.e. `(f (f a))` is no valid expresssion or `f` is `id`
+idempotent method: setters `(f (f a)) == (f a)` or `(f a) >> (f a) == (f a)`
+unsafe method: adding `(f (f a)) /= (f a)` or `(f a) >> (f a) /= (f a)`
+
+== Same-origin policy
+
+.same-origin policy
+* permits scripts within web page access to other web page, iff *same origin*, i.e.
+.. *URI scheme*, e.g. `http` vs `https`
+.. *host name*
+.. *port number*:
+*** whether implicit vs explicit port number relevant depends on implementation
+
+.same-origin policy; what does it apply to
+* mainly to XMLHttpRequest
+** also fonts
+* images, CSS, and dynamically-loaded scripts are not subject
+
+** determines whether cross-origin requests lead to valid responses
+** which properties of the resonse are readable
+* under same-origin policy no cross-origin requests are supported
+** this is a _restriction enforced by browsers_
+* diff.:
+** *cross-origin embedding*: script tags
+** *cross-origin writes*:
+** *cross-origin reading*:
+
+.same-origin policy; methods for relaxing
+. document.domain property
+. Cross-document messaging
+. JSON-P
+. Cross-origin resource sharing
+. WebSockets
+
+== Same-origin policy: document.domain
+
+* `document.domain` can be set to a suffix of its current domain, e.g.
+** `www.example.com` and `net.example.com` are set to `example.com`:
+*** now can request each others resources
+
+* setting `document.domain` explicitly can set port to null
+** interpreted differently from explicit or implicit ports
+** ∴ must be set on both websites to enable communication
+
+== Request modes: Cross-document messaging
+
+* uses `window.postMessage(msg, targetOrigin)` function
+* others can receive message via `message` eventListener
+** document must be open within browser
+* `targetOrigin` must match origins host and protocol
+
+== Request modes: JSON-P
+
+** is replaced by CORS
+** html document is injected with `<script>` element
+*** only usable with HTTP GET method
+
+* JSON must be configured to be used for JSON-P, i.e.
+** must be wrapped with `parseJson()` and used with `eval()` in the browser, e.g.
+** instead `{ "foo": "bar", "val": 5 }`: `parseJson({ "foo": "bar", "val": 5 }`
+
+** `parseJson` must be defined within the script that uses JSON-P
+
+== Request modes: Cross-origin resource sharing (CORS)
+
+** CORS defines a alternative mode to same-origin for resource sharing in browsers:
+*** scripts must share their origin:
+**** i.e. *protocol*, *host*, and *port* must be the same
+*** this mode is enforced by browsers
+*** if they are different, following restrictions:
+**** `GET`, `HEAD`, or `POST` method
+**** standard Content-Type
+**** no custom headers
+*** if restrictions not fulfilled:
+**** browser sends CORS OPTIONS request to determine whether okay
+** *CORS OPTIONS request* includes:
+*** several headers starting with `Access-Control-*`
+*** browser does a *preflight*:
+**** sends `OPTIONS` HTTP method to server
+***** contains `Origin` header denoting host sending the request
+**** diff. further request headers:
+***** `Access-Control-Request-Method:` is method supported?
+***** `Access-Control-Request-Headers:` are headers supported?
+**** e.g. a request whether DELETE is supported:
+
+----
+OPTIONS /resource/foo
+Access-Control-Request-Method: DELETE
+Access-Control-Request-Headers: origin,x-requested-with
+Origin: http://foo.bar.org/
+----
+
+* server passes an *answer to preflight*:
+** diff. possible answers:
+*** an error page stating it doesn't support CORS
+*** response containg requests, authorization, and identity:
+**** with response with server headers, describing further procedure
+**** all of these contain comma separated lists
+**** diff. further reponse headers:
+***** `Access-Control-Allow-Origin`: hosts of origins allows; necessary
+***** `Access-Control-Allow-Methods`: HTTP methods allowed
+***** `Access-Control-Allow-Credentials`: whether server demands [credentials](###credentials)
+***** `Access-Control-Allow-Headers`: headers that need to be present
+***** `Access-Control-Expose-Headers`: ??
+***** `Access-Control-Max-Age`: ??
+** OpenID or OAuth can provide authorization
+
+== Request modes: WebSockets
+
+** not yet implemented
+** modern browsers allow connections to WebSockets without applying same-origin policy
+** uses Origin header, like CORS
+** a whole other protocol, which looks like HTTP, but behaves differently
+
+== Response message
+* status with code + message
+* response header fields
+* empty line
+* optional message body
+
+.Example message
+----
+HTTP/1.1 302 Found
+Cache-Control: private
+Content-Type: text/html; charset=UTF-8
+Location: http://www.google.de/?gfe_rd=cr&ei=AFtJWLeuLM-o8wfl9ZrIDg
+Content-Length: 258
+Date: Thu, 08 Dec 2016 13:07:12 GMT
+<html>
+<head><meta http-equiv="content-type" content="text/html;charset=utf-8">
+<title>302 Moved</title></head>
+<body>
+<h1>302 Moved</h1>
+The document has moved <a href="http://www.google.de/?gfe_rd=cr&amp;ei=AFtJWLeuLM-o8wfl9ZrIDg">here</a>.
+</body>
+</html>
+----
+
+== Status codes
+
+1xx info
+2xx success
+3xx redirection
+4xx client error
+5xx server error
+
+== Statelessness
+
+* http by default is a stateless protocol
+
+== Statelessness: Cookies
+
+.cookies
+* small piece of data sent by server and saved in server
+
+.cookies; types
+. session cookies
+. secure cookies
+. HttpOnly cookies
+. SameSite cookies
+. super cookies
+
+'''
+
+// TODO javascript/html examples setting these
+
+.cookies; *session cookie*:
+** do not have expiration date <-> persistent cookie
+** are deleted when user quits window
+
+.cookies; *secure cookie*:
+** can only be transmitted on secure channels adding “Secure” flag
+
+.cookies; *HttpOnly cookie*:
+** cannot be accessed by JavaScript client-side (avoid XSS)
+
+.cookies; *SameSite cookie*:
+** only accessable from same domain (avoid XSRF)
+
+.cookies; *Super cookie*:
+** cookies in TLD
+
+== Statelessness: Web storage
+
+* Web storage:
+** `document.localStorage`
+** `document.sessionStorage`
+* *fragment / named anchor
+* ?...=...&...=... for form elements:
+** accessed with `document.URIcomponents`
+
+
+== Tools
+
+* *curl*:
+** can be used to make HTTP requests
+** headers:
+*** `--header|-H`: used to define a header, e.g. `Host: example.com`
+*** `--data|-d`: used to send a body, e.g. for a POST request
+*** `-X`: used to define the HTTP verb

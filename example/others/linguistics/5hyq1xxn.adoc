@@ -1,0 +1,232 @@
+= Grammar
+
+== Grammar
+Grammar::
+* (the/a) set of rules for the organization of meaningful elements (morphemes) into sentences
+
+== Morphology
+
+* *internal structure* of words:
+** e.g. "bookkeppers" has four morphemes:
+*** "book", "keep", "-er", "-s"
+*** put together using morphology
+* morphological transform: book → books; is → was
+* includes:
+.. inflection
+.. clitics
+.. intonation
+
+* term "word" has no defined meaning
+* instead, two related terms are used in morphology:
+.. lexemes
+.. word forms
+
+* a lexeme is a set of inflected word forms
+** often represented in the citation form (lemma) with small capitals
+** the lexeme EAT contains the word-forms "eats, eaten, ate"
+** eat, and eater however are different lexems, as they refer to two different
+concepts
+
+* a lexicon is the collection of lexemes in a language
+
+* given lexems, you can differentiate:
+.. some morphological rules relate to different forms of the same lexeme
+*** -> *inflectional*
+*** yields variant forms of the same lexeme
+** Allomorphy:
+*** same inflections yield different results "goose,geese", etc.
+
+
+
+
+
+
+.. other rules relate to different lexems
+*** -> *word formation*
+*** e.g. dog → dog catcher
+*** forms new lexems from existent ones
+
+** this distinction is not clear cut:
+**** can change the grammatical category
+*** inflection, you can combine it with affixes
+
+
+.Types of word formation
+* *derivation*
+** involves affixing bound forms to existing lexemes
+** e.g. independent, from dependent
+** clipping, portion of a word is removed
+** blending, in which two parts of different words are blended into one
+** acronyms
+** borrowing
+** coinage, in which a new word is created to represent a new object or concept
+
+* *compounding*
+** word formation, about combining two complete words
+
+
+* a *linguistic paradigm* is a set of related word forms associated with a given
+  lexeme
+* familar examples of paradigms are conjugations of verbs, and declensions of
+  nouns
+
+== Clitics
+
+* syntactically independent but phonologically dependent, attached to a host
+* like an affix, but a syntactic role at the phrase level
+** clitics have the form of affixes, but the distribution of function words
+
+== Adpositions
+
+== Lexeme
+
+== Morphemes
+
+
+== Morphological typology
+
+* different approaches to match the different morphologies:
+
+
+.Morpheme-based morphology
+* *item-and-arrangement* approch
+* agglutanative languages
+
+* word forms ar analyzed as arrangements of morphemes
+* morpheme is defined as the minimal meaningful unit of a language
+
+* morpheme may have two meaning:
+.. Bloomfeldian: morpheme is the minimal form with meaning, but without meaning
+itself:
+*** e.g. "-s"
+.. HOckettian: morphemes are "meaning elements", not "form" elements
+*** e.g. the morpheme plural
+
+.Lexeme-based morphology
+* *item-and-process* approch
+* fusional languages
+
+** instead of analyzing a word as a set of morphemes, arranged in sequence
+*** word form is said to be the result of applying rules that a word form or
+stem in order to produce a new one
+*** inflectional rule takes a stem, changes it per requirements, and outputs a
+derived stem
+*** a compounding rule takes a word form and similarly outputs a compound stem
+
+
+.Word-based morphology
+* *word-and-paradigm* approch
+* fusional languages
+
+** takes paradigms as a central notion
+** instead of stating rules to combine morphemes into word forms, or to generate
+word forms from stems:
+*** states generalizations that hold between the forms of inflected paradigms
+*** examples to show the effectiveness, is usually fusional languages
+*** given a piece of a word, morpheme based theory would call an inflectional
+morpheme, coressonds to a combination of grammatical categories, for example
+third person plural
+
+*** no problems with this sitatuion since one that says 
+
+Inflectional morphology
+
+* affixation
+* reduplication
+* alternation
+* suprasegmental variations
+
+
+
+
+
+
+
+
+
+
+
+
+
+== Syntax
+
+* *external structure* of words
+* syntactical transform: "For me it's great" -> "It's great for me"
+* includes:
+.. word order
+.. word agreement
+
+
+
+== Types of words
+
+== Part of speech
+
+.categories of words
+.. functions words (functors)
+<->
+.. content words (lexical words)
+
+open classes <->
+closed classes
+
+== Noun phrases
+
+* possible parts:
+** determiners
+* attributive adjectives
+* adjectives phrases
+* noun adjuncts
+preop...
+
+== Verb phrases
+
+Constituency structure / Phrase structure grammars
+
+Dependency structure / Dependency grammar
+
+.nonfinite verb
+* generally not inflected by grammatical categories
+** also lack a subject dependent
+* in english:
+.. infinitives
+.. participles
+.. gerunds
+.. others: converbs, gerundives, supines
+
+.finite verb
+* do conjugation
+
+.verb catena
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+== Dependent clauses
+
+Content clauses::
+Adjective clauses/Relative clauses::
+Adverbial clauses::
+
+* conjunctions connect clauses
+* three types:
+** coordinating
+** correlative
+** subordinating
+* prepositions show connections between nouns
+
+* relative adverbs v. relative pronouns:
+** when, where v that, who
+

@@ -1,124 +1,154 @@
 # MAIN ENTRANCE FOR EVERYTHING RUN WITHIN ANKI ITSELF
+# the name "context" derives from the Anki component of this Anki addon orginally
+# being it's own addon called "Anki-context"
 import re
 import os
+from subprocess import Popen
 
-# import the main window object (mw) from aqt
 from aqt import mw
-# import the "show info" tool from utils.py
 from aqt.utils import showInfo
-# import all of the Qt GUI library
 from aqt.qt import *
-
 from anki.hooks import addHook
-from subprocess import Popen, PIPE
-from shutil     import copyfile
 
 from .util import *
 
 from . import pyperclip
 
-home = os.path.expanduser('~')
-config = mw.addonManager.getConfig(__name__)
+def on_command_replace(text, archive_root, section, page, qid):
+    for dirname, _, bases in os.walk(archive_root):
+        if os.path.basename(dirname) == section:
+            for base in bases:
+                if re.match(page, base):
 
-addon_path = os.path.abspath(os.path.dirname(__file__))
+                    return list(map(
+                        lambda x: re.sub('\$ROOT', archive_root, x), map(
+                            lambda x: re.sub('\$DIR', dirname, x), map(
+                                lambda x: re.sub('\$BASE', base, x), map(
+                                    lambda x: re.sub('\$SECTION', section, x), map(
+                                        lambda x: re.sub('\$PAGE', page, x), map(
+                                            lambda x: re.sub('\$QID', qid, x), text)))))))
 
-icon_path = os.path.join(addon_path, "../icons")
-icon_path_archive = os.path.join(icon_path, "archive.png")
+def on_command(editor, archive_root: str, card_config, comm) -> None:
+    ### get qid
+    qid_field_name = card_config['qid_field']
 
-def install_ark():
-    install_dir = os.path.join(home, '.local/bin')
-    install_path = os.path.join(install_dir, 'ark')
+    if qid_field_name:
+        try:
+            qid_field = editor.note.keys().index(qid_field_name)
+        except:
+            showInfo('Note type does not have quest field: ' + qid_field_name)
+            return None
 
-    if os.path.isdir(install_dir) and not os.path.isfile(install_path):
-        os.symlink(addon_path + '/../__init__.py', install_path)
-        os.chmod(install_path, 0o755)
+        qid_unclean = editor.note.fields[qid_field]
+        qid_regex = re.compile("^:?([0-9]+):?")
 
-# cross out the currently selected text
-def on_archive(editor):
-    found_file = False
+        try:
+            qid = re.search(qid_regex, qid_unclean).group(1) # only match inner group
+        except:
+            showInfo('Quest field %s does not contain quest tag specified by this regex: '
+                    '"^:([0-9]+):(?: .*)?"' % (card_config['qid_field']))
 
-    try:
-        quest_field_index = editor.note.keys().index(config['card_sets'][0]['quest_field'])
-    except:
-        showInfo('Note type does not have quest field: '+config['card_sets'][0]['quest_field'])
-        return
+            return None
+    else:
+        qid = str(editor.note.id)
 
-    quest_content = editor.note.fields[quest_field_index]
+    ### DEACTIVATED because:
+    ### * not really useful, and
+    ### * hard to implement because of different card sets
+    # content_field_name = card_sets[0]['content_field']
+    # try:
+    #     content_field = editor.note.keys().index(content_field_name)
+    # except:
+    #     showInfo('Note type does not have content field: ' + content_field_name)
+    #     return None
+    # content = editor.note.fields[content_field]
 
-    try:
-        quest = re.search(config['card_sets'][0]['qid_regex'], quest_content).group(1) # only match inner group
-    except:
-        showInfo('Quest field "'+ config['card_sets'][0]['quest_field'] +'" does not contain quest tag specified by this regex: "'
-                + config['card_sets'][0]['qid_regex'] + '"')
-        return
-
-    pageid_regex = re.compile(config['card_sets'][0]['pageid_regex'])
+    ### get section and page
+    pageid_prefix = card_config['pageid_prefix'] + '::' if card_config['pageid_prefix'] else ''
+    pageid_suffix = '::' + card_config['pageid_suffix'] if card_config['pageid_suffix'] else ''
+    pageid_regex = re.compile(pageid_prefix + '(?:.*::)?([^:]*)::([^:]*)' + pageid_suffix)
 
     # first tag that is found that contains a sign of being hierarchical is taken to be section
     indices = [i for i, item in enumerate(editor.note.tags) if pageid_regex.search(item)]
 
     if len(indices) == 0:
-        showInfo('Tags do not contain section tag')
-        return
+        showInfo('Tags do not contain section tag!')
+        return None
 
-    if len(indices) > 1 :
-        showInfo('Tags contain multiple viable pageids')
-        return
+    elif len(indices) != 1:
+        showInfo('''
+        Tags contain multiple viable pageids.
+        Only one tag is allowed to be hierarchical!')
+        '''.lstrip())
+        return None
 
     tag = editor.note.tags[indices[0]]
     tag_matches = pageid_regex.search(tag)
+
     section = tag_matches.group(1)
     page = tag_matches.group(2)
 
-    if config['debug']:
-        showInfo(str(
-            '$SECTION    = ' + sextion    + '\n' +
-            '$PAGE = ' + page + '\n' +
-            '$QUEST    = ' + quest    + '\n'
+    # showInfo("%s::%s#%s" % (section, page, qid))
+
+    if comm['type'] == 'shell':
+        result = on_command_replace(comm['arguments'], archive_root, section, page, qid)
+        proc = Popen(result, env={})
+
+    elif comm['type'] == 'clipboard':
+        result = on_command_replace([comm['text']], archive_root, section, page, qid)[0]
+        pyperclip.copy(result)
+
+    else:
+        showInfo('Invalid command type!')
+        return
+
+def main(config, icons):
+
+    if len(config['commands']) > 6:
+        showInfo('anki-plus-archive supports a maximum of 6 commands')
+        return
+
+    def on_command0(editor):
+        nonlocal config
+        on_command(editor, config['archive_root'], config['card_config'], config['commands'][0])
+    def on_command1(editor):
+        nonlocal config
+        on_command(editor, config['archive_root'], config['card_config'], config['commands'][1])
+    def on_command2(editor):
+        nonlocal config
+        on_command(editor, config['archive_root'], config['card_config'], config['commands'][2])
+    def on_command3(editor):
+        nonlocal config
+        on_command(editor, config['archive_root'], config['card_config'], config['commands'][3])
+    def on_command4(editor):
+        nonlocal config
+        on_command(editor, config['archive_root'], config['card_config'], config['commands'][4])
+    def on_command5(editor):
+        nonlocal config
+        on_command(editor, config['archive_root'], config['card_config'], config['commands'][5])
+
+    on_command_list = [
+        on_command0,
+        on_command1,
+        on_command2,
+        on_command3,
+        on_command4,
+        on_command5,
+    ]
+
+    def add_my_buttons(buttons, editor):
+        nonlocal config
+        nonlocal icons
+        nonlocal on_command_list
+
+        for i, command in enumerate(config['commands']):
+            editor._links[command['title']] = on_command_list[i]
+            buttons.insert(-1, editor._addButton(
+                icons[i],
+                command['title'],
+                command['description']
             ))
 
-    for root, _, files in os.walk(config['archive_root']):
-        if os.path.basename(root) == section:
-            for filename in files:
-                if re.match(page, filename):
+        return buttons
 
-                    editor_command = config['editor_command']
-
-                    lineno='1'
-                    with open(root+'/'+filename, 'r+', encoding='utf-8') as handler:
-                        for num, line in enumerate(handler, 1):
-                            if re.match(re.sub('\([^?].*\)', quest, config['card_sets'][0]['qid_regex']), line):
-                                lineno=str(num)
-
-                    if config['debug']:
-                        showInfo(str(
-                            '$ROOT   = ' + root     + '\n' +
-                            '$FILE   = ' + filename + '\n' +
-                            '$LINENO = ' + lineno   + '\n'
-                            ))
-
-                    proc = Popen(
-                    map(lambda x: re.sub('\$SECTION', section, x),
-                     map(lambda x: re.sub('\$ROOT', root, x),
-                      map(lambda x: re.sub('\$PAGE', page, x),
-                       map(lambda x: re.sub('\$FILE', filename, x),
-                        map(lambda x: re.sub('\$QUEST', quest, x),
-                         map(lambda x: re.sub('\$LINENO', lineno, x),
-                          editor_command)))))), env={})
-
-                    found_file = True
-
-    if not found_file:
-        showInfo('Nothing was found')
-
-
-def add_my_button(buttons, editor):
-    editor._links['archive'] = on_archive
-    buttons.insert(-1, editor._addButton(
-        icon_path_archive, # "/full/path/to/icon.png",
-        "archive",
-        "Query archive"))
-    return buttons
-
-addHook("setupEditorButtons", add_my_button)
-install_ark()
+    addHook("setupEditorButtons", add_my_buttons)

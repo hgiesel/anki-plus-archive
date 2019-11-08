@@ -1,0 +1,9 @@
+= Complex numbers
+
+== Complex numbers
+
+* multiplication of complex numbers is based on `Z₄`
+
+== Quaternion numbers
+
+* multiplication of quaternions is based on `Q₈ = Z₂×Z₄`

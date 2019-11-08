@@ -1,0 +1,76 @@
+= Characters
+
+== Definition
+
+.characters; definition
+* characters match a single character:
+** i.e. they have a width of one
+
+.characters; types
+. *character literals*
+. *character classes*
+.. self-defined character classes
+.. predefined character classes
+.. equivalence classes
+
+== Character literals
+
+.character literals; definition
+* matches a single character that is equal to the literal, e.g.:
+.. `a`, `B`, `%`
+.. ∃ some specials literals; e.g. `\n`, `\r`
+
+== Character classes
+
+.character classes; *self-defined character classes*
+* matches any one character out of a set
+* uses bracket notation: e.g. `[xyz]`:
+** inside bracket notation `[`, `]`, `-`, `^` and `\` are magic
+... `[` introduces a POSIX character class, or equivalence class
+... `]` terminates the character class
+... `-` is used for ranges; e.g. `a-z`, `0-9`
+... `^` is used to negate a character class (match anything but); e.g. `[^.]`
+... `\` makes a character nonmagic; no effect on already nonmagic characters
+
+'''
+
+.character classes; types of predefined classes
+. dot
+. shorthand character classes
+. POSIX character classes
+. equivalence character classes
+
+.character classes; *dot*
+* `.` is usually equal to `[^\n\r]`
+* `\_.` matches everything, i.e. matches normal dot + newline
+
+.character classes; *shorthand character classes*
+* cannot be used within bracket notation
+.. e.g. `\d` for digits, equal to `[0-9]`
+.. e.g. `\u` for upper case alphabetic characters, equal to `[A-Z]`
+.. e.g. `\l` for lower case alphabetic characters, equal to `[a-z]`
+.. e.g. `\w` for word characters, equal to `[0-9a-zA-Z]`
+
+.character classes; *POSIX character classes*
+* can only be used within bracket notation
+.. e.g. `[:alpha:]`, equal to `[A-Za-z]`
+.. e.g. `[:xdigit:]`, equal to `[0-9A-Fa-f]`
+
+.character classes; *equivalence character classes*
+* can only be used within bracket notation
+* used to match character _similar_ to a specific character
+* useful for diacritics
+.. e.g. `[=a=]` will match any of 'äàáāǎăa'
+.. e.g. `[=o=]` will match any of 'øöóǒòōo'
+
+== Unicode support
+
+.Unicode support
+* Unicode regex engines treat Unicode code points as characters
+* in Unicode there are characters that are not graphemes, e.g. U+0030:
+.. `\X` matches a single grapheme
+.. `\xFF` and `\uFFFF` match Unicode code points
+.. `\p{category_names}` are Unicode classes, that include Unicode characters
+*** e.g. `\p{lL}` matches alphabetic characters beyond ASCII
+.. equivalence classes can also be used for Unicode
+

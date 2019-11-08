@@ -1,0 +1,75 @@
+= Application layer in OSI
+:stats: transport-layer:8l5yfneg,0,56
+
+== Session layer
+.L5 protocols' service (3)
+. session management
+** session setup and torndown, checkpointing and recovery
+** multiplexing for proper combination/synchronization of different streams
+. authentication
+. authorization
+
+.OSIs L5 versus TCP/IP (2)
+.Comparison with TCP/IP
+* OSI's session management for transport protocols (TCP, SCTP) is contained in those:
+* otherwise considered to be in realm of application layer protocols
+
+== Sessions
+.L5 sessions (1-4)
+* semi-permanent dialogues between local and remote application
+.. set up at one point, torn down at a later point
+.. checkpointing and recovery of dialogues
+.. simplex, half-duplex, or full-duplex transmission of messages
+.. typically, stateful
+
+.examples of sessions (4)
+.Examples of sessions
+. HTTP sessions, which allow associating information with visitors
+. telnet remote login sessions
+. TCP session, which is synonymous to an established TCP socket
+** graceful termination of sessions is a property of TCP
+. RPC sessions
+
+== Presentation layer
+.L6; alternative name (2;1)
+* the data translator for the network:
+** lowest layer at which application programmers consider data structures
+** delivers and formats information for application layer processing or display
+** relieves L7 of dealing with data representation differences between systems
+** L7 points at data to be moved, and L6 will deal with rest
+* sometimes called the *syntax layer*
+
+.L6 services (4)
+* L6 services:
+.. data encryption/decryption
+.. data compression
+.. character/string encoding, or object representation
+*** e.g. files with different encodings, Pascal vs. C string encodings, or XML
+.. graphic handling
+
+== Application layer
+
+.L7 in TCP/IP suite and OSI model
+* application layer exists in both TCP/IP suite and OSI model:
+.. contains communication protocols and interface methods:
+*** protocol to establish host-to-host data transfer and manage data exchange
+*** no specific rules or data formats applications must consider
+.. OSI model's L7 much narrower in scope:
+*** user interface responsible for displaying received information to the user
+
+.robustness principle
+* original specification of TCP/IP suite recommends guideline for design:
+** called *robustness principle*:
+** "Be conservative in what you send, be liberal in what you accept"
+
+== Service requests
+
+.service requests
+* valid in OSI model (and to some degree in TCP/IP suite):
+** lower layers answer to service requests of upper layers
+
+.examples of service requests (4)
+. L4 asks L3 for datagrams and assembles a coherent data stream
+. L5 asks L4 for data stream filters out different sessions
+. L6 asks L5 for sessions and filters out type of data / decrypts / etc.
+. L7 asks L6 for user data in specific format and hands it to user application

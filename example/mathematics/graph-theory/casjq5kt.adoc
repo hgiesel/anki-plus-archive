@@ -1,0 +1,58 @@
+= Directed sets
+
+== Ideals and filters: Directed sets
+
+.directed sets; *upwards directed sets*
+. nonempty set, with a preorder `≤`
+. `∀x,y. ∃upper bound`, but not necessarily a least upper bound / supremum
+
+.directed sets; *downwards directed sets*
+. nonempty set, with a preorder `≤`
+. `∀x,y. ∃lower bound`, but not necessarily a greatest lower bound / infimum
+
+.directed sets; difference to semilattices
+* every meet-semilattice is a dds, but not conversely
+* every join-semilattice is a uds, but not conversely
+
+.directed sets; difference to semilattices; example
+image::https://bit.ly/2rK9bbX[Example of uds]
+
+== Ideals and filters: Lower sets and upper sets
+
+.lower sets and upper sets; *upper sets*
+* a subset `↑U` of a poset `(X,≼)`, s.t.
+** `∀x∈U. ∀y∈X. x≼y ⇒ y∈U`
+
+.lower sets and upper sets; *lower sets*
+* a subset `↓U` of a poset `(X,≼)`, s.t.
+** `∀x∈U. ∀y∈X. y≼x ⇒ y∈U`,
+
+.lower sets and upper sets; principal lower, and upper sets
+* lower, and upper sets that are derived from a single element
+
+== Ideals and filters: Ideals and filters
+
+
+.ideals and filters; ideals
+* a subset of a poset `I ⊆ P`, s.t.
+.. a lower set, a uds
+
+.ideals and filters; filters
+* the subset of a poset `I ⊆ P`, s.t.
+.. an upper set, a dds
+
+'''
+
+.ideals and filters; principal ideals, and filters
+* the lower, or upper set it is based on, is principal
+
+.ideals and filters; prime ideals, and filters
+* an ideal `U` is prime, iff
+.. the ideal is proper
+.. given x,y ∈ X, x∧y ∈ U ⇒ (x∈U) ∨ (y∈U)
+*** if `U` is a prime ideal, `P\U` is a prime filter
+*** prime filters reverse
+
+.ideals and filters; maximal ideals, and filters
+* an ideal, or filter is maximal, iff
+** no strictly greater proper ideal, or filter exists

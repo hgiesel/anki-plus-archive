@@ -2,47 +2,35 @@
 
 == Managing your archive
 
-* `ark paths`
+* `ark paths <sectionid/pageid/noteid>`
 
 Will print the files associated with a specific ark locator
-This might be directories for sections, files for pages, or 
-files and lines for quests.
+This might be directories for sections, files for pages, or
+files and lines for notes
 
-* `ark stats`
+* `ark stats <sectionid/pageid/noteid>`
+
 Will print stats for a specific ark locator.
 Section ark locators summarize the stats for pages.
 Quest ark locators have their own set of available stats.
 
-* `ark update`
-** updates vim-context to the latest release from github
+* `ark verify <pageid>`
 
-== Managing file content
+Will test the integrity of the pages provided under `<pageid>`.
 
-* `ark verify`
+* `ark headings <pageid>`
 
-* `ark headings`
-
-== Managing pagerefs
-
-* `ark tocs`
-
-* `ark refs`
-
-* `ark revrefs`
-
-== Managing quest ids
-
-* `ark qids`
-
-* `ark match`
+Will print the headings used in the file.
 
 == Interaction with Anki
 
 * `ark query`
 
+* `ark browse`
+
 * `ark add`
 
-* `ark browse`
+* `ark match`
 
 == Utilities
 

@@ -1,0 +1,77 @@
+= Transport layer in OSI
+:stats: transport-layer:1gna7qxj,0,51
+
+== Overview
+
+.overview of terms reliability, same-order delivery, connection-orientation (3)
+* reliability, and same-order delivery two wanted features for network protocols
+.. connectionless services: no same-order per se, maybe reliability
+.. connection-oriented services: same-order, maybe reliability:
+
+.purpose of transport layer (2)
+* host-to-host communication services for applications via programming interface
+* conveyed to applications via *network sockets*, identifier of process-to-process communications
+** combination of IP address and port number
+
+.L4 protocols' services (6)
+Reliability::
+Same-order delivery::
+Connection-oriented communication::
+
+Flow control::
+Congestion control::
+
+.multiplexing on the transport layer (2)
+Multiplexing::
+* provides multiple endpoints on single node under single network address
+* uses statistical multiplexing (*STDM*) of data from application processes:
+** by forming data segments, adding source and destination port numbers to each one
+
+* ! in OSI, this is part of the *session layer*
+** transport layer only provides an contextless stream of data
+
+== Reliability
+
+.reliability in network protocols; how achieved (1;2)
+* property of network protocols to wait for each transaction to finish:
+.. may be in the nature of the connection (physical link)
+.. may be emulated by some manner e.g. notifications to sender
+*** i.e. a service notifies the user whether delivery succeeded
+
+.disadvantages of reliability (1)
+* ∃ disadvantages:
+.. usually more overhead than unreliable protocols ∴ less scalable
+
+== Same-order delivery
+
+.same-order delivery for network protocols; relation to connection orientation (1-2)
+* property of network protocols to transmit data in the same order it was sent
+** connection-mode implies same-order delivery
+** ↯ does not imply reliability
+
+== Connection orientation: Connection-mode services
+
+.types of connnection-mode services (2)
+* implies either:
+.. *circuit-switched connection*
+.. *packet-switched connection in virtual circuit mode*
+
+== Connection orientation: Connectionless-mode services
+
+.connectionless-mode services (1-2)
+* provides only *best-effort*:
+.. i.e. no guarantees for packet loss, duplication, out-of-sequence delivery, etc.
+.. may be reduced by implementing error-control procedures
+
+.connectionless-mode connection (2)
+* *practical connection*, rather than logical connection:
+.. messages routed independently of other messages via destination addresses
+.. no establishment of persistent circuit required before data transmission
+.. channel becomes free after data transmission
+
+.advantages and disadvantages of connectionless-mode services (3)
+* ∃ advantages and disadvantages:
+.. have low overhead beforehand
+.. have constant overhead because of addresses
+.. allow for multicast, and broadcast
+

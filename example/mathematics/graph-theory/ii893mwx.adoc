@@ -1,0 +1,59 @@
+= Semilattice
+
+== Semilattices
+
+.semilattices; types
+. meet-semilattice
+. bounded meet-semilattice
+. join-semilattice
+. bounded join-semilattice
+
+'''
+
+.semilattices; *meet-semilattice*
+* poset where meet is a function, `∀x,y. ∃!inf({x,y})`:
+** i.e. has an *infimum* for any nonempty finite subset
+
+.semilattices; *bounded meet-semilattice*
+* a meet-semilattice with a a _least element_, or *bottom*:
+.. identity under join, `∀x. x∨⊥ = x`
+.. absorbing element under meet, `∀x. x∧⊥ = ⊥`
+
+.semilattices; *join-semilattice*
+* poset where join is a function, `∀x,y. ∃!sup{x,y}`:
+** i.e. has a *supremum* for any nonempty finite subset
+
+.semilattices; *bounded join-semilattice*
+* a join-semilattice with a _greatest element_, or *top*:
+.. identity under meet, `∀x. x∧⊤ = x`
+.. absorbing element under join, `∀x. x∨⊤ = ⊤`
+
+'''
+
+.semilattices; relation to abstract algebra 
+* semilattices can be seen as _commutative, idempotent semigroups_
+* bounded semilattices can be seen as _commutative, idempotent monoids_
+
+.semilattices; relation to each other
+* every meet-semilattice can be turned into a join-semilattice:
+** by reversing the order of the underlying poset
+** and vice versa
+
+== Lattices
+
+.lattices
+* both a meet-semilattice and join-semilattice
+* fulfills the *absorption law*, implying the idempotent laws
+
+.lattices; Absorption law
+----
+l ≡ l ∧ (l ∨ l′) ≡ l ∨ (l ∧ l′)
+----
+
+.lattices; bounded lattice
+* both a bounded meet-semilattice, and a bounded join-semilattice
+
+== Lattices: Map of lattices
+
+.lattices; map of lattices
+image::https://goo.gl/FFkbGx[]

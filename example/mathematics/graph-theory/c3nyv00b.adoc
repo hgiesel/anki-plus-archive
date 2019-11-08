@@ -1,0 +1,112 @@
+= Residuated lattices
+
+== Residuated lattice
+
+.residuated lattice; structure
+* a structure `(L,≼,⋅,I,\,/)`, that is simultanenously:
+.. a lattice `(L,≼)`
+.. a monoid `(L,⋅,I)`
+.. additionally, it has:
+*** right residual: `∀x,z. ∃x\z`
+*** left residual: `∀y,z. ∃z/y`
+
+.residuated lattice; definition one
+* such that `∀x,y,z. (x⋅y ≤ z) ⇔ (x ≤ z/y) ⇔ (y ≤ x\z)`:
+* iff commutative monoid, `\` and `/` fall together:
+** `∀x,y,z. (x⋅y ≤ z) ⇔ (x ≤ y|z) ⇔ (y ≤ x|z)`:
+
+.residuated lattice; definition two
+* monoidal multiplication, and residuals create two adjunctions:
+.. `(x⋅) ⊣ (x\)`
+.. `(⋅y) ⊣ (/y)`
+
+----
+x⋅(x\z) ≤ z ≤ x\(x⋅z)
+(z/y)⋅y ≤ z ≤ (z⋅y)/y
+----
+
+== Residuated lattices: Examples
+
+.residuated lattices; natural language
+* we translate the operators:
+.. `x⋅y` ≔ x, and then y (not commutative)
+.. `x\y` ≔ if-had x, then y
+.. `x/y` ≔ if-ever y, then x
+
+.residuated lattices; natural language; example
+----
+x ≔ bet; y ≔ win (guess correct); z ≔ rich
+x⋅y ≤ z -- bet and then win entails rich
+y ≤ x\z -- win entails if-had bet, then rich
+x ≤ z/y -- bet entails if-ever win, then rich
+----
+
+.residuated lattices; multiplication example
+----
+-- (ℤ,∣,gcd,lcm,⋅,1,/)
+x⋅y ≼ z -- e.g. 5*2 | 50
+y ≼ x\z -- e.g. 5 | 50÷2
+x ≼ z/y -- e.g. 2 | 50÷5
+----
+
+.residuated lattices; addition example
+----
+-- (ℤ,≤,min,max,+,0,−)
+x⋅y ≼ z -- e.g. 2+5 ≤ 10
+y ≼ x-z -- e.g. 5 ≤ 10-2
+x ≼ z-y -- e.g. 2 ≤ 10-5
+----
+
+== Residuated lattices: Euclidean algorithm
+
+.remainder operator
+* result takes the sign of the _dividend_
+
+.modulus operator
+* result takes the sign of the _divisor_
+
+.modulus and remainder; example
+----
+mod( 5,−2) = −1
+mod(−5, 2) =  1
+rem( 5,−2) =  1
+rem(−5, 2) = −1
+----
+
+.truncated division
+* `r = a − n⋅trunc(a⌟n)`
+
+----
+x / y = sgn(x) ⋅ |x/y|
+----
+
+* gives rise to remainder operator
+
+.floored division
+* `r = a − n⋅⌊a⌟n⌋`
+* gives rise to modulus operator
+
+.Euclidean division division
+* given `a÷n = q`, `q = ⌊a÷|n|⌋`
+* `r = a − |n|⋅⌊a⌟|n|⌋`
+* remainder is nonnegative always
+
+----
+-- given a%n=r
+r = a −  n ⋅trunc(a⌟n)
+r = a −  n ⋅⌊a⌟n⌋
+r = a − |n|⋅⌊a⌟|n|⌋
+----
+
+== Heyting algebra
+
+* a special case of a residuated lattice, where `⋄` and `∧` fall together
+* unit `I` is the top element
+* both residuals are the same operation, `x → y`
+
+* every complete, distributive lattice is a Heyting algebra
+
+== Boolean algebras
+
+// INFO everything above that is dealth with in the topic _logic_
+// INFO also see, adjunctions of category theory

@@ -1,0 +1,94 @@
+= Section, page, and note identifiers
+
+=== Section identifiers / Sectionids
+
+Section identifiers, or short *sectionids*, can either signify an individual section, or a section group
+a section corresponds to a directory in the filesystem, and contains possible pages.
+A section cannot contain another section.
+It is marked by containing a `README` file. It also may have an `assets` directory for assets.
+
+Section identifers have the form:
+
+.Section identifier
+----
+[ancestor//]section
+----
+
+=== Page identifiers / Pageids
+
+Each section can contain multiple pages. A page corresponds to a file in the filesystem.
+
+Page identifers, or short *pageids*, have the form:
+
+.Page identifier
+----
+section:page
+----
+
+=== Note identifiers / Noteids
+
+Each page can contain multiple noteids, which refer to Anki notes.
+The Anki note, in return, points to this file.
+
+Note identifers, or short noteids, have the following form:
+
+.Note identifiers
+----
+section:page#note
+----
+
+==== Example filesystem
+
+----
+archive
+├── information-security
+│   └──  cryptography
+│       ├── README.adoc
+│       ├── symmetric-key-encryption-1.adoc
+│       └── symmetric-key-encryption-2.adoc
+└── mathematics
+    ├── graph-theory
+    │   ├── README.adoc
+    │   ├── graphs-1.adoc
+    │   ├── graphs-2.adoc
+    │   └── lattices.adoc
+    └── group-theory/
+        ├── README.adoc
+        ├── groups.adoc
+        └── rings.adoc
+----
+
+.Example identifiers with sectionids
+. `(nothing)`
+** denotes the archive root under 'archive'
+. `mathematics//`
+** denotes all sections in 'mathematics'
+. `cryptography`
+** denotes the section 'cryptogrphy'
+. `mathematics//@`
+** denotes the sections 'graph-theory', and 'group-theory'
+. `@`
+** denotes all sections in the archive
+
+.Example identifiers with pageids
+. `graph-theory:graphs-1`
+** denotes page 'graphs-1.adoc'
+. `graph-theory:graphs-@`
+** denotes pages 'graphs-1.adoc', and 'graphs-2.adoc'
+. `graph-theory:@`
+** denotes pages 'graphs-1.adoc', 'graphs-2.adoc', 'lattices.adoc'
+. `in-se:sy-1`
+** denotes page 'symmetric-key-encryption-1.adoc'
+** as long as they remain uniquely identifying, you can shorten sections, pages and notes
+. `@:@`
+** denotes all files within 'archive', that are in directories together with a 'README' file
+
+.Example identifiers with noteids
+. `graph-theory:graphs-1#4`
+** denotes noteid '4' or a noteid ending in '1' in the file 'graphs-1.adoc'
+** it is not sure, whether it even exists
+. `graph-theory:graphs-1#@`
+** denotes all noteids defined within 'graphs-1.adoc'
+** might be none at all
+. `@:@#@`
+** denotes all noteids defined within the 'archive'

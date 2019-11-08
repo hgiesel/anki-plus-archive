@@ -1,0 +1,41 @@
+= Implementations
+
+== Examples of regular expression engines
+
+.Shell Glob
+* limited functionality
+* * ? [ ] ** !() ?() \*() +() @()
+
+.GNU BRE
+* metachars `[` `]` `\` `^` `$` `.`
+* `\<` `\>` word boundaries
+* `\b` `\B` word boundaries inside
+* character classes with two brackets, `\1` `\2` `\3` `\4`
+
+.GNU ERE
+* metachars: `[` `]` `\` `^` `$` `.` `|` `?` `+` `{` `}`
+* functionally equivalent
+
+.Vim regex
+* lacks `\b` and `\B`
+* forwards search `\/` for literal slash
+* backwards search `\=` for literal ?
+
+* *magic* is the amount of special characters that don't need to be escaped:
+** in magic syntaxes, many characters have a special meaning
+** in non-magic syntaxes, few charachters have special meaning
+
+:mat HighlightGroup
+
+.PCRE
+* `\d`, and syntax like `(?:)` is PCRE exclusively
+
+.JavaScript
+* functions that use RegExp
+** `.match`
+** `.replace`
+** `.search`
+** `.split`
+
+** `.exec`
+** `.test`

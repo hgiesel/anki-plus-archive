@@ -1,0 +1,129 @@
+= TCP Congestion Control in a narrow sense
+:stats: transport-layer:iz4lq9xa,0,0
+
+== Operations in TCP congestion control
+
+.operating stages in TCP congestion control (5)
+* slow start
+* linear growth
+* aimd
+* fast retransmit
+* fast recovery
+
+== Slow start
+
+.slow start
+* method of initial increase of the congestion window:
+** e.g. after a connection initializion, or timeout
+** starts with initial congestion window size (cwnd) of 1, 2, 4, or 10 MSS
+
+* for every acknowledged packet, congestion window increases by 1 MSS:
+** until `ssthresh` is reached, then enters *linear growth*
+** i.e. it doubles for every round-trip time (RTT)
+
+.slow start; disadvantages
+. assumes unacknowledged packages are due to network congestion
+** usually true, but not necessarily
+** e.g. errors in data transmission due to poor wireless reception
+. performs badly for short-lived connections
+
+== Linear growth algorithm
+
+.linear growth algorithm (3)
+* cwnd grows by `1/(cwnd window)` MSS on each ACK
+** i.e. grows by 1 MSS for every RTT
+
+* keeps growing until timeout:
+** i.e. receiver window (rwnd) is the limiting factor
+
+* if loss occurs, it is assumed, it is because network congestion:
+.. `ssthreash ≔ cwnd/2`, sstresh is set to half the congestion window size
+.. `cwnd ≔ initial_cwnd`, cwnd is reset to inital size (e.g. 1 MSS)
+.. slow start is reinitiated
+
+.Additive increase/multiplicative decrease (AIMD)
+.AIMD (3)
+* an implementation of the linear growth algorithm
+* stands for Additive increase/multiplicative decrease
+* multiple flows using AIMD congestion control eventually converge:
+** i.e. they use equal amounts of contented link
+
+* combines:
+.. linear growth of congestion window
+.. exponential reduction when congestion happens
+
+----
+w(t + 1) = { w(t) + a, if congestion occured
+           { w(t) × a, if congestion is detected
+----
+
+== Fast retransmit
+
+.TCP Fast retransmit (3)
+* enhancement to TCP, reducing time sender waits before retransmitting
+** i.e. resends before timeout
+** *DUPACKs* are the basis for the fast retransmit mechanism:
+
+* if segment in a stream lost, receiver cannot acknowledge anything above it:
+** e.g. if segment 100 lost, receiver will acknowledge 99 again
+
+* if sender receives three DUPACKs, retransmits last unacknowledged segment:
+** packet was presumed dropped anyway, sender was just waiting for its timeout
+** requires 3 DUPACKs ∴ avoids *spurious retransmissions* due to reordering
+
+.Fast recovery
+.TCP Fast recovery (2)
+* retransmits missing packet as signaled by three DUPACKs
+* waits for entire transmit window to be ACKed:
+.. if ACK, returns to congestion avoidance (i.e. no low start)
+.. if no ACK, Reno experiences a timeout and enters slow start
+
+== TCP Tahoe and Reno
+
+.compare TCP Tahoe and Reno (3)
+* named after 4.3BSD operating systems
+* both consider retransmission timeout (RTO) and duplicate ACKs (DUPACKs):
+** differ in how they react to DUPACKs
+
+.Tahoe
+** three DUPACKs are received (4 altogether) ⇒
+... Fast retransmit
+... `sthresh ≔ cwnd / 2`
+... `cwnd ≔ 1 MSS`
+... Slow start
+
+.Reno
+** three DUPACKs are received (4 altogether) ⇒
+... Fast retransmit
+... `cwnd = cwnd / 2`
+... `sthresh ≔ cwnd`
+... Fast recovery
+
+== TCP New Reno
+
+.tcp new reno
+* improves upon TCP Reno:
+** retransmission during Fast recovery phase of TCP Reno
+
+* during Fast recovery:
+.. every additional DUPACK ⇒ new unsent packet from end of cwnd is sent
+.. keeps transmit window full
+.. sender assumes ACKs point to new hole
+*** for every ACK that makes partial progress in sequence space
+.. next packet beyond ACKed sequence is sent
+
+* timeout timer resets whenever progress in transmit buffer:
+** allows New Reno to fill large holes or multiple holes
+** works much like TCP SACK
+
+.tcp new reno; problems
+* if packets are reordered by more than 3 packet sequence numbers
+** ⇒ New Reno mistakenly enters fast recovery
+* when reordered packet is delivered, ACK seqno progress occurs
+** ⇒ every bit of seqno progress produces duplicate and needless retransmission
+
+.tcp new reno; paractical use
+* TCP New Reno most commonly implemented algorithm:
+** usually with SACK support
+* nowadays Linux uses TCP BIC, and TCP CUBIC:
+** tries to find maximum where to keep window at by using a binary search algorithm

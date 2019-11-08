@@ -1,0 +1,21 @@
+= Group theory
+
+.GROUP-LIKE STRUCTURES; toc
+. <<:h971cued,Identitites and absorbing elements>>
+. <<:9cykei4e,Invertibility>>
+. <<:edq289gr,Subgroups and quotient groups>>
+
+. <<:8snpjx48,Properties>>
+. <<:ryypac4g,Kernels>>
+. <<:dd7rj5im,Group-like: Operations>>
+
+.AUTOMORPHISM GROUPS; toc
+. <<:x7ls6mbw,Automorphism groups>>
+. <<:bfdb0d00,Isometry groups>>
+. <<:rw4tchfy,Group actions>>
+
+.RING-LIKE STRUCTURES; toc
+. <<:js3lq756,Rings and fields>>
+. <<:gf6bpcd4,Domains>>
+. <<:mxockwkw,Complex numbers>>
+

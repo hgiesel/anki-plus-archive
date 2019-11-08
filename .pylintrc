@@ -1,2 +1,6 @@
+# inspired by
+# https://github.com/google/styleguide/blob/gh-pages/pyguide.md#s3.4-indentation
+
 [Master]
 init-hook='import sys; sys.path.append("/Users/hgiesel/anki-2.1.8")
+

@@ -1,0 +1,29 @@
+= Completeness
+
+== Completeness
+
+:1547303755568:
+.completeness; *complete lattice*
+* all, _not just finite_, subsets have meet and join:
+** every complete lattice is necessarily bounded
+** join of ∅ is ⊤, meet of ∅ is ⊥
+
+:1547304001480:
+.completeness; *conditionally complete lattice*
+* every nonempty subset that has an upper bound has a join
+* generalization of the completeness axiom on `ℝ`
+
+.completeness; *compact elements*
+* an element of a poset, where
+** cannot be subsumed by supremum of elements not already above
+.. `∀uds ∈ P. (∃ sup(D)) ∧ c ≤ sup(D) ⇒ c ≤ d ∀d ∈ D`
+.. ∀T⊂S⊂P. sup(S), c≼sup(S), 
+
+.completeness; compact elements; illustration
+
+== Completeness: Algebraic lattices
+
+.completeness; algebraic lattice
+* a lattice, s.t.
+.. a complete lattice
+.. s.t. every element is a join of compact elements
