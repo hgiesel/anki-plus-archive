@@ -975,7 +975,6 @@ class Identifier:
     def query(self, option=0):
 
         result = []
-        result.append('card:1')
 
         # toc in filter_component
         if ':' in self.filter_component:
