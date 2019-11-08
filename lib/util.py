@@ -26,8 +26,8 @@ ark() {
         set ''
     fi
 
-    if [[ "$1" =~ ^(-.*|paths|stats|pagerefs|revrefs|headings|verify|query|match|browse|add|decloze|stdlib)$ ]]; then
-        command ark "$@"
+    if [[ "$1" =~ ^(-.*|paths|stats|pagerefs|revpagerefs|headings|verify|query|match|browse|add|decloze|stdlib)$ ]]; then
+        command exec ark "$@"
 
     else
         arr="$(command ark paths "$1")"
@@ -44,8 +44,7 @@ ark() {
             $EDITOR "${entry}"
 
         elif [[ "${entry}" =~ ^(.*):(.*): ]]; then
-            cd "$(dirname ${entry})"
-            $EDITOR "${BASH_REMATCH[1]}" +${BASH_REMATCH[2]} -c 'normal! zz'
+            exec $EDITOR "${BASH_REMATCH[1]}" +${BASH_REMATCH[2]} -c 'normal! zz'
         fi
     fi
 }
